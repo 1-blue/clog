@@ -13,8 +13,6 @@ import { twMerge } from "tailwind-merge";
  * cn('text-sm', className) // 외부에서 전달받은 className과 병합
  * ```
  */
-const cn = (...inputs: ClassValue[]) => {
+export const cn = (...inputs: ClassValue[]) => {
   return twMerge(clsx(inputs));
 };
-
-export default cn;
