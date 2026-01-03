@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import type { Database } from "./types";
+import type { Database } from "../types";
 
 const supabaseUrl =
   process.env.NEXT_PUBLIC_SUPABASE_URL ||
@@ -24,5 +24,10 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 // Supabase 클라이언트 생성 (타입 안전성 포함)
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-  //
+  auth: {
+    flowType: "pkce",
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true,
+  },
 });
