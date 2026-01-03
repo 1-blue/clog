@@ -1,5 +1,3 @@
-import { ComponentExample } from "#/src/components/component-example";
-
 export default function Page() {
-  return <ComponentExample />;
+  return <div>메인 페이지</div>;
 }

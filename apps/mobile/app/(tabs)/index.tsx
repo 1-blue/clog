@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Text } from "react-native";
 import { WebView } from "react-native-webview";
-import { Database, supabase } from "@clog/db";
+import { Database } from "@clog/db";
+import { supabase } from "@clog/db/mobile";
 import { getBaseUrl } from "#/src/utils/getBaseUrl";
 
 export default function HomeScreen() {
