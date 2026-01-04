@@ -52,6 +52,6 @@ export const useAuth = () => {
     user,
     session,
     loading,
-    isAuthenticated: !!user,
+    isLoggedIn: !!user,
   };
 };
