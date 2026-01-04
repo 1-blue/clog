@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { getSharedMetadata } from "../libs/sharedMetadata";
+import Layout from "../components/layout/layout";
 
 const pretendard = localFont({
   src: [
@@ -63,7 +64,9 @@ const RootLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
     <html lang="ko">
       <head></head>
 
-      <body className={`${pretendard.variable} antialiased`}>{children}</body>
+      <body className={`${pretendard.variable} antialiased`}>
+        <Layout>{children}</Layout>
+      </body>
     </html>
   );
 };
