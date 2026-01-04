@@ -42,14 +42,14 @@ export default function LoginPage() {
         <CardHeader className="space-y-4 text-center">
           <div className="mx-auto">
             <Image
-              src="/images/logo.png"
-              alt="ClimbLog"
+              src="/images/common/logo.png"
+              alt="클로그"
               width={80}
               height={80}
               className="mx-auto"
             />
           </div>
-          <CardTitle className="text-3xl font-bold">ClimbLog</CardTitle>
+          <CardTitle className="text-3xl font-bold">클로그</CardTitle>
           <CardDescription className="text-base">
             클라이밍 기록을 시작하세요
           </CardDescription>
