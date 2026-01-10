@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "#/src/hooks/useAuth";
+import { useMe } from "#/src/hooks/useMe";
 import { Database } from "@clog/db";
 import { supabase } from "@clog/db/web";
 import { signOut } from "@clog/db/web";
@@ -25,20 +25,24 @@ const PageComponent: React.FC = () => {
     getGyms();
   }, []);
 
-  const { user } = useAuth();
+  const { me } = useMe();
 
-  console.log("🐬 user >> ", user);
+  console.log("🐬 me >> ", me);
 
   return (
     <div className="px-4">
       <div className="text-2xl font-bold text-blue-500">
-        User: {user?.email}
+        Profile: {me?.nickname || "No profile"}
       </div>
       <div className="text-2xl font-bold text-blue-500">
         PageComponent {gyms.map((gym) => gym.name).join(", ")}
       </div>
 
-      <button type="button" onClick={() => signOut()}>
+      <button
+        type="button"
+        onClick={() => signOut()}
+        className="cursor-pointer"
+      >
         Logout
       </button>
     </div>

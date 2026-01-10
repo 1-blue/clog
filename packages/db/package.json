@@ -14,7 +14,7 @@
   "scripts": {
     "lint": "eslint . --max-warnings 0",
     "check-types": "tsc --noEmit",
-    "gen:types": "supabase gen types typescript --project-id rckdkhohxaagllqghdvy > src/db.types.ts"
+    "gen:types": "supabase gen types typescript --project-id rckdkhohxaagllqghdvy > src/types.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.6.1",

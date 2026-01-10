@@ -168,6 +168,94 @@ export type Database = {
           },
         ];
       };
+      gym_edit_suggestion_votes: {
+        Row: {
+          created_at: string | null;
+          id: string;
+          suggestion_id: string;
+          user_id: string;
+          vote_type: string;
+        };
+        Insert: {
+          created_at?: string | null;
+          id?: string;
+          suggestion_id: string;
+          user_id: string;
+          vote_type: string;
+        };
+        Update: {
+          created_at?: string | null;
+          id?: string;
+          suggestion_id?: string;
+          user_id?: string;
+          vote_type?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "gym_edit_suggestion_votes_suggestion_id_fkey";
+            columns: ["suggestion_id"];
+            isOneToOne: false;
+            referencedRelation: "gym_edit_suggestions";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      gym_edit_suggestions: {
+        Row: {
+          admin_note: string | null;
+          created_at: string | null;
+          current_value: string | null;
+          downvotes: number | null;
+          field_name: string;
+          gym_id: string;
+          id: string;
+          reason: string | null;
+          status: string | null;
+          suggested_value: string;
+          updated_at: string | null;
+          upvotes: number | null;
+          user_id: string;
+        };
+        Insert: {
+          admin_note?: string | null;
+          created_at?: string | null;
+          current_value?: string | null;
+          downvotes?: number | null;
+          field_name: string;
+          gym_id: string;
+          id?: string;
+          reason?: string | null;
+          status?: string | null;
+          suggested_value: string;
+          updated_at?: string | null;
+          upvotes?: number | null;
+          user_id: string;
+        };
+        Update: {
+          admin_note?: string | null;
+          created_at?: string | null;
+          current_value?: string | null;
+          downvotes?: number | null;
+          field_name?: string;
+          gym_id?: string;
+          id?: string;
+          reason?: string | null;
+          status?: string | null;
+          suggested_value?: string;
+          updated_at?: string | null;
+          upvotes?: number | null;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "gym_edit_suggestions_gym_id_fkey";
+            columns: ["gym_id"];
+            isOneToOne: false;
+            referencedRelation: "gyms";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       gym_reviews: {
         Row: {
           content: string;
@@ -425,6 +513,89 @@ export type Database = {
           youtube?: string | null;
         };
         Relationships: [];
+      };
+      reports: {
+        Row: {
+          admin_note: string | null;
+          category: string;
+          created_at: string | null;
+          description: string | null;
+          id: string;
+          reason: string;
+          reporter_id: string;
+          status: string;
+          target_id: string;
+          target_type: string;
+          updated_at: string | null;
+        };
+        Insert: {
+          admin_note?: string | null;
+          category: string;
+          created_at?: string | null;
+          description?: string | null;
+          id?: string;
+          reason: string;
+          reporter_id: string;
+          status?: string;
+          target_id: string;
+          target_type: string;
+          updated_at?: string | null;
+        };
+        Update: {
+          admin_note?: string | null;
+          category?: string;
+          created_at?: string | null;
+          description?: string | null;
+          id?: string;
+          reason?: string;
+          reporter_id?: string;
+          status?: string;
+          target_id?: string;
+          target_type?: string;
+          updated_at?: string | null;
+        };
+        Relationships: [];
+      };
+      session_media: {
+        Row: {
+          created_at: string | null;
+          description: string | null;
+          id: string;
+          media_type: string;
+          media_url: string;
+          session_id: string;
+          thumbnail_url: string | null;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string | null;
+          description?: string | null;
+          id?: string;
+          media_type: string;
+          media_url: string;
+          session_id: string;
+          thumbnail_url?: string | null;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string | null;
+          description?: string | null;
+          id?: string;
+          media_type?: string;
+          media_url?: string;
+          session_id?: string;
+          thumbnail_url?: string | null;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "session_media_session_id_fkey";
+            columns: ["session_id"];
+            isOneToOne: false;
+            referencedRelation: "sessions";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       sessions: {
         Row: {
