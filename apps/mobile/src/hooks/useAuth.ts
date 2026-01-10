@@ -1,11 +1,6 @@
 import { useEffect, useState } from "react";
-import {
-  supabase,
-  getCurrentUser,
-  getSession,
-  type User,
-  type Session,
-} from "@clog/db";
+import { type User, type Session } from "@clog/db";
+import { supabase, getCurrentUser, getSession } from "@clog/db/mobile";
 
 /**
  * 현재 로그인한 사용자 정보를 가져오는 Hook (Mobile)

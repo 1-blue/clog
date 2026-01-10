@@ -1,10 +1,7 @@
 import { createBrowserClient } from "@supabase/ssr";
 import type { Database } from "../types";
 
-/**
- * 브라우저(클라이언트) 환경에서 사용하는 Supabase 클라이언트
- * @supabase/ssr을 사용하여 쿠키 기반 세션 관리
- */
+/** 브라우저(클라이언트) 환경에서 사용하는 Supabase 클라이언트 생성 함수 */
 export const createClientBrowser = () => {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
@@ -21,4 +18,5 @@ export const createClientBrowser = () => {
   return createBrowserClient<Database>(supabaseUrl, supabaseAnonKey);
 };
 
+/** 브라우저 환경에서 사용하는 Supabase 클라이언트 인스턴스 */
 export const supabase = createClientBrowser();

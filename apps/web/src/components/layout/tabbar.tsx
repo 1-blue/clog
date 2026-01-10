@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { Home, FileText, Users, Building2, User } from "lucide-react";
 import { routes } from "@clog/libs";
 import { cn } from "@clog/libs";
-import { useAuth } from "#/src/hooks/useAuth";
+import { useMe } from "#/src/hooks/useMe";
 
 interface TabItem {
   label: string;
@@ -72,9 +72,9 @@ const guestTabs: TabItem[] = [
 const Tabbar: React.FC = () => {
   const pathname = usePathname();
 
-  const { isLoggedIn } = useAuth();
+  const { me: profile } = useMe();
 
-  const tabs = isLoggedIn ? loggedInTabs : guestTabs;
+  const tabs = profile ? loggedInTabs : guestTabs;
 
   const isActive = (url: string) => {
     if (url === routes.home.url) {
