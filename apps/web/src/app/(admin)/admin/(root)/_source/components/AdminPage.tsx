@@ -7,6 +7,7 @@ import { Suspense } from "react";
 import { getThisWeekMonday, getThisWeekSunday } from "../utils";
 
 const AdminPage: React.FC = () => {
+  // ================================ section 02 ================================
   // 전체 개수
   const promiseGyms = Promise.resolve(
     supabase.from("gyms").select("*", { count: "exact", head: true })
