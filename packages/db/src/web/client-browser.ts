@@ -1,4 +1,4 @@
-import { createBrowserClient } from "@supabase/ssr";
+import { createClient } from "@supabase/supabase-js";
 import type { Database } from "../types";
 
 /** 브라우저(클라이언트) 환경에서 사용하는 Supabase 클라이언트 생성 함수 */
@@ -15,7 +15,7 @@ export const createClientBrowser = () => {
     );
   }
 
-  return createBrowserClient<Database>(supabaseUrl, supabaseAnonKey);
+  return createClient<Database>(supabaseUrl, supabaseAnonKey);
 };
 
 /** 브라우저 환경에서 사용하는 Supabase 클라이언트 인스턴스 */
