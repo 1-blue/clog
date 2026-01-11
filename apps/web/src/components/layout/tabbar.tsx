@@ -72,9 +72,9 @@ const guestTabs: TabItem[] = [
 const Tabbar: React.FC = () => {
   const pathname = usePathname();
 
-  const { me: profile } = useMe();
+  const { isLoggedIn } = useMe();
 
-  const tabs = profile ? loggedInTabs : guestTabs;
+  const tabs = isLoggedIn ? loggedInTabs : guestTabs;
 
   const isActive = (url: string) => {
     if (url === routes.home.url) {
