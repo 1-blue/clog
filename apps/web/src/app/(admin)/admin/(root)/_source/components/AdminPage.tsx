@@ -4,7 +4,10 @@ import Section02 from "./sections/section02/Section02";
 import Section03 from "./sections/Section03";
 import Section04 from "./sections/Section04";
 import { Suspense } from "react";
-import { getThisWeekMonday, getThisWeekSunday } from "../utils";
+import { startOfWeek } from "date-fns/startOfWeek";
+import { endOfWeek } from "date-fns/endOfWeek";
+
+const NOW = new Date();
 
 const AdminPage: React.FC = () => {
   // ================================ section 02 ================================
@@ -27,8 +30,8 @@ const AdminPage: React.FC = () => {
   );
 
   // 이번주 개수
-  const weekStart = getThisWeekMonday().toISOString();
-  const weekEnd = getThisWeekSunday().toISOString();
+  const weekStart = startOfWeek(NOW, { weekStartsOn: 1 });
+  const weekEnd = endOfWeek(NOW, { weekStartsOn: 1 });
 
   const promiseGymsThisWeek = Promise.resolve(
     supabase
@@ -52,6 +55,37 @@ const AdminPage: React.FC = () => {
       .lte("created_at", weekEnd)
   );
 
+  // ================================ section 04 ================================
+  // 최근 활동 (각 테이블에서 최근 10개씩 가져와서 탭별로 표시)
+  const promiseRecentGyms = Promise.resolve(
+    supabase
+      .from("gyms")
+      .select("*")
+      .order("updated_at", { ascending: false })
+      .limit(10)
+  );
+  const promiseRecentProfiles = Promise.resolve(
+    supabase
+      .from("profiles")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(10)
+  );
+  const promiseRecentCommunityPosts = Promise.resolve(
+    supabase
+      .from("community_posts")
+      .select("*")
+      .order("updated_at", { ascending: false })
+      .limit(10)
+  );
+  const promiseRecentReports = Promise.resolve(
+    supabase
+      .from("reports")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(10)
+  );
+
   return (
     <div className="flex flex-col gap-4">
       <Section01 />
@@ -68,7 +102,14 @@ const AdminPage: React.FC = () => {
         />
       </Suspense>
       <Section03 />
-      <Section04 />
+      <Suspense fallback={<div>Loading...</div>}>
+        <Section04
+          promiseGyms={promiseRecentGyms}
+          promiseProfiles={promiseRecentProfiles}
+          promiseCommunityPosts={promiseRecentCommunityPosts}
+          promiseReports={promiseRecentReports}
+        />
+      </Suspense>
     </div>
   );
 };
