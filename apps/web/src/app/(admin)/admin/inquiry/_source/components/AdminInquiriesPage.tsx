@@ -1,3 +1,4 @@
+import * as React from "react";
 import { routes } from "@clog/libs";
 
 const AdminInquiryPage: React.FC = () => {

@@ -1,9 +1,22 @@
 import Link from "next/link";
-import { Building2, MessageCircle, User } from "lucide-react";
+import {
+  Building2,
+  MessageCircle,
+  User,
+  Bell,
+  Calendar,
+  Crown,
+} from "lucide-react";
 import { routes } from "@clog/libs";
 import { cn } from "@clog/libs";
 
-type TManagementType = "gym" | "user" | "community";
+type TManagementType =
+  | "gym"
+  | "user"
+  | "community"
+  | "report"
+  | "session"
+  | "pass";
 
 interface ManagementCard {
   type: TManagementType;
@@ -53,6 +66,42 @@ const managementCards: ManagementCard[] = [
       bg: "bg-purple-50",
       icon: "text-purple-600",
       link: "text-purple-600",
+    },
+  },
+  {
+    type: "session",
+    title: "세션 관리",
+    subtitle: "전체 세션 관리",
+    route: routes.admin.session,
+    icon: Calendar,
+    colors: {
+      bg: "bg-yellow-50",
+      icon: "text-yellow-600",
+      link: "text-yellow-600",
+    },
+  },
+  {
+    type: "pass",
+    title: "회원권 관리",
+    subtitle: "회원권 및 이용권",
+    route: routes.admin.pass,
+    icon: Crown,
+    colors: {
+      bg: "bg-purple-50",
+      icon: "text-purple-600",
+      link: "text-purple-600",
+    },
+  },
+  {
+    type: "report",
+    title: "신고 관리",
+    subtitle: "사용자 신고 처리",
+    route: routes.admin.report,
+    icon: Bell,
+    colors: {
+      bg: "bg-red-50",
+      icon: "text-red-600",
+      link: "text-red-600",
     },
   },
 ];

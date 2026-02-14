@@ -1,6 +1,6 @@
 "use client";
 
-import { use } from "react";
+import * as React from "react";
 import type { Database } from "@clog/db";
 import { Building2, MessageCircle, User, Flag } from "lucide-react";
 import { cn } from "@clog/libs";
@@ -10,7 +10,12 @@ import {
   TabsList,
   TabsTrigger,
 } from "#/src/components/ui/tabs";
-import { SupabaseQueryResponse } from "#/src/types";
+import {
+  useSuspenseRecentGyms,
+  useSuspenseRecentProfiles,
+  useSuspenseRecentCommunityPosts,
+  useSuspenseRecentReports,
+} from "#/src/hooks/queries/use-admin-stats";
 import {
   formatDistanceToNow,
   compareDesc,
@@ -24,13 +29,6 @@ type Gym = Database["public"]["Tables"]["gyms"]["Row"];
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 type CommunityPost = Database["public"]["Tables"]["community_posts"]["Row"];
 type Report = Database["public"]["Tables"]["reports"]["Row"];
-
-interface RecentActivitiesProps {
-  promiseGyms: Promise<SupabaseQueryResponse<Gym[]>>;
-  promiseProfiles: Promise<SupabaseQueryResponse<Profile[]>>;
-  promiseCommunityPosts: Promise<SupabaseQueryResponse<CommunityPost[]>>;
-  promiseReports: Promise<SupabaseQueryResponse<Report[]>>;
-}
 
 // 시간 포맷 함수
 const formatTime = (timestamp: string) => {
@@ -52,16 +50,11 @@ const formatTime = (timestamp: string) => {
   return format(date, "yyyy. M. d", { locale: ko });
 };
 
-const Section04: React.FC<RecentActivitiesProps> = ({
-  promiseGyms,
-  promiseProfiles,
-  promiseCommunityPosts,
-  promiseReports,
-}) => {
-  const resultGyms = use(promiseGyms);
-  const resultProfiles = use(promiseProfiles);
-  const resultCommunityPosts = use(promiseCommunityPosts);
-  const resultReports = use(promiseReports);
+const Section04: React.FC = () => {
+  const { data: gyms } = useSuspenseRecentGyms();
+  const { data: profiles } = useSuspenseRecentProfiles();
+  const { data: communityPosts } = useSuspenseRecentCommunityPosts();
+  const { data: reports } = useSuspenseRecentReports();
 
   // 암장 활동 목록 생성 (등록, 수정)
   const gymActivities: Array<{
@@ -72,8 +65,8 @@ const Section04: React.FC<RecentActivitiesProps> = ({
     action: "created" | "updated";
   }> = [];
 
-  if (resultGyms.data) {
-    resultGyms.data.forEach((gym) => {
+  if (gyms) {
+    gyms.forEach((gym) => {
       if (gym.created_at) {
         gymActivities.push({
           id: gym.id,
@@ -107,8 +100,8 @@ const Section04: React.FC<RecentActivitiesProps> = ({
     timestamp: string;
   }> = [];
 
-  if (resultProfiles.data) {
-    resultProfiles.data.forEach((profile) => {
+  if (profiles) {
+    profiles.forEach((profile) => {
       if (profile.created_at) {
         profileActivities.push({
           id: profile.id,
@@ -129,8 +122,8 @@ const Section04: React.FC<RecentActivitiesProps> = ({
     action: "created" | "updated";
   }> = [];
 
-  if (resultCommunityPosts.data) {
-    resultCommunityPosts.data.forEach((post) => {
+  if (communityPosts) {
+    communityPosts.forEach((post) => {
       if (post.created_at) {
         communityPostActivities.push({
           id: post.id,
@@ -164,8 +157,8 @@ const Section04: React.FC<RecentActivitiesProps> = ({
     timestamp: string;
   }> = [];
 
-  if (resultReports.data) {
-    resultReports.data.forEach((report) => {
+  if (reports) {
+    reports.forEach((report) => {
       if (report.created_at) {
         reportActivities.push({
           id: report.id,
