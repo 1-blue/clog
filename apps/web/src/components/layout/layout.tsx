@@ -1,3 +1,5 @@
+"use client";
+
 import Tabbar from "./tabbar";
 
 const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {

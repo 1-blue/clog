@@ -73,5 +73,6 @@ export const useMe = () => {
   return {
     me,
     loading,
+    isLoggedIn: !!me,
   };
 };

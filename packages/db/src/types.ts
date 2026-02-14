@@ -335,7 +335,9 @@ export type Database = {
       gyms: {
         Row: {
           address: string;
+          city: Database["public"]["Enums"]["gym_city_enum"];
           created_at: string | null;
+          district: string;
           floors: number | null;
           has_cafe: boolean | null;
           has_endurance: boolean | null;
@@ -350,18 +352,26 @@ export type Database = {
           name: string;
           operating_hours: string | null;
           phone: string | null;
-          problem_types: string[] | null;
+          problem_types:
+            | Database["public"]["Enums"]["problem_type_enum"][]
+            | null;
           rating: number | null;
-          region: string;
           review_count: number | null;
           single_price: number | null;
           size_sqm: number | null;
+          status: Database["public"]["Enums"]["gym_status_enum"];
           ten_times_price: number | null;
           updated_at: string | null;
+          weekday_end: string | null;
+          weekday_start: string | null;
+          weekend_end: string | null;
+          weekend_start: string | null;
         };
         Insert: {
           address: string;
+          city: Database["public"]["Enums"]["gym_city_enum"];
           created_at?: string | null;
+          district: string;
           floors?: number | null;
           has_cafe?: boolean | null;
           has_endurance?: boolean | null;
@@ -376,18 +386,26 @@ export type Database = {
           name: string;
           operating_hours?: string | null;
           phone?: string | null;
-          problem_types?: string[] | null;
+          problem_types?:
+            | Database["public"]["Enums"]["problem_type_enum"][]
+            | null;
           rating?: number | null;
-          region: string;
           review_count?: number | null;
           single_price?: number | null;
           size_sqm?: number | null;
+          status?: Database["public"]["Enums"]["gym_status_enum"];
           ten_times_price?: number | null;
           updated_at?: string | null;
+          weekday_end?: string | null;
+          weekday_start?: string | null;
+          weekend_end?: string | null;
+          weekend_start?: string | null;
         };
         Update: {
           address?: string;
+          city?: Database["public"]["Enums"]["gym_city_enum"];
           created_at?: string | null;
+          district?: string;
           floors?: number | null;
           has_cafe?: boolean | null;
           has_endurance?: boolean | null;
@@ -402,14 +420,20 @@ export type Database = {
           name?: string;
           operating_hours?: string | null;
           phone?: string | null;
-          problem_types?: string[] | null;
+          problem_types?:
+            | Database["public"]["Enums"]["problem_type_enum"][]
+            | null;
           rating?: number | null;
-          region?: string;
           review_count?: number | null;
           single_price?: number | null;
           size_sqm?: number | null;
+          status?: Database["public"]["Enums"]["gym_status_enum"];
           ten_times_price?: number | null;
           updated_at?: string | null;
+          weekday_end?: string | null;
+          weekday_start?: string | null;
+          weekend_end?: string | null;
+          weekend_start?: string | null;
         };
         Relationships: [];
       };
@@ -665,7 +689,55 @@ export type Database = {
       [_ in never]: never;
     };
     Enums: {
-      [_ in never]: never;
+      community_post_category_enum: "question" | "tip" | "crew";
+      contact_message_status_enum: "pending" | "resolved";
+      contact_message_type_enum: "bug" | "info" | "feature" | "other";
+      gym_city_enum:
+        | "seoul"
+        | "busan"
+        | "daegu"
+        | "incheon"
+        | "daejeon"
+        | "gwangju"
+        | "ulsan"
+        | "gyeonggi"
+        | "gangwon"
+        | "chungbuk"
+        | "chungnam"
+        | "jeonbuk"
+        | "jeonnam"
+        | "gyeongbuk"
+        | "gyeongnam"
+        | "jeju";
+      gym_edit_suggestion_status_enum: "pending" | "approved" | "rejected";
+      gym_status_enum: "pending" | "active" | "rejected" | "inactive";
+      pass_type_enum: "count" | "period" | "daily";
+      problem_type_enum:
+        | "dyno"
+        | "crimpy"
+        | "balance"
+        | "slab"
+        | "overhang"
+        | "roof"
+        | "crack"
+        | "pinch"
+        | "compression"
+        | "technical"
+        | "power"
+        | "endurance"
+        | "mixed";
+      report_category_enum:
+        | "spam"
+        | "inappropriate"
+        | "fake"
+        | "harassment"
+        | "copyright"
+        | "other";
+      report_status_enum: "pending" | "reviewed" | "resolved" | "rejected";
+      report_target_type_enum: "user" | "community_post" | "gym";
+      session_condition_enum: "good" | "normal" | "bad";
+      session_media_type_enum: "image" | "video";
+      vote_type_enum: "upvote" | "downvote";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -795,6 +867,59 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      community_post_category_enum: ["question", "tip", "crew"],
+      contact_message_status_enum: ["pending", "resolved"],
+      contact_message_type_enum: ["bug", "info", "feature", "other"],
+      gym_city_enum: [
+        "seoul",
+        "busan",
+        "daegu",
+        "incheon",
+        "daejeon",
+        "gwangju",
+        "ulsan",
+        "gyeonggi",
+        "gangwon",
+        "chungbuk",
+        "chungnam",
+        "jeonbuk",
+        "jeonnam",
+        "gyeongbuk",
+        "gyeongnam",
+        "jeju",
+      ],
+      gym_edit_suggestion_status_enum: ["pending", "approved", "rejected"],
+      gym_status_enum: ["pending", "active", "rejected", "inactive"],
+      pass_type_enum: ["count", "period", "daily"],
+      problem_type_enum: [
+        "dyno",
+        "crimpy",
+        "balance",
+        "slab",
+        "overhang",
+        "roof",
+        "crack",
+        "pinch",
+        "compression",
+        "technical",
+        "power",
+        "endurance",
+        "mixed",
+      ],
+      report_category_enum: [
+        "spam",
+        "inappropriate",
+        "fake",
+        "harassment",
+        "copyright",
+        "other",
+      ],
+      report_status_enum: ["pending", "reviewed", "resolved", "rejected"],
+      report_target_type_enum: ["user", "community_post", "gym"],
+      session_condition_enum: ["good", "normal", "bad"],
+      session_media_type_enum: ["image", "video"],
+      vote_type_enum: ["upvote", "downvote"],
+    },
   },
 } as const;

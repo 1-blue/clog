@@ -1,24 +1,24 @@
-import { routes } from "@clog/libs";
-import Link from "next/link";
+import * as React from "react";
+import { Suspense } from "react";
+import Section01 from "./sections/Section01";
+import Section02 from "./sections/section02/Section02";
+import Section02Skeleton from "./sections/section02/Section02Skeleton";
+import Section03 from "./sections/Section03";
+import Section04 from "./sections/section04/Section04";
+import Section04Skeleton from "./sections/section04/Section04Skeleton";
 
 const AdminPage: React.FC = () => {
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-2">
-        <h1>/admin</h1>
-        <h1>관리자 대시보드</h1>
-      </div>
+      <Section01 />
 
-      <div className="flex flex-col gap-4">
-        <Link href={routes.admin.gym.url}>{routes.admin.gym.label}</Link>
-        <Link href={routes.admin.community.url}>
-          {routes.admin.community.label}
-        </Link>
-        <Link href={routes.admin.inquiry.url}>
-          {routes.admin.inquiry.label}
-        </Link>
-        <Link href={routes.admin.user.url}>{routes.admin.user.label}</Link>
-      </div>
+      <Suspense fallback={<Section02Skeleton />}>
+        <Section02 />
+      </Suspense>
+      <Section03 />
+      <Suspense fallback={<Section04Skeleton />}>
+        <Section04 />
+      </Suspense>
     </div>
   );
 };

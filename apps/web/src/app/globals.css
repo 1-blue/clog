@@ -136,4 +136,8 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  .clog-section {
+    @apply flex flex-col justify-center gap-2 rounded-md bg-white p-6 shadow-sm transition-shadow;
+  }
 }

@@ -12,11 +12,11 @@
   },
   "iconLibrary": "lucide",
   "aliases": {
-    "components": "#/components",
-    "utils": "@clog/libs/cn",
-    "ui": "#/components/ui",
+    "components": "#/src/components",
+    "utils": "@clog/libs",
+    "ui": "#/src/components/ui",
     "lib": "@clog/libs",
-    "hooks": "#/hooks"
+    "hooks": "#/src/hooks"
   },
   "menuColor": "default",
   "menuAccent": "subtle",

@@ -23,10 +23,41 @@ export const routes = {
       label: `관리자 암장 관리`,
       url: `/admin/gym`,
       access: "admin",
+
+      detail: {
+        label: `암장 상세`,
+        url: (gymId: string) => `/admin/gym/${gymId}`,
+        access: "admin",
+      },
+      create: {
+        label: `암장 생성`,
+        url: `/admin/gym/create`,
+        access: "admin",
+      },
+      edit: {
+        label: `암장 수정`,
+        url: (gymId: string) => `/admin/gym/${gymId}/edit`,
+        access: "admin",
+      },
     },
     user: {
       label: `관리자 유저 관리`,
       url: `/admin/user`,
+      access: "admin",
+    },
+    report: {
+      label: `관리자 신고 관리`,
+      url: `/admin/report`,
+      access: "admin",
+    },
+    session: {
+      label: `관리자 세션 관리`,
+      url: `/admin/session`,
+      access: "admin",
+    },
+    pass: {
+      label: `관리자 회원권 관리`,
+      url: `/admin/pass`,
       access: "admin",
     },
   },

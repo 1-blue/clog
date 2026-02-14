@@ -7,25 +7,21 @@
     "lint:mobile": "pnpm --filter mobile lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
-
     "build": "turbo run build",
     "build:web": "pnpm --filter web build",
     "build:mobile": "pnpm --filter mobile build",
-    
     "dev": "turbo run dev",
     "dev:web": "pnpm --filter web dev",
     "dev:mobile": "pnpm --filter mobile start",
     "dev:android": "pnpm --filter mobile android",
     "dev:ios": "pnpm --filter mobile ios",
-    
     "start": "turbo run start",
     "start:web": "pnpm --filter web start",
     "start:mobile": "pnpm --filter mobile start",
-    
     "db:gen:types": "pnpm --filter @clog/db gen:types"
   },
   "devDependencies": {
-    "prettier": "^3.7.4",
+    "prettier": "^3.8.0",
     "prettier-plugin-tailwindcss": "^0.5.11",
     "turbo": "^2.7.2",
     "typescript": "5.9.2"
