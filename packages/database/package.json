@@ -1,0 +1,26 @@
+{
+  "name": "@clog/db",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:studio": "prisma studio",
+    "clean": "rm -rf dist node_modules .turbo"
+  },
+  "dependencies": {
+    "@prisma/client": "^7.5.0"
+  },
+  "devDependencies": {
+    "@clog/typescript-config": "workspace:*",
+    "@types/node": "^20.19.37",
+    "prisma": "^7.5.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}
