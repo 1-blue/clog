@@ -14,6 +14,8 @@
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
+  --color-tertiary: var(--tertiary);
+  --color-tertiary-foreground: var(--tertiary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
@@ -24,8 +26,33 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Surface hierarchy (Material Design 3) */
+  --color-surface: var(--surface);
+  --color-surface-dim: var(--surface-dim);
+  --color-surface-bright: var(--surface-bright);
+  --color-surface-container-lowest: var(--surface-container-lowest);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-high: var(--surface-container-high);
+  --color-surface-container-highest: var(--surface-container-highest);
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-outline: var(--outline);
+  --color-outline-variant: var(--outline-variant);
+
+  /* Primary container */
+  --color-primary-container: var(--primary-container);
+  --color-on-primary-container: var(--on-primary-container);
+
+  /* Secondary container */
+  --color-secondary-container: var(--secondary-container);
+  --color-on-secondary-container: var(--on-secondary-container);
+
+  /* Tertiary container */
+  --color-tertiary-container: var(--tertiary-container);
+  --color-on-tertiary-container: var(--on-tertiary-container);
+
+  --font-sans: "Pretendard", system-ui, -apple-system, sans-serif;
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -33,52 +60,160 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* 다크 모드 (기본) */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.965 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.965 0 0);
-  --muted-foreground: oklch(0.45 0 0);
-  --accent: oklch(0.965 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --radius: 0.625rem;
+  --background: #131316;
+  --foreground: #e4e1e6;
+  --card: #1b1b1e;
+  --card-foreground: #e4e1e6;
+  --popover: #1f1f22;
+  --popover-foreground: #e4e1e6;
+  --primary: #c0c1ff;
+  --primary-foreground: #1000a9;
+  --secondary: #4edea3;
+  --secondary-foreground: #003822;
+  --tertiary: #ffb95f;
+  --tertiary-foreground: #452b00;
+  --muted: #1f1f22;
+  --muted-foreground: #908fa0;
+  --accent: #2a2a2d;
+  --accent-foreground: #e4e1e6;
+  --destructive: #ffb4ab;
+  --destructive-foreground: #690005;
+  --border: #464554;
+  --input: #464554;
+  --ring: #c0c1ff;
+  --radius: 1rem;
+
+  /* Surface hierarchy */
+  --surface: #131316;
+  --surface-dim: #131316;
+  --surface-bright: #393840;
+  --surface-container-lowest: #0e0e11;
+  --surface-container-low: #1b1b1e;
+  --surface-container: #1f1f22;
+  --surface-container-high: #2a2a2d;
+  --surface-container-highest: #353438;
+  --on-surface: #e4e1e6;
+  --on-surface-variant: #c7c4d7;
+  --outline: #908fa0;
+  --outline-variant: #464554;
+
+  /* Containers */
+  --primary-container: #8083ff;
+  --on-primary-container: #ffffff;
+  --secondary-container: #00a572;
+  --on-secondary-container: #ffffff;
+  --tertiary-container: #ca8100;
+  --on-tertiary-container: #ffffff;
 }
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
+/* 라이트 모드 */
+.light {
+  --background: #fbf8ff;
+  --foreground: #1a1b22;
+  --card: #f4f2fd;
+  --card-foreground: #1a1b22;
+  --popover: #ffffff;
+  --popover-foreground: #1a1b22;
+  --primary: #4f46e5;
+  --primary-foreground: #ffffff;
+  --secondary: #10b981;
+  --secondary-foreground: #ffffff;
+  --tertiary: #f59e0b;
+  --tertiary-foreground: #ffffff;
+  --muted: #eeedf7;
+  --muted-foreground: #777587;
+  --accent: #e8e7f1;
+  --accent-foreground: #1a1b22;
+  --destructive: #ba1a1a;
+  --destructive-foreground: #ffffff;
+  --border: #c7c4d8;
+  --input: #c7c4d8;
+  --ring: #4f46e5;
+
+  /* Surface hierarchy */
+  --surface: #fbf8ff;
+  --surface-dim: #dad9e3;
+  --surface-bright: #fbf8ff;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #f4f2fd;
+  --surface-container: #eeedf7;
+  --surface-container-high: #e8e7f1;
+  --surface-container-highest: #e3e1ec;
+  --on-surface: #1a1b22;
+  --on-surface-variant: #464555;
+  --outline: #777587;
+  --outline-variant: #c7c4d8;
+
+  /* Containers */
+  --primary-container: #e2dfff;
+  --on-primary-container: #0f0069;
+  --secondary-container: #d5e3fc;
+  --on-secondary-container: #0d1c2e;
+  --tertiary-container: #ffdf9f;
+  --on-tertiary-container: #261a00;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
+}
+
+/* 스크롤바: 평소 숨김, 스크롤 시 얇게 표시 후 자동 페이드 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+*:hover,
+*:active {
+  scrollbar-color: rgba(255 255 255 / 0.2) transparent;
+}
+
+.light *:hover,
+.light *:active {
+  scrollbar-color: rgba(0 0 0 / 0.15) transparent;
+}
+
+/* WebKit (Chrome, Safari, Edge) */
+*::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 9999px;
+  transition: background 0.3s;
+}
+
+*:hover::-webkit-scrollbar-thumb {
+  background: rgba(255 255 255 / 0.2);
+}
+
+.light *:hover::-webkit-scrollbar-thumb {
+  background: rgba(0 0 0 / 0.15);
+}
+
+/* 암장 상세 히어로 그라데이션 (스티치) */
+.kinetic-gradient {
+  background: linear-gradient(
+    180deg,
+    rgba(19, 19, 22, 0) 0%,
+    rgba(19, 19, 22, 0.4) 40%,
+    rgba(19, 19, 22, 1) 100%
+  );
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }

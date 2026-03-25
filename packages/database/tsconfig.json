@@ -1,9 +1,8 @@
 {
   "extends": "@clog/typescript-config/react-library.json",
   "compilerOptions": {
-    "outDir": "dist",
-    "rootDir": "src"
+    "noEmit": true
   },
-  "include": ["src"],
+  "include": ["src/**/*", "prisma.config.ts", "prisma/seed/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }

@@ -5,20 +5,25 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -p tsconfig.build.json",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
-    "db:seed": "tsx prisma/seed.ts",
+    "db:seed": "tsx prisma/seed/index.ts",
     "db:studio": "prisma studio",
+    "db:reset": "prisma migrate reset",
     "clean": "rm -rf dist node_modules .turbo"
   },
   "dependencies": {
-    "@prisma/client": "^7.5.0"
+    "@clog/utils": "workspace:*",
+    "@prisma/adapter-pg": "^7.5.0",
+    "@prisma/client": "^7.5.0",
+    "pg": "^8.20.0"
   },
   "devDependencies": {
     "@clog/typescript-config": "workspace:*",
     "@types/node": "^20.19.37",
+    "@types/pg": "^8.20.0",
     "prisma": "^7.5.0",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"

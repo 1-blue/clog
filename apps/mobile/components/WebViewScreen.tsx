@@ -1,9 +1,8 @@
-import { useRef, useCallback } from "react";
+import { useFocusEffect } from "expo-router";
 import { BackHandler, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { WebView } from "react-native-webview";
-import type { WebViewNavigation } from "react-native-webview";
-import { useFocusEffect } from "expo-router";
+import { WebView, type WebViewNavigation } from "react-native-webview";
+import { useCallback, useRef } from "react";
 
 import { WEB_URL } from "../constants";
 

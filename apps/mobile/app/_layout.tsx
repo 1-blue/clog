@@ -1,5 +1,5 @@
-import { LogBox } from "react-native";
 import { Stack } from "expo-router";
+import { LogBox } from "react-native";
 
 // Expo Go에서 발생하는 SplashModule 에러 무시
 // development build 또는 프로덕션에서는 발생하지 않음

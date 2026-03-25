@@ -1,0 +1,1436 @@
+openapi: 3.1.0
+info:
+  title: Clog API
+  description: 클라이밍 커뮤니티 앱 API
+  version: 1.0.0
+servers:
+  - url: /
+
+# ── paths ──────────────────────────────────────────────────────
+
+paths:
+  # ── Gyms ──
+  /api/v1/gyms:
+    get:
+      operationId: getGyms
+      summary: 암장 목록 (무한스크롤)
+      tags: [Gyms]
+      parameters:
+        - { name: cursor, in: query, schema: { type: string, format: uuid } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 50, default: 20 } }
+        - { name: region, in: query, schema: { $ref: "#/components/schemas/Region" } }
+        - { name: search, in: query, schema: { type: string } }
+        - { name: sort, in: query, schema: { type: string, enum: [name, rating, congestion, reviewCount], default: name } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    $ref: "#/components/schemas/PaginatedGymListItem"
+
+  /api/v1/gyms/{gymId}:
+    get:
+      operationId: getGym
+      summary: 암장 상세
+      tags: [Gyms]
+      parameters:
+        - { name: gymId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    $ref: "#/components/schemas/GymDetail"
+
+  /api/v1/gyms/{gymId}/check-in:
+    post:
+      operationId: checkInGym
+      summary: 암장 체크인
+      tags: [Gyms]
+      parameters:
+        - { name: gymId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [toast, payload]
+                properties:
+                  toast: { type: string }
+                  payload:
+                    $ref: "#/components/schemas/CheckInResult"
+
+  /api/v1/gyms/{gymId}/check-out:
+    post:
+      operationId: checkOutGym
+      summary: 암장 체크아웃
+      tags: [Gyms]
+      parameters:
+        - { name: gymId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [toast, payload]
+                properties:
+                  toast: { type: string }
+                  payload:
+                    $ref: "#/components/schemas/CheckOutResult"
+
+  /api/v1/gyms/{gymId}/congestion:
+    get:
+      operationId: getGymCongestion
+      summary: 시간대별 혼잡도
+      tags: [Gyms]
+      parameters:
+        - { name: gymId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/CongestionLog"
+
+  /api/v1/gyms/{gymId}/reviews:
+    get:
+      operationId: getGymReviews
+      summary: 리뷰 목록 (무한스크롤)
+      tags: [Reviews]
+      parameters:
+        - { name: gymId, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: cursor, in: query, schema: { type: string, format: uuid } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 50, default: 20 } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    $ref: "#/components/schemas/PaginatedReviewListItem"
+    post:
+      operationId: createReview
+      summary: 리뷰 작성
+      tags: [Reviews]
+      parameters:
+        - { name: gymId, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReviewBody"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [toast, payload]
+                properties:
+                  toast: { type: string }
+                  payload:
+                    $ref: "#/components/schemas/Review"
+
+  # ── Records ──
+  /api/v1/records:
+    get:
+      operationId: getRecords
+      summary: 기록 목록 (무한스크롤)
+      tags: [Records]
+      parameters:
+        - { name: cursor, in: query, schema: { type: string, format: uuid } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 50, default: 20 } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    $ref: "#/components/schemas/PaginatedRecordListItem"
+    post:
+      operationId: createRecord
+      summary: 기록 생성
+      tags: [Records]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSessionBody"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [toast, payload]
+                properties:
+                  toast: { type: string }
+                  payload:
+                    $ref: "#/components/schemas/RecordDetail"
+
+  /api/v1/records/{recordId}:
+    get:
+      operationId: getRecord
+      summary: 기록 상세
+      tags: [Records]
+      parameters:
+        - { name: recordId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    $ref: "#/components/schemas/RecordDetail"
+    patch:
+      operationId: updateRecord
+      summary: 기록 수정
+      tags: [Records]
+      parameters:
+        - { name: recordId, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSessionBody"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [toast, payload]
+                properties:
+                  toast: { type: string }
+                  payload:
+                    $ref: "#/components/schemas/RecordDetail"
+    delete:
+      operationId: deleteRecord
+      summary: 기록 삭제
+      tags: [Records]
+      parameters:
+        - { name: recordId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [toast, payload]
+                properties:
+                  toast: { type: string }
+                  payload: { type: "null" }
+
+  # ── Posts ──
+  /api/v1/posts:
+    get:
+      operationId: getPosts
+      summary: 게시글 목록 (무한스크롤)
+      tags: [Posts]
+      parameters:
+        - { name: cursor, in: query, schema: { type: string, format: uuid } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 50, default: 20 } }
+        - { name: category, in: query, schema: { $ref: "#/components/schemas/CommunityCategory" } }
+        - { name: search, in: query, schema: { type: string } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    $ref: "#/components/schemas/PaginatedPostListItem"
+    post:
+      operationId: createPost
+      summary: 게시글 작성
+      tags: [Posts]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePostBody"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [toast, payload]
+                properties:
+                  toast: { type: string }
+                  payload:
+                    $ref: "#/components/schemas/Post"
+
+  /api/v1/posts/{postId}:
+    get:
+      operationId: getPost
+      summary: 게시글 상세
+      tags: [Posts]
+      parameters:
+        - { name: postId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    $ref: "#/components/schemas/PostDetail"
+    patch:
+      operationId: updatePost
+      summary: 게시글 수정
+      tags: [Posts]
+      parameters:
+        - { name: postId, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePostBody"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [toast, payload]
+                properties:
+                  toast: { type: string }
+                  payload:
+                    $ref: "#/components/schemas/Post"
+    delete:
+      operationId: deletePost
+      summary: 게시글 삭제
+      tags: [Posts]
+      parameters:
+        - { name: postId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [toast, payload]
+                properties:
+                  toast: { type: string }
+                  payload: { type: "null" }
+
+  /api/v1/posts/{postId}/view:
+    post:
+      operationId: recordPostView
+      summary: 게시글 조회수 증가 (세션당 1회 호출 권장)
+      tags: [Posts]
+      parameters:
+        - { name: postId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    type: object
+                    required: [viewCount]
+                    properties:
+                      viewCount: { type: integer }
+
+  /api/v1/posts/{postId}/like:
+    post:
+      operationId: togglePostLike
+      summary: 좋아요 토글
+      tags: [Posts]
+      parameters:
+        - { name: postId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    type: object
+                    required: [liked]
+                    properties:
+                      liked: { type: boolean }
+
+  /api/v1/posts/{postId}/bookmark:
+    post:
+      operationId: togglePostBookmark
+      summary: 북마크 토글
+      tags: [Posts]
+      parameters:
+        - { name: postId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    type: object
+                    required: [bookmarked]
+                    properties:
+                      bookmarked: { type: boolean }
+
+  /api/v1/posts/{postId}/comments:
+    get:
+      operationId: getPostComments
+      summary: 댓글 목록 (무한스크롤)
+      tags: [Comments]
+      parameters:
+        - { name: postId, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: cursor, in: query, schema: { type: string, format: uuid } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 50, default: 20 } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    $ref: "#/components/schemas/PaginatedCommentListItem"
+    post:
+      operationId: createComment
+      summary: 댓글 작성
+      tags: [Comments]
+      parameters:
+        - { name: postId, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCommentBody"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [toast, payload]
+                properties:
+                  toast: { type: string }
+                  payload:
+                    $ref: "#/components/schemas/CommentWithAuthor"
+
+  # ── Users ──
+  /api/v1/users/me:
+    get:
+      operationId: getMe
+      summary: 내 정보
+      tags: [Users]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    $ref: "#/components/schemas/UserMe"
+    patch:
+      operationId: updateMe
+      summary: 내 정보 수정
+      tags: [Users]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserBody"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [toast, payload]
+                properties:
+                  toast: { type: string }
+                  payload:
+                    $ref: "#/components/schemas/User"
+    delete:
+      operationId: deleteMe
+      summary: 회원 탈퇴
+      tags: [Users]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [toast, payload]
+                properties:
+                  toast: { type: string }
+                  payload: { nullable: true }
+
+  /api/v1/users/me/nickname-availability:
+    get:
+      operationId: getMyNicknameAvailability
+      summary: 닉네임 사용 가능 여부 (본인 현재 닉네임 제외)
+      tags: [Users]
+      parameters:
+        - name: nickname
+          in: query
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 20 }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    type: object
+                    required: [available]
+                    properties:
+                      available: { type: boolean }
+
+  /api/v1/users/me/bookmarked-posts:
+    get:
+      operationId: getMyBookmarkedPosts
+      summary: 저장한 게시글 (무한스크롤)
+      tags: [Users]
+      parameters:
+        - { name: cursor, in: query, schema: { type: string, format: uuid } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 50, default: 20 } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    $ref: "#/components/schemas/PaginatedPostListItem"
+
+  /api/v1/users/me/liked-posts:
+    get:
+      operationId: getMyLikedPosts
+      summary: 좋아요한 게시글 (무한스크롤)
+      tags: [Users]
+      parameters:
+        - { name: cursor, in: query, schema: { type: string, format: uuid } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 50, default: 20 } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    $ref: "#/components/schemas/PaginatedPostListItem"
+
+  /api/v1/users/{userId}:
+    get:
+      operationId: getUser
+      summary: 유저 프로필
+      tags: [Users]
+      parameters:
+        - { name: userId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    $ref: "#/components/schemas/UserProfile"
+
+  /api/v1/users/{userId}/follow:
+    post:
+      operationId: toggleFollow
+      summary: 팔로우 토글
+      tags: [Users]
+      parameters:
+        - { name: userId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    type: object
+                    required: [following]
+                    properties:
+                      following: { type: boolean }
+
+  /api/v1/users/{userId}/public-records:
+    get:
+      operationId: getUserPublicRecords
+      summary: 유저 공개 기록 목록 (프로필 그리드)
+      tags: [Users]
+      parameters:
+        - { name: userId, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: cursor, in: query, schema: { type: string, format: uuid } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 50, default: 20 } }
+        - name: day
+          in: query
+          description: 방문일 필터 (yyyy-MM-dd)
+          schema: { type: string, pattern: "^\\d{4}-\\d{2}-\\d{2}$" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    $ref: "#/components/schemas/PaginatedRecordListItem"
+
+  # ── Stats ──
+  /api/v1/stats/completion-week:
+    get:
+      operationId: getCompletionWeekStats
+      summary: 최근 7일 완등 추이 (홈 차트)
+      tags: [Stats]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    type: object
+                    required: [points]
+                    properties:
+                      points:
+                        type: array
+                        items:
+                          type: object
+                          required: [date, count]
+                          properties:
+                            date: { type: string, format: date }
+                            count: { type: integer }
+
+  # ── Notifications ──
+  /api/v1/notifications:
+    get:
+      operationId: getNotifications
+      summary: 알림 목록 (무한스크롤)
+      tags: [Notifications]
+      parameters:
+        - { name: cursor, in: query, schema: { type: string, format: uuid } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 50, default: 20 } }
+        - { name: type, in: query, schema: { $ref: "#/components/schemas/NotificationType" } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    $ref: "#/components/schemas/PaginatedNotification"
+
+  /api/v1/notifications/read:
+    patch:
+      operationId: markNotificationsRead
+      summary: 알림 읽음 처리
+      tags: [Notifications]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [toast, payload]
+                properties:
+                  toast: { type: string }
+                  payload: { type: "null" }
+
+  # ── Upload ──
+  /api/v1/upload/presigned:
+    post:
+      operationId: getPresignedUrl
+      summary: S3 Presigned URL 발급
+      tags: [Upload]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [filename, contentType, type]
+              properties:
+                filename: { type: string, description: "원본 파일명 (확장자 포함)" }
+                contentType: { type: string, description: "image/* 또는 video/*" }
+                type:
+                  type: string
+                  enum: [images, videos]
+                  description: "S3 경로 세그먼트 (images | videos)"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    type: object
+                    required: [presignedUrl, publicUrl, key, bucket, type]
+                    properties:
+                      presignedUrl: { type: string }
+                      publicUrl: { type: string }
+                      key:
+                        type: string
+                        description: "{development|production}/{images|videos}/{name}_{ts}.{ext}"
+                      bucket: { type: string }
+                      type:
+                        type: string
+                        enum: [images, videos]
+
+# ── components ─────────────────────────────────────────────────
+
+components:
+  schemas:
+    # ── Enums ──
+    Region:
+      type: string
+      enum: [SEOUL, GYEONGGI, INCHEON, BUSAN, DAEGU, DAEJEON, GWANGJU, ULSAN, SEJONG, GANGWON, CHUNGBUK, CHUNGNAM, JEONBUK, JEONNAM, GYEONGBUK, GYEONGNAM, JEJU]
+    Difficulty:
+      type: string
+      enum: [V0, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V_PLUS]
+    CommunityCategory:
+      type: string
+      enum: [FREE, TIPS, REVIEW, MEETUP, GEAR]
+    NotificationType:
+      type: string
+      enum: [COMMENT, LIKE, FOLLOW, SYSTEM, GYM_UPDATE]
+    FacilityType:
+      type: string
+      enum: [PARKING, SHOWER, LOCKER, RENTAL, CAFE, WIFI, REST_AREA, TRAINING]
+    AttemptResult:
+      type: string
+      enum: [SEND, ATTEMPT, FLASH, ONSIGHT]
+    GymReviewFeature:
+      type: string
+      enum:
+        - COOL_AIR
+        - WIDE_STRETCH
+        - VARIOUS_LEVEL
+        - KIND_STAFF
+        - EASY_PARKING
+        - SHOWER_ROOM
+        - CLEAN_FACILITY
+        - GOOD_VENT
+    Role:
+      type: string
+      enum: [ADMIN, MANAGER, GUEST]
+
+    # ── Common ──
+    AuthorSummary:
+      type: object
+      required: [id, nickname, profileImage]
+      properties:
+        id: { type: string, format: uuid }
+        nickname: { type: string }
+        profileImage: { type: string, nullable: true }
+
+    # ── Gym ──
+    GymImage:
+      type: object
+      required: [id, gymId, url, order]
+      properties:
+        id: { type: string, format: uuid }
+        gymId: { type: string, format: uuid }
+        url: { type: string }
+        order: { type: integer }
+
+    GymFacility:
+      type: object
+      required: [id, gymId, type]
+      properties:
+        id: { type: string, format: uuid }
+        gymId: { type: string, format: uuid }
+        type: { $ref: "#/components/schemas/FacilityType" }
+
+    GymListItem:
+      type: object
+      required: [id, name, address, region, phone, openHours, congestion, visitorCount, visitorCapacity, latitude, longitude, description, avgRating, reviewCount, createdAt, updatedAt, facilities, images]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        address: { type: string }
+        region: { $ref: "#/components/schemas/Region" }
+        phone: { type: string, nullable: true }
+        openHours: { nullable: true }
+        congestion: { type: integer }
+        visitorCount: { type: integer, description: "현재 체크인 기준 이용 인원" }
+        visitorCapacity: { type: integer, description: "수용 인원(표시 상한)" }
+        latitude: { type: number, nullable: true }
+        longitude: { type: number, nullable: true }
+        description: { type: string, nullable: true }
+        avgRating: { type: number }
+        reviewCount: { type: integer }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        facilities:
+          type: array
+          items: { $ref: "#/components/schemas/GymFacility" }
+        images:
+          type: array
+          items: { $ref: "#/components/schemas/GymImage" }
+
+    GymDetail:
+      allOf:
+        - $ref: "#/components/schemas/GymListItem"
+        - type: object
+          properties:
+            myCheckIn:
+              type: object
+              nullable: true
+              required: [endsAt]
+              properties:
+                endsAt: { type: string, format: date-time }
+
+    CheckInResult:
+      type: object
+      required: [endsAt]
+      properties:
+        endsAt: { type: string, format: date-time }
+
+    CheckOutResult:
+      type: object
+      required: [ok]
+      properties:
+        ok: { type: boolean }
+
+    CongestionLog:
+      type: object
+      required: [id, gymId, dayOfWeek, hour, congestion]
+      properties:
+        id: { type: string, format: uuid }
+        gymId: { type: string, format: uuid }
+        dayOfWeek: { type: integer }
+        hour: { type: integer }
+        congestion: { type: integer }
+
+    PaginatedGymListItem:
+      type: object
+      required: [items, nextCursor]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/GymListItem" }
+        nextCursor: { type: string, nullable: true }
+
+    # ── Review ──
+    ReviewImage:
+      type: object
+      required: [id, reviewId, url, order]
+      properties:
+        id: { type: string, format: uuid }
+        reviewId: { type: string, format: uuid }
+        url: { type: string }
+        order: { type: integer }
+
+    Review:
+      type: object
+      required: [id, userId, gymId, rating, content, createdAt, updatedAt]
+      properties:
+        id: { type: string, format: uuid }
+        userId: { type: string, format: uuid }
+        gymId: { type: string, format: uuid }
+        rating: { type: integer }
+        content: { type: string }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    ReviewListItem:
+      type: object
+      required: [id, userId, gymId, rating, content, createdAt, updatedAt, user, features, images]
+      properties:
+        id: { type: string, format: uuid }
+        userId: { type: string, format: uuid }
+        gymId: { type: string, format: uuid }
+        rating: { type: integer }
+        content: { type: string }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        user: { $ref: "#/components/schemas/AuthorSummary" }
+        features:
+          type: array
+          items: { $ref: "#/components/schemas/GymReviewFeature" }
+        images:
+          type: array
+          items: { $ref: "#/components/schemas/ReviewImage" }
+
+    PaginatedReviewListItem:
+      type: object
+      required: [items, nextCursor]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/ReviewListItem" }
+        nextCursor: { type: string, nullable: true }
+
+    CreateReviewBody:
+      type: object
+      required: [rating, content]
+      properties:
+        rating: { type: integer, minimum: 1, maximum: 5 }
+        content: { type: string, minLength: 10, maxLength: 1000 }
+        features:
+          type: array
+          items: { $ref: "#/components/schemas/GymReviewFeature" }
+        imageUrls:
+          type: array
+          items: { type: string, format: uri }
+
+    # ── Record / Session ──
+    Route:
+      type: object
+      required: [id, sessionId, difficulty, result, attempts, memo, order]
+      properties:
+        id: { type: string, format: uuid }
+        sessionId: { type: string, format: uuid }
+        difficulty: { $ref: "#/components/schemas/Difficulty" }
+        result: { $ref: "#/components/schemas/AttemptResult" }
+        attempts: { type: integer }
+        memo: { type: string, nullable: true }
+        order: { type: integer }
+
+    SessionImage:
+      type: object
+      required: [id, sessionId, url, order]
+      properties:
+        id: { type: string, format: uuid }
+        sessionId: { type: string, format: uuid }
+        url: { type: string }
+        order: { type: integer }
+
+    GymSummary:
+      type: object
+      required: [id, name]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+
+    RecordListItem:
+      type: object
+      required: [id, userId, gymId, date, startTime, endTime, memo, isPublic, createdAt, updatedAt, gym, routes, images]
+      properties:
+        id: { type: string, format: uuid }
+        userId: { type: string, format: uuid }
+        gymId: { type: string, format: uuid }
+        date: { type: string, format: date-time }
+        startTime: { type: string, format: date-time, nullable: true }
+        endTime: { type: string, format: date-time, nullable: true }
+        memo: { type: string, nullable: true }
+        isPublic: { type: boolean }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        gym: { $ref: "#/components/schemas/GymSummary" }
+        routes:
+          type: array
+          items: { $ref: "#/components/schemas/Route" }
+        images:
+          type: array
+          items: { $ref: "#/components/schemas/SessionImage" }
+
+    RecordDetail:
+      type: object
+      required: [id, userId, gymId, date, startTime, endTime, memo, isPublic, createdAt, updatedAt, gym, routes, images, user]
+      properties:
+        id: { type: string, format: uuid }
+        userId: { type: string, format: uuid }
+        gymId: { type: string, format: uuid }
+        date: { type: string, format: date-time }
+        startTime: { type: string, format: date-time, nullable: true }
+        endTime: { type: string, format: date-time, nullable: true }
+        memo: { type: string, nullable: true }
+        isPublic: { type: boolean }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        gym:
+          type: object
+          required: [id, name, address]
+          properties:
+            id: { type: string, format: uuid }
+            name: { type: string }
+            address: { type: string }
+        routes:
+          type: array
+          items: { $ref: "#/components/schemas/Route" }
+        images:
+          type: array
+          items: { $ref: "#/components/schemas/SessionImage" }
+        user: { $ref: "#/components/schemas/AuthorSummary" }
+
+    PaginatedRecordListItem:
+      type: object
+      required: [items, nextCursor]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/RecordListItem" }
+        nextCursor: { type: string, nullable: true }
+
+    CreateRouteBody:
+      type: object
+      required: [difficulty, result]
+      properties:
+        difficulty: { $ref: "#/components/schemas/Difficulty" }
+        result: { $ref: "#/components/schemas/AttemptResult" }
+        attempts: { type: integer, minimum: 1, default: 1 }
+        memo: { type: string, maxLength: 200 }
+
+    CreateSessionBody:
+      type: object
+      required: [gymId, date, routes]
+      properties:
+        gymId: { type: string, format: uuid }
+        date: { type: string, format: date-time }
+        startTime: { type: string, format: date-time }
+        endTime: { type: string, format: date-time }
+        memo: { type: string, maxLength: 500 }
+        isPublic: { type: boolean, default: true }
+        routes:
+          type: array
+          minItems: 1
+          items: { $ref: "#/components/schemas/CreateRouteBody" }
+        imageUrls:
+          type: array
+          items: { type: string, format: uri }
+
+    UpdateSessionBody:
+      type: object
+      properties:
+        date: { type: string, format: date-time }
+        startTime: { type: string, format: date-time }
+        endTime: { type: string, format: date-time }
+        memo: { type: string, maxLength: 500, nullable: true }
+        isPublic: { type: boolean }
+        routes:
+          type: array
+          items: { $ref: "#/components/schemas/CreateRouteBody" }
+        imageUrls:
+          type: array
+          items: { type: string, format: uri }
+
+    # ── Post ──
+    PostTag:
+      type: object
+      required: [id, postId, name]
+      properties:
+        id: { type: string, format: uuid }
+        postId: { type: string, format: uuid }
+        name: { type: string }
+
+    PostImage:
+      type: object
+      required: [id, postId, url, order]
+      properties:
+        id: { type: string, format: uuid }
+        postId: { type: string, format: uuid }
+        url: { type: string }
+        order: { type: integer }
+
+    Post:
+      type: object
+      required: [id, authorId, category, title, content, viewCount, likeCount, commentCount, createdAt, updatedAt]
+      properties:
+        id: { type: string, format: uuid }
+        authorId: { type: string, format: uuid }
+        category: { $ref: "#/components/schemas/CommunityCategory" }
+        title: { type: string }
+        content: { type: string }
+        viewCount: { type: integer }
+        likeCount: { type: integer }
+        commentCount: { type: integer }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    PostListItem:
+      type: object
+      required: [id, authorId, category, title, content, viewCount, likeCount, commentCount, createdAt, updatedAt, author, tags, images]
+      properties:
+        id: { type: string, format: uuid }
+        authorId: { type: string, format: uuid }
+        category: { $ref: "#/components/schemas/CommunityCategory" }
+        title: { type: string }
+        content: { type: string }
+        viewCount: { type: integer }
+        likeCount: { type: integer }
+        commentCount: { type: integer }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        author: { $ref: "#/components/schemas/AuthorSummary" }
+        tags:
+          type: array
+          items: { $ref: "#/components/schemas/PostTag" }
+        images:
+          type: array
+          items: { $ref: "#/components/schemas/PostImage" }
+        likes:
+          type: array
+          items:
+            type: object
+            required: [id]
+            properties:
+              id: { type: string, format: uuid }
+        bookmarks:
+          type: array
+          items:
+            type: object
+            required: [id]
+            properties:
+              id: { type: string, format: uuid }
+
+    PostDetail:
+      type: object
+      required: [id, authorId, category, title, content, viewCount, likeCount, commentCount, createdAt, updatedAt, author, tags, images]
+      properties:
+        id: { type: string, format: uuid }
+        authorId: { type: string, format: uuid }
+        category: { $ref: "#/components/schemas/CommunityCategory" }
+        title: { type: string }
+        content: { type: string }
+        viewCount: { type: integer }
+        likeCount: { type: integer }
+        commentCount: { type: integer }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        author: { $ref: "#/components/schemas/AuthorSummary" }
+        tags:
+          type: array
+          items: { $ref: "#/components/schemas/PostTag" }
+        images:
+          type: array
+          items: { $ref: "#/components/schemas/PostImage" }
+        likes:
+          type: array
+          items:
+            type: object
+            required: [id]
+            properties:
+              id: { type: string, format: uuid }
+        bookmarks:
+          type: array
+          items:
+            type: object
+            required: [id]
+            properties:
+              id: { type: string, format: uuid }
+
+    PaginatedPostListItem:
+      type: object
+      required: [items, nextCursor]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/PostListItem" }
+        nextCursor: { type: string, nullable: true }
+
+    CreatePostBody:
+      type: object
+      required: [category, title, content]
+      properties:
+        category: { $ref: "#/components/schemas/CommunityCategory" }
+        title: { type: string, minLength: 2, maxLength: 100 }
+        content: { type: string, minLength: 10, maxLength: 5000 }
+        tags:
+          type: array
+          maxItems: 5
+          items: { type: string, maxLength: 20 }
+        imageUrls:
+          type: array
+          maxItems: 10
+          items: { type: string, format: uri }
+
+    UpdatePostBody:
+      type: object
+      properties:
+        title: { type: string, minLength: 2, maxLength: 100 }
+        content: { type: string, minLength: 10, maxLength: 5000 }
+        category: { $ref: "#/components/schemas/CommunityCategory" }
+        tags:
+          type: array
+          maxItems: 5
+          items: { type: string, maxLength: 20 }
+        imageUrls:
+          type: array
+          maxItems: 10
+          items: { type: string, format: uri }
+
+    # ── Comment ──
+    CommentWithAuthor:
+      type: object
+      required: [id, postId, authorId, parentId, content, createdAt, updatedAt, author]
+      properties:
+        id: { type: string, format: uuid }
+        postId: { type: string, format: uuid }
+        authorId: { type: string, format: uuid }
+        parentId: { type: string, format: uuid, nullable: true }
+        content: { type: string }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        author: { $ref: "#/components/schemas/AuthorSummary" }
+
+    CommentListItem:
+      type: object
+      required: [id, postId, authorId, parentId, content, createdAt, updatedAt, author, replies]
+      properties:
+        id: { type: string, format: uuid }
+        postId: { type: string, format: uuid }
+        authorId: { type: string, format: uuid }
+        parentId: { type: string, format: uuid, nullable: true }
+        content: { type: string }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        author: { $ref: "#/components/schemas/AuthorSummary" }
+        replies:
+          type: array
+          items: { $ref: "#/components/schemas/CommentWithAuthor" }
+
+    PaginatedCommentListItem:
+      type: object
+      required: [items, nextCursor]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/CommentListItem" }
+        nextCursor: { type: string, nullable: true }
+
+    CreateCommentBody:
+      type: object
+      required: [content]
+      properties:
+        content: { type: string, minLength: 1, maxLength: 1000 }
+        parentId: { type: string, format: uuid }
+
+    # ── User ──
+    User:
+      type: object
+      required: [id, email, nickname, bio, profileImage, coverImage, instagramId, youtubeUrl, maxDifficulty, role, createdAt, updatedAt]
+      properties:
+        id: { type: string, format: uuid }
+        email: { type: string, format: email }
+        nickname: { type: string }
+        bio: { type: string, nullable: true }
+        profileImage: { type: string, nullable: true }
+        coverImage: { type: string, nullable: true }
+        instagramId: { type: string, nullable: true }
+        youtubeUrl: { type: string, nullable: true }
+        maxDifficulty: { $ref: "#/components/schemas/Difficulty", nullable: true }
+        role: { $ref: "#/components/schemas/Role" }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    UserCounts:
+      type: object
+      required: [following, followers, sessions]
+      properties:
+        following: { type: integer }
+        followers: { type: integer }
+        sessions: { type: integer }
+
+    ActiveCheckIn:
+      type: object
+      required: [id, gymId, gymName, startedAt, endsAt]
+      properties:
+        id: { type: string, format: uuid }
+        gymId: { type: string, format: uuid }
+        gymName: { type: string }
+        startedAt: { type: string, format: date-time }
+        endsAt: { type: string, format: date-time }
+
+    UserMe:
+      type: object
+      required: [id, email, nickname, bio, profileImage, coverImage, instagramId, youtubeUrl, maxDifficulty, role, createdAt, updatedAt, _count, visitCount, sendCount, checkInAutoDurationMinutes, linkedProviders, activeCheckIn]
+      properties:
+        id: { type: string, format: uuid }
+        email: { type: string, format: email }
+        nickname: { type: string }
+        bio: { type: string, nullable: true }
+        profileImage: { type: string, nullable: true }
+        coverImage: { type: string, nullable: true }
+        instagramId: { type: string, nullable: true }
+        youtubeUrl: { type: string, nullable: true }
+        maxDifficulty: { $ref: "#/components/schemas/Difficulty", nullable: true }
+        role: { $ref: "#/components/schemas/Role" }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        _count: { $ref: "#/components/schemas/UserCounts" }
+        visitCount: { type: integer, description: "방문한 서로 다른 암장 수" }
+        sendCount: { type: integer, description: "완등(SEND) 누적" }
+        checkInAutoDurationMinutes:
+          type: integer
+          minimum: 30
+          maximum: 720
+          description: "체크인 후 자동 체크아웃까지 분 (기본 240)"
+        linkedProviders:
+          type: array
+          description: "Supabase에 연결된 소셜 로그인 (카카오·구글)"
+          items:
+            type: string
+            enum: [KAKAO, GOOGLE]
+        activeCheckIn:
+          nullable: true
+          allOf:
+            - $ref: "#/components/schemas/ActiveCheckIn"
+
+    UserProfile:
+      type: object
+      required: [id, nickname, bio, profileImage, coverImage, instagramId, youtubeUrl, maxDifficulty, createdAt, _count, visitCount, sendCount, activityHeatmap, activityHeatmapDays]
+      properties:
+        id: { type: string, format: uuid }
+        nickname: { type: string }
+        bio: { type: string, nullable: true }
+        profileImage: { type: string, nullable: true }
+        coverImage: { type: string, nullable: true }
+        instagramId: { type: string, nullable: true }
+        youtubeUrl: { type: string, nullable: true }
+        maxDifficulty: { $ref: "#/components/schemas/Difficulty", nullable: true }
+        createdAt: { type: string, format: date-time }
+        _count: { $ref: "#/components/schemas/UserCounts" }
+        visitCount: { type: integer }
+        sendCount: { type: integer }
+        activityHeatmap:
+          type: array
+          items: { type: integer, minimum: 0, maximum: 4 }
+          description: "최근 20주×7일 활동 강도 (0~4)"
+        activityHeatmapDays:
+          type: array
+          items: { type: string, format: date }
+          description: "각 히트맵 셀 날짜 (yyyy-MM-dd), activityHeatmap과 동일 순서"
+        followers:
+          type: array
+          items:
+            type: object
+            required: [id]
+            properties:
+              id: { type: string, format: uuid }
+
+    UpdateUserBody:
+      type: object
+      properties:
+        nickname: { type: string, minLength: 1, maxLength: 20 }
+        bio: { type: string, maxLength: 200 }
+        profileImage: { type: string, format: uri }
+        coverImage: { type: string, format: uri }
+        instagramId: { type: string, maxLength: 50 }
+        youtubeUrl: { type: string, format: uri, maxLength: 200 }
+        maxDifficulty: { $ref: "#/components/schemas/Difficulty" }
+        checkInAutoDurationMinutes:
+          type: integer
+          minimum: 30
+          maximum: 720
+          description: "체크인 후 자동 체크아웃까지 분"
+
+    # ── Notification ──
+    Notification:
+      type: object
+      required: [id, userId, type, title, message, isRead, link, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        userId: { type: string, format: uuid }
+        type: { $ref: "#/components/schemas/NotificationType" }
+        title: { type: string }
+        message: { type: string }
+        isRead: { type: boolean }
+        link: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+
+    PaginatedNotification:
+      type: object
+      required: [items, nextCursor]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/Notification" }
+        nextCursor: { type: string, nullable: true }

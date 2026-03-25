@@ -1,11 +1,22 @@
 import { z } from "zod";
 
-export const userSchema = z.object({
-  id: z.string().uuid(),
-  email: z.string().email(),
-  nickname: z.string().min(1),
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
+import { difficultyEnum } from "./enums";
+import { schemas } from "./shared";
+
+/** 유저 프로필 수정 */
+export const updateUserSchema = z.object({
+  nickname: schemas.nickname.optional(),
+  bio: z.string().max(200).optional(),
+  profileImage: schemas.url.optional(),
+  coverImage: schemas.url.optional(),
+  instagramId: z.string().max(50).optional(),
+  youtubeUrl: schemas.url.max(200).optional(),
+  maxDifficulty: difficultyEnum.optional(),
+  /** 체크인 후 자동 체크아웃까지 분 (30~720) */
+  checkInAutoDurationMinutes: z.number().int().min(30).max(720).optional(),
 });
 
-export type User = z.infer<typeof userSchema>;
+/** GET /users/me/nickname-availability 쿼리 */
+export const nicknameAvailabilityQuerySchema = z.object({
+  nickname: schemas.nickname,
+});

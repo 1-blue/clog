@@ -132,6 +132,7 @@ export default Page;
 ```
 
 **핵심 패턴:**
+
 - `params`는 항상 `Promise<T>` 타입 → `await params`
 - `queryClient`는 모듈 레벨에서 `getQueryClient()`로 생성
 - `cache()`로 같은 요청 중복 방지 (generateMetadata + Page에서 공유)
@@ -160,7 +161,7 @@ export default Loading;
 
 Skeleton 레이아웃은 실제 페이지 구조에 맞게 조정한다. 목록은 그리드, 상세는 단일 카드 형태 등.
 
-### _components/Main.tsx
+### \_components/Main.tsx
 
 ```typescript
 "use client";
@@ -210,6 +211,7 @@ export default Main;
 ```
 
 **핵심:**
+
 - `"use client"` 필수
 - `openapi.useSuspenseQuery()`로 서버에서 prefetch된 데이터를 클라이언트에서 사용
 - page.tsx의 HydrationBoundary가 서버 데이터를 클라이언트로 전달
@@ -240,15 +242,15 @@ export default Page;
 
 ## import 경로 규칙
 
-| 모듈 | 경로 |
-|------|------|
-| openapi | `#web/apis/openapi` |
-| getQueryClient | `#web/libs/getQueryClient` |
-| getSharedMetadata | `#web/libs/sharedMetadata` |
-| routes | `#web/constants` |
-| Shadcn 컴포넌트 | `#web/components/ui/{component}` |
-| Zod 스키마 | `@clog/utils` |
-| _components | `#web/app/{routeGroup}/{routePath}/_components/{Name}` |
+| 모듈              | 경로                                                   |
+| ----------------- | ------------------------------------------------------ |
+| openapi           | `#web/apis/openapi`                                    |
+| getQueryClient    | `#web/libs/getQueryClient`                             |
+| getSharedMetadata | `#web/libs/sharedMetadata`                             |
+| routes            | `#web/constants`                                       |
+| Shadcn 컴포넌트   | `#web/components/ui/{component}`                       |
+| Zod 스키마        | `@clog/utils`                                          |
+| \_components      | `#web/app/{routeGroup}/{routePath}/_components/{Name}` |
 
 ## 체크리스트
 
@@ -256,7 +258,7 @@ export default Page;
 - [ ] 동적 라우트면 `dynamicParams`, `generateStaticParams` export 있음
 - [ ] `generateMetadata`가 `getSharedMetadata` 사용
 - [ ] `params`가 `Promise<T>` 타입으로 선언
-- [ ] _components/Main.tsx에 `"use client"` 선언
+- [ ] \_components/Main.tsx에 `"use client"` 선언
 - [ ] loading.tsx에 Skeleton 사용
 - [ ] cache 함수로 데이터 페칭 래핑
 - [ ] HydrationBoundary + dehydrate(queryClient) 패턴 적용

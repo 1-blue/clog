@@ -1,1 +1,9 @@
+export { schemas } from "./shared";
+export * from "./enums";
 export * from "./user.schema";
+export * from "./gym.schema";
+export * from "./record.schema";
+export * from "./review.schema";
+export * from "./post.schema";
+export * from "./comment.schema";
+export * from "./notification.schema";

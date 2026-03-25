@@ -1,41 +1,46 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+
 import "./globals.css";
+
+import { Toaster } from "sonner";
 
 import QueryProvider from "#web/providers/QueryProvider";
 import ThemeProvider from "#web/providers/ThemeProvider";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 export const metadata: Metadata = {
-  title: "clog",
-  description: "clog",
+  title: "Clog - 클라이밍 커뮤니티",
+  description: `클라이머를 위한 커뮤니티 & 기록 앱. 암장 검색, 기록 관리, 커뮤니티까지.`,
+  metadataBase: new URL("https://clog.story-dict.com"),
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+const RootLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
   return (
-    <html
-      lang="ko"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-      suppressHydrationWarning
-    >
-      <body className="min-h-full flex flex-col">
+    <html lang="ko" className="h-full antialiased" suppressHydrationWarning>
+      <head>
+        {/* Pretendard 폰트 */}
+        <link
+          rel="stylesheet"
+          as="style"
+          crossOrigin="anonymous"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+        />
+      </head>
+      {/* 확장 프로그램이 body에 속성 주입 시(cz-shortcut-listen 등) hydration 경고 방지 */}
+      <body className="flex min-h-full flex-col" suppressHydrationWarning>
         <ThemeProvider>
-          <QueryProvider>{children}</QueryProvider>
+          <QueryProvider>
+            <div className="mx-auto w-full max-w-3xl">{children}</div>
+            <Toaster
+              position="top-center"
+              toastOptions={{
+                className:
+                  "!bg-surface-container-high !text-on-surface !border-outline-variant",
+              }}
+            />
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>
   );
-}
+};
+export default RootLayout;

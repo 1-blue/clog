@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm --filter @clog/web add next-auth@beta @auth/prisma-adapter @aws-sdk/client-s3 @aws-sdk/s3-request-presigner sonner recharts date-fns)",
+      "Bash(pnpm --filter web add next-auth@beta @auth/prisma-adapter @aws-sdk/client-s3 @aws-sdk/s3-request-presigner sonner recharts date-fns)",
+      "Bash(pnpm db:generate)",
+      "Bash(find /Users/1-blue/Desktop/Workspace/project/clog/node_modules/next/dist/docs -type f -name *middleware*)",
+      "Bash(npx shadcn@latest add avatar badge card carousel dialog dropdown-menu form input label select separator sheet switch tabs textarea tooltip -y)",
+      "Bash(npx shadcn@latest add avatar badge card carousel dialog dropdown-menu form input label select separator sheet switch tabs textarea tooltip -y --overwrite)",
+      "Bash(pnpm db:push)",
+      "Bash(find packages/database/node_modules/prisma -name config.d.ts -o -name defineConfig*)",
+      "Bash(find /Users/1-blue/Desktop/Workspace/project/clog -path */prisma/config* -name *.d.ts)",
+      "Bash(find /Users/1-blue/Desktop/Workspace/project/clog/node_modules/.pnpm -path */@prisma/config* -name *.d.ts)",
+      "Bash(node -e \"require\\(''dotenv''\\).config\\(\\); console.log\\(process.env.DATABASE_URL?.substring\\(0,30\\)\\)\")",
+      "Bash(pnpm --filter @clog/db db:push)",
+      "Bash(pnpm type-check:*)",
+      "Bash(pnpm ls:*)",
+      "Bash(grep -rn export.*revalidateTag node_modules/next/dist/)",
+      "Bash(npx tsc:*)"
+    ],
+    "additionalDirectories": [
+      "/Users/1-blue/Desktop/Workspace/project/clog/apps/web/src/app/api/auth",
+      "/Users/1-blue/Desktop/Workspace/project/clog/apps/web/src/app/(public)/community/[postId]/_source"
+    ]
+  }
+}

@@ -26,10 +26,10 @@ apps/web/src/hooks/mutations/{feature}/use{Feature}Mutations.tsx
 
 ## 패턴 선택 가이드
 
-| 시나리오 | 패턴 | invalidate 대상 | revalidateTag | redirect |
-|---------|------|----------------|---------------|----------|
-| 최상위 리소스 CRUD | 기본 패턴 | 목록 쿼리 | O | O |
-| 중첩 리소스 (reaction 등) | 중첩 패턴 | 부모 상세 쿼리 | X | X |
+| 시나리오                  | 패턴      | invalidate 대상 | revalidateTag | redirect |
+| ------------------------- | --------- | --------------- | ------------- | -------- |
+| 최상위 리소스 CRUD        | 기본 패턴 | 목록 쿼리       | O             | O        |
+| 중첩 리소스 (reaction 등) | 중첩 패턴 | 부모 상세 쿼리  | X             | X        |
 
 ## 템플릿
 
@@ -160,14 +160,14 @@ export default use{Feature}Mutations;
 
 ## import 경로 규칙
 
-| 모듈 | 경로 |
-|------|------|
-| openapi | `#web/apis/openapi` |
-| routes | `#web/constants` |
+| 모듈                   | 경로                               |
+| ---------------------- | ---------------------------------- |
+| openapi                | `#web/apis/openapi`                |
+| routes                 | `#web/constants`                   |
 | revalidateTagForServer | `#web/actions/revalidateForServer` |
-| useRouter | `next/navigation` |
-| useQueryClient | `@tanstack/react-query` |
-| useParams | `next/navigation` |
+| useRouter              | `next/navigation`                  |
+| useQueryClient         | `@tanstack/react-query`            |
+| useParams              | `next/navigation`                  |
 
 ## 체크리스트
 

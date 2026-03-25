@@ -6,12 +6,642 @@ datasource db {
   provider = "postgresql"
 }
 
+// ============================================
+// Enums
+// ============================================
+
+/// OAuth 제공자
+enum Provider {
+  KAKAO
+  GOOGLE
+}
+
+/// 유저 권한
+enum Role {
+  ADMIN   /// 관리자 페이지 접근 권한
+  MANAGER /// 정보 수정/삭제 권한
+  GUEST   /// 일반 유저 (기본값)
+}
+
+/// 지역 (17개 시도)
+enum Region {
+  SEOUL
+  GYEONGGI
+  INCHEON
+  BUSAN
+  DAEGU
+  DAEJEON
+  GWANGJU
+  ULSAN
+  SEJONG
+  GANGWON
+  CHUNGBUK
+  CHUNGNAM
+  JEONBUK
+  JEONNAM
+  GYEONGBUK
+  GYEONGNAM
+  JEJU
+}
+
+/// 난이도
+enum Difficulty {
+  V0
+  V1
+  V2
+  V3
+  V4
+  V5
+  V6
+  V7
+  V8
+  V9
+  V10
+  V_PLUS
+}
+
+/// 커뮤니티 카테고리
+enum CommunityCategory {
+  FREE
+  TIPS
+  REVIEW
+  MEETUP
+  GEAR
+}
+
+/// 알림 타입
+enum NotificationType {
+  COMMENT
+  LIKE
+  FOLLOW
+  SYSTEM
+  GYM_UPDATE
+}
+
+/// 시설 타입
+enum FacilityType {
+  PARKING
+  SHOWER
+  LOCKER
+  RENTAL
+  CAFE
+  WIFI
+  REST_AREA
+  TRAINING
+}
+
+/// 시도 결과
+enum AttemptResult {
+  SEND
+  ATTEMPT
+  FLASH
+  ONSIGHT
+}
+
+/// 체감 난이도
+enum PerceivedDifficulty {
+  EASY
+  NORMAL
+  HARD
+}
+
+/// 암장 리뷰 특징
+enum GymReviewFeature {
+  COOL_AIR        /// 쾌적한 냉방
+  WIDE_STRETCH    /// 넓은 스트레칭존
+  VARIOUS_LEVEL   /// 다양한 난이도
+  KIND_STAFF      /// 친절한 스태프
+  EASY_PARKING    /// 주차 편리
+  SHOWER_ROOM     /// 샤워실 완비
+  CLEAN_FACILITY  /// 깨끗한 시설
+  GOOD_VENT       /// 환기 좋음
+}
+
+// ============================================
+// Models
+// ============================================
+
+/// 유저
 model User {
-  id        String   @id @default(uuid()) @db.Uuid
-  email     String   @unique
-  nickname  String
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  /// 유저 고유 ID
+  id           String   @id @default(uuid()) @db.Uuid
+  /// 이메일
+  email        String   @unique
+  /// 닉네임
+  nickname     String
+  /// 자기소개
+  bio          String?
+  /// 프로필 이미지 URL
+  profileImage String?  @map("profile_image")
+  /// 커버 이미지 URL
+  coverImage   String?  @map("cover_image")
+  /// 인스타그램 아이디
+  instagramId  String?  @map("instagram_id")
+  /// 유튜브 URL
+  youtubeUrl   String?  @map("youtube_url")
+  /// 최고 난이도
+  maxDifficulty Difficulty? @map("max_difficulty")
+  /// 유저 권한
+  role         Role     @default(GUEST)
+  /// 생성일
+  createdAt    DateTime @default(now()) @map("created_at")
+  /// 수정일
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  /// OAuth 계정 목록
+  accounts      Account[]
+  /// 클라이밍 세션 목록
+  sessions      ClimbingSession[]
+  /// 리뷰 목록
+  reviews       Review[]
+  /// 게시글 목록
+  posts         Post[]
+  /// 댓글 목록
+  comments      Comment[]
+  /// 알림 목록
+  notifications Notification[]
+  /// 좋아요 목록
+  postLikes     PostLike[]
+  /// 북마크 목록
+  postBookmarks PostBookmark[]
+  /// 팔로잉 목록
+  following     Follow[] @relation("follower")
+  /// 팔로워 목록
+  followers     Follow[] @relation("following")
+  /// 암장 체크인 기록
+  gymCheckIns   GymCheckIn[]
+  /// 체크인 후 자동 체크아웃까지 시간(분). 기본 240(4시간)
+  checkInAutoDurationMinutes Int @default(240) @map("check_in_auto_duration_minutes")
 
   @@map("users")
+}
+
+/// OAuth 계정
+model Account {
+  /// 계정 고유 ID
+  id                String   @id @default(uuid()) @db.Uuid
+  /// 유저 ID
+  userId            String   @map("user_id") @db.Uuid
+  /// OAuth 제공자
+  provider          Provider
+  /// 제공자 계정 ID
+  providerAccountId String   @map("provider_account_id")
+  /// 액세스 토큰
+  accessToken       String?  @map("access_token")
+  /// 리프레시 토큰
+  refreshToken      String?  @map("refresh_token")
+  /// 토큰 만료일
+  expiresAt         Int?     @map("expires_at")
+  /// 생성일
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  /// 유저
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+/// 암장
+model Gym {
+  /// 암장 고유 ID
+  id          String   @id @default(uuid()) @db.Uuid
+  /// 암장 이름
+  name        String
+  /// 주소
+  address     String
+  /// 지역
+  region      Region
+  /// 전화번호
+  phone       String?
+  /// 영업시간 (JSON)
+  openHours   Json?    @map("open_hours")
+  /// 현재 혼잡도 (0~100)
+  congestion  Int      @default(0)
+  /// 현재 추정 이용 인원 (실시간 표시용, 체크인 집계와 병행 가능)
+  visitorCount Int     @default(0) @map("visitor_count")
+  /// 수용 인원(표시용 상한, 혼잡도 카드 분모)
+  visitorCapacity Int  @default(60) @map("visitor_capacity")
+  /// 위도
+  latitude    Float?
+  /// 경도
+  longitude   Float?
+  /// 설명
+  description String?
+  /// 평균 평점
+  avgRating   Float    @default(0) @map("avg_rating")
+  /// 리뷰 수
+  reviewCount Int      @default(0) @map("review_count")
+  /// 생성일
+  createdAt   DateTime @default(now()) @map("created_at")
+  /// 수정일
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  /// 시설 목록
+  facilities     GymFacility[]
+  /// 이미지 목록
+  images         GymImage[]
+  /// 혼잡도 로그
+  congestionLogs CongestionLog[]
+  /// 클라이밍 세션 목록
+  sessions       ClimbingSession[]
+  /// 리뷰 목록
+  reviews        Review[]
+  /// 체크인 세션
+  checkIns       GymCheckIn[]
+
+  @@map("gyms")
+}
+
+/// 암장 체크인 (자동 체크아웃: endsAt 경과 시 비활성, endedAt으로 수동 종료)
+model GymCheckIn {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  gymId     String    @map("gym_id") @db.Uuid
+  startedAt DateTime  @default(now()) @map("started_at")
+  /// 자동 체크아웃 예정 시각
+  endsAt    DateTime  @map("ends_at")
+  /// 수동 체크아웃 또는 정리 시각 (null이면 아직 활성 후보)
+  endedAt   DateTime? @map("ended_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gym  Gym  @relation(fields: [gymId], references: [id], onDelete: Cascade)
+
+  @@index([gymId, endedAt, endsAt])
+  @@index([userId, endedAt, endsAt])
+  @@map("gym_check_ins")
+}
+
+/// 암장 시설
+model GymFacility {
+  /// 시설 고유 ID
+  id     String       @id @default(uuid()) @db.Uuid
+  /// 암장 ID
+  gymId  String       @map("gym_id") @db.Uuid
+  /// 시설 타입
+  type   FacilityType
+
+  /// 암장
+  gym Gym @relation(fields: [gymId], references: [id], onDelete: Cascade)
+
+  @@unique([gymId, type])
+  @@map("gym_facilities")
+}
+
+/// 암장 이미지
+model GymImage {
+  /// 이미지 고유 ID
+  id       String   @id @default(uuid()) @db.Uuid
+  /// 암장 ID
+  gymId    String   @map("gym_id") @db.Uuid
+  /// 이미지 URL
+  url      String
+  /// 순서
+  order    Int      @default(0)
+  /// 생성일
+  createdAt DateTime @default(now()) @map("created_at")
+
+  /// 암장
+  gym Gym @relation(fields: [gymId], references: [id], onDelete: Cascade)
+
+  @@map("gym_images")
+}
+
+/// 시간대별 혼잡도 로그
+model CongestionLog {
+  /// 로그 고유 ID
+  id         String   @id @default(uuid()) @db.Uuid
+  /// 암장 ID
+  gymId      String   @map("gym_id") @db.Uuid
+  /// 요일 (0=일, 6=토)
+  dayOfWeek  Int      @map("day_of_week")
+  /// 시간 (0~23)
+  hour       Int
+  /// 혼잡도 (0~100)
+  congestion Int
+  /// 생성일
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  /// 암장
+  gym Gym @relation(fields: [gymId], references: [id], onDelete: Cascade)
+
+  @@unique([gymId, dayOfWeek, hour])
+  @@map("congestion_logs")
+}
+
+/// 클라이밍 세션
+model ClimbingSession {
+  /// 세션 고유 ID
+  id          String    @id @default(uuid()) @db.Uuid
+  /// 유저 ID
+  userId      String    @map("user_id") @db.Uuid
+  /// 암장 ID
+  gymId       String    @map("gym_id") @db.Uuid
+  /// 세션 날짜
+  date        DateTime  @db.Date
+  /// 시작 시간 (앱/시드 규칙: 방문일 당일 08:00~23:55 현지 벽시계, 5분 단위 권장)
+  startTime   DateTime? @map("start_time")
+  /// 종료 시간 (시작보다 이후, 동일 규칙)
+  endTime     DateTime? @map("end_time")
+  /// 메모
+  memo        String?
+  /// 공개 여부
+  isPublic    Boolean   @default(true) @map("is_public")
+  /// 생성일
+  createdAt   DateTime  @default(now()) @map("created_at")
+  /// 수정일
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  /// 유저
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// 암장
+  gym    Gym  @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  /// 루트 목록
+  routes Route[]
+  /// 세션 이미지 목록
+  images SessionImage[]
+
+  @@map("climbing_sessions")
+}
+
+/// 루트 기록
+model Route {
+  /// 루트 고유 ID
+  id        String        @id @default(uuid()) @db.Uuid
+  /// 세션 ID
+  sessionId String        @map("session_id") @db.Uuid
+  /// 난이도
+  difficulty Difficulty
+  /// 시도 결과
+  result    AttemptResult
+  /// 시도 횟수
+  attempts  Int           @default(1)
+  /// 메모
+  memo      String?
+  /// 순서
+  order     Int           @default(0)
+  /// 생성일
+  createdAt DateTime      @default(now()) @map("created_at")
+
+  /// 세션
+  session ClimbingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("routes")
+}
+
+/// 세션 이미지
+model SessionImage {
+  /// 이미지 고유 ID
+  id        String   @id @default(uuid()) @db.Uuid
+  /// 세션 ID
+  sessionId String   @map("session_id") @db.Uuid
+  /// 이미지 URL
+  url       String
+  /// 순서
+  order     Int      @default(0)
+  /// 생성일
+  createdAt DateTime @default(now()) @map("created_at")
+
+  /// 세션
+  session ClimbingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("session_images")
+}
+
+/// 암장 리뷰
+model Review {
+  /// 리뷰 고유 ID
+  id        String   @id @default(uuid()) @db.Uuid
+  /// 유저 ID
+  userId    String   @map("user_id") @db.Uuid
+  /// 암장 ID
+  gymId     String   @map("gym_id") @db.Uuid
+  /// 평점 (1~5)
+  rating              Int
+  /// 리뷰 내용
+  content             String
+  /// 체감 난이도
+  perceivedDifficulty PerceivedDifficulty? @map("perceived_difficulty")
+  /// 생성일
+  createdAt           DateTime             @default(now()) @map("created_at")
+  /// 수정일
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  /// 유저
+  user     User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// 암장
+  gym      Gym            @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  /// 특징 (enum 배열, PostgreSQL)
+  features GymReviewFeature[] @default([])
+  /// 이미지 목록
+  images   ReviewImage[]
+
+  @@unique([userId, gymId])
+  @@map("reviews")
+}
+
+/// 리뷰 이미지
+model ReviewImage {
+  /// 이미지 고유 ID
+  id        String   @id @default(uuid()) @db.Uuid
+  /// 리뷰 ID
+  reviewId  String   @map("review_id") @db.Uuid
+  /// 이미지 URL
+  url       String
+  /// 순서
+  order     Int      @default(0)
+  /// 생성일
+  createdAt DateTime @default(now()) @map("created_at")
+
+  /// 리뷰
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@map("review_images")
+}
+
+/// 커뮤니티 게시글
+model Post {
+  /// 게시글 고유 ID
+  id        String            @id @default(uuid()) @db.Uuid
+  /// 작성자 ID
+  authorId  String            @map("author_id") @db.Uuid
+  /// 카테고리
+  category  CommunityCategory
+  /// 제목
+  title     String
+  /// 본문
+  content   String
+  /// 조회수
+  viewCount Int               @default(0) @map("view_count")
+  /// 좋아요 수
+  likeCount Int               @default(0) @map("like_count")
+  /// 댓글 수
+  commentCount Int            @default(0) @map("comment_count")
+  /// 생성일
+  createdAt DateTime          @default(now()) @map("created_at")
+  /// 수정일
+  updatedAt DateTime          @updatedAt @map("updated_at")
+
+  /// 작성자
+  author    User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  /// 이미지 목록
+  images    PostImage[]
+  /// 태그 목록
+  tags      PostTag[]
+  /// 좋아요 목록
+  likes     PostLike[]
+  /// 북마크 목록
+  bookmarks PostBookmark[]
+  /// 댓글 목록
+  comments  Comment[]
+
+  @@map("posts")
+}
+
+/// 게시글 이미지
+model PostImage {
+  /// 이미지 고유 ID
+  id        String   @id @default(uuid()) @db.Uuid
+  /// 게시글 ID
+  postId    String   @map("post_id") @db.Uuid
+  /// 이미지 URL
+  url       String
+  /// 순서
+  order     Int      @default(0)
+  /// 생성일
+  createdAt DateTime @default(now()) @map("created_at")
+
+  /// 게시글
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@map("post_images")
+}
+
+/// 게시글 태그
+model PostTag {
+  /// 태그 고유 ID
+  id     String @id @default(uuid()) @db.Uuid
+  /// 게시글 ID
+  postId String @map("post_id") @db.Uuid
+  /// 태그명
+  name   String
+
+  /// 게시글
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@map("post_tags")
+}
+
+/// 게시글 좋아요
+model PostLike {
+  /// 좋아요 고유 ID
+  id        String   @id @default(uuid()) @db.Uuid
+  /// 게시글 ID
+  postId    String   @map("post_id") @db.Uuid
+  /// 유저 ID
+  userId    String   @map("user_id") @db.Uuid
+  /// 생성일
+  createdAt DateTime @default(now()) @map("created_at")
+
+  /// 게시글
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  /// 유저
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@map("post_likes")
+}
+
+/// 게시글 북마크
+model PostBookmark {
+  /// 북마크 고유 ID
+  id        String   @id @default(uuid()) @db.Uuid
+  /// 게시글 ID
+  postId    String   @map("post_id") @db.Uuid
+  /// 유저 ID
+  userId    String   @map("user_id") @db.Uuid
+  /// 생성일
+  createdAt DateTime @default(now()) @map("created_at")
+
+  /// 게시글
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  /// 유저
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@map("post_bookmarks")
+}
+
+/// 댓글
+model Comment {
+  /// 댓글 고유 ID
+  id        String   @id @default(uuid()) @db.Uuid
+  /// 게시글 ID
+  postId    String   @map("post_id") @db.Uuid
+  /// 작성자 ID
+  authorId  String   @map("author_id") @db.Uuid
+  /// 부모 댓글 ID (대댓글)
+  parentId  String?  @map("parent_id") @db.Uuid
+  /// 댓글 내용
+  content   String
+  /// 생성일
+  createdAt DateTime @default(now()) @map("created_at")
+  /// 수정일
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  /// 게시글
+  post     Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  /// 작성자
+  author   User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  /// 부모 댓글
+  parent   Comment?  @relation("replies", fields: [parentId], references: [id], onDelete: Cascade)
+  /// 대댓글 목록
+  replies  Comment[] @relation("replies")
+
+  @@map("comments")
+}
+
+/// 알림
+model Notification {
+  /// 알림 고유 ID
+  id        String           @id @default(uuid()) @db.Uuid
+  /// 수신자 ID
+  userId    String           @map("user_id") @db.Uuid
+  /// 알림 타입
+  type      NotificationType
+  /// 알림 제목
+  title     String
+  /// 알림 내용
+  message   String
+  /// 읽음 여부
+  isRead    Boolean          @default(false) @map("is_read")
+  /// 관련 링크
+  link      String?
+  /// 생성일
+  createdAt DateTime         @default(now()) @map("created_at")
+
+  /// 수신자
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+/// 팔로우 관계
+model Follow {
+  /// 팔로우 고유 ID
+  id          String   @id @default(uuid()) @db.Uuid
+  /// 팔로우하는 유저 ID
+  followerId  String   @map("follower_id") @db.Uuid
+  /// 팔로우 대상 유저 ID
+  followingId String   @map("following_id") @db.Uuid
+  /// 생성일
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  /// 팔로우하는 유저
+  follower  User @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
+  /// 팔로우 대상 유저
+  following User @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@map("follows")
 }

@@ -5,11 +5,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import { getQueryClient } from "#web/libs/getQueryClient";
 
-export default function QueryProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+const QueryProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   const queryClient = getQueryClient();
 
   return (
@@ -18,4 +14,5 @@ export default function QueryProvider({
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
-}
+};
+export default QueryProvider;
