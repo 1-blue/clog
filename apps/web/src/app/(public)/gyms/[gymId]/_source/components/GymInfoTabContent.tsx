@@ -1,4 +1,5 @@
-import { Phone, Star } from "lucide-react";
+import { format } from "date-fns";
+import { ko } from "date-fns/locale";
 
 import type { FacilityType } from "@clog/utils";
 
@@ -6,9 +7,12 @@ import type { components } from "#web/@types/openapi";
 import FacilityChip from "#web/components/gym/FacilityChip";
 import GymMapActionBar from "#web/components/gym/GymMapActionBar";
 import KakaoMapEmbed from "#web/components/gym/KakaoMapEmbed";
-import { cn } from "#web/libs/utils";
+import { formatGymPriceInfoLines } from "#web/libs/gym/priceInfo";
 
 type TGymDetail = components["schemas"]["GymDetail"];
+
+const sectionTitleClass =
+  "mb-2 text-sm font-bold tracking-widest text-tertiary uppercase";
 
 interface IProps {
   gym: TGymDetail;
@@ -16,39 +20,22 @@ interface IProps {
 
 const GymInfoTabContent: React.FC<IProps> = ({ gym }) => {
   const hasCoords = gym.latitude != null && gym.longitude != null;
+  const priceLines = formatGymPriceInfoLines(
+    gym.priceInfo as Record<string, unknown> | null | undefined,
+  );
+  const createdLabel = format(new Date(gym.createdAt), "yyyy.MM.dd", {
+    locale: ko,
+  });
+  const updatedLabel = format(new Date(gym.updatedAt), "yyyy.MM.dd", {
+    locale: ko,
+  });
 
   return (
     <section className="space-y-8 px-6 py-8">
-      <div className="flex flex-wrap items-center gap-2 border-b border-white/5 pb-4">
-        <div className="flex items-center gap-1">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Star
-              key={i}
-              className={cn(
-                "size-5 text-tertiary",
-                i < Math.round(gym.avgRating)
-                  ? "fill-tertiary"
-                  : "fill-none",
-              )}
-              strokeWidth={2}
-              aria-hidden
-            />
-          ))}
-        </div>
-        <span className="text-sm font-medium text-on-surface">
-          {gym.avgRating.toFixed(1)}
-        </span>
-        <span className="text-sm text-on-surface-variant">
-          ({gym.reviewCount}개 리뷰)
-        </span>
-      </div>
-
       {gym.facilities.length > 0 ? (
         <div>
-          <h5 className="mb-5 text-xs font-bold tracking-widest text-tertiary uppercase">
-            시설
-          </h5>
-          <div className="flex flex-wrap gap-2.5 rounded-2xl border border-white/5 bg-surface-container-low p-6">
+          <h5 className={sectionTitleClass}>시설</h5>
+          <div className="flex flex-wrap gap-2.5 rounded-2xl border border-white/5 bg-surface-container-low p-4">
             {gym.facilities.map((f) => (
               <FacilityChip key={f.id} type={f.type as FacilityType} />
             ))}
@@ -56,29 +43,31 @@ const GymInfoTabContent: React.FC<IProps> = ({ gym }) => {
         </div>
       ) : null}
 
-      {gym.phone ? (
+      {gym.description ? (
         <div>
-          <h5 className="mb-2 text-sm font-semibold text-on-surface">
-            연락처
-          </h5>
-          <a
-            href={`tel:${gym.phone}`}
-            className="inline-flex items-center gap-2 text-sm font-medium text-primary"
-          >
-            <Phone className="size-5" strokeWidth={2} aria-hidden />
-            {gym.phone}
-          </a>
+          <h5 className={sectionTitleClass}>소개</h5>
+          <div className="rounded-2xl border border-white/5 bg-surface-container-low p-4">
+            <p className="text-sm leading-relaxed whitespace-pre-wrap text-on-surface-variant">
+              {gym.description}
+            </p>
+          </div>
         </div>
       ) : null}
 
-      {gym.description ? (
+      {priceLines.length > 0 ? (
         <div>
-          <h5 className="mb-2 text-sm font-semibold text-on-surface">
-            소개
-          </h5>
-          <p className="text-sm leading-relaxed text-on-surface-variant">
-            {gym.description}
-          </p>
+          <h5 className={sectionTitleClass}>요금</h5>
+          <ul className="space-y-2 rounded-2xl border border-white/5 bg-surface-container-low p-4">
+            {priceLines.map(({ label, value }, i) => (
+              <li
+                key={`${label}-${i}`}
+                className="flex items-center justify-between gap-4 text-sm"
+              >
+                <span className="text-on-surface-variant">{label}</span>
+                <span className="font-semibold text-on-surface">{value}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       ) : null}
 
@@ -104,6 +93,11 @@ const GymInfoTabContent: React.FC<IProps> = ({ gym }) => {
           )}
         </div>
       </div>
+
+      <p className="text-center text-xs text-on-surface-variant">
+        등록 {createdLabel}
+        {createdLabel !== updatedLabel ? ` · 수정 ${updatedLabel}` : null}
+      </p>
     </section>
   );
 };

@@ -20,7 +20,7 @@ export const GET = async (
     const searchParams = getSearchParams(request);
     const query = commentQuerySchema.parse(searchParams);
 
-    const comments = await prisma.comment.findMany({
+    const comments = await prisma.postComment.findMany({
       where: { postId, parentId: null },
       orderBy: { createdAt: "asc" },
       take: query.limit + 1,
@@ -61,7 +61,7 @@ export const POST = async (
     const body = await request.json();
     const data = createCommentSchema.parse(body);
 
-    const comment = await prisma.comment.create({
+    const comment = await prisma.postComment.create({
       data: {
         postId,
         authorId: userId!,

@@ -1,7 +1,25 @@
-import { Clock, MapPin } from "lucide-react";
+"use client";
+
+import { Clock, Globe, Instagram, MapPin, MapPinned, Phone } from "lucide-react";
+import { toast } from "sonner";
+
+import { regionToKoreanMap, type Region } from "@clog/utils";
 
 import type { components } from "#web/@types/openapi";
-import { parseOpenHoursLines } from "#web/libs/gym/openHours";
+import { formatGymOpenHoursDisplay } from "#web/libs/gym/openHours";
+
+const normalizeWebsiteHref = (raw: string | null | undefined): string | null => {
+  const t = raw?.trim();
+  if (!t) return null;
+  if (/^https?:\/\//i.test(t)) return t;
+  return `https://${t}`;
+};
+
+const instagramProfileUrl = (raw: string | null | undefined): string | null => {
+  const t = raw?.replace(/^@/, "").trim();
+  if (!t) return null;
+  return `https://www.instagram.com/${encodeURIComponent(t)}/`;
+};
 
 type TGymDetail = components["schemas"]["GymDetail"];
 
@@ -10,30 +28,119 @@ interface IProps {
 }
 
 const GymBasicInfoSection: React.FC<IProps> = ({ gym }) => {
-  const hoursLines = parseOpenHoursLines(gym.openHours);
+  const { scheduleLines, notice } = formatGymOpenHoursDisplay(gym.openHours);
+  const hasHours = scheduleLines.length > 0 || !!notice;
+  const regionLabel = regionToKoreanMap[gym.region as Region];
+  const websiteHref = normalizeWebsiteHref(gym.website);
+  const instagramHref = instagramProfileUrl(gym.instagramId);
+
+  const copyAddress = async () => {
+    const text = gym.address?.trim();
+    if (!text) return;
+
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success("주소를 복사했어요");
+    } catch {
+      toast.warning("주소 복사에 실패했어요");
+    }
+  };
 
   return (
     <section className="space-y-6 px-6 py-8">
       <div className="flex items-start gap-4">
         <div className="flex size-11 shrink-0 items-center justify-center rounded-full bg-surface-container text-primary">
-          <MapPin
-            className="size-5"
-            fill="currentColor"
-            stroke="none"
-            aria-hidden
-          />
+          <MapPinned className="size-5" aria-hidden />
+        </div>
+        <div className="min-w-0 pt-0.5">
+          <p className="mb-1 text-sm font-medium text-on-surface-variant">
+            지역
+          </p>
+          <p className="text-base font-semibold text-on-surface">{regionLabel}</p>
+        </div>
+      </div>
+
+      <div className="flex items-start gap-4">
+        <div className="flex size-11 shrink-0 items-center justify-center rounded-full bg-surface-container text-primary">
+          <MapPin className="size-5" aria-hidden />
         </div>
         <div className="min-w-0 pt-0.5">
           <p className="mb-1 text-sm font-medium text-on-surface-variant">
             위치
           </p>
-          <p className="text-base leading-relaxed font-semibold text-on-surface">
+          <button
+            type="button"
+            onClick={copyAddress}
+            className="max-w-full cursor-pointer text-left text-base leading-relaxed font-semibold text-on-surface underline-offset-2 transition-colors hover:text-primary focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+            aria-label="주소 복사"
+          >
             {gym.address}
-          </p>
+          </button>
         </div>
       </div>
 
-      {hoursLines.length > 0 ? (
+      {websiteHref ? (
+        <div className="flex items-start gap-4">
+          <div className="flex size-11 shrink-0 items-center justify-center rounded-full bg-surface-container text-primary">
+            <Globe className="size-5" strokeWidth={2} aria-hidden />
+          </div>
+          <div className="min-w-0 pt-0.5">
+            <p className="mb-1 text-sm font-medium text-on-surface-variant">
+              웹사이트
+            </p>
+            <a
+              href={websiteHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex max-w-full break-all text-base leading-relaxed font-semibold text-on-surface transition-colors hover:text-primary focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+            >
+              {gym.website?.replace(/^https?:\/\//i, "") ?? websiteHref}
+            </a>
+          </div>
+        </div>
+      ) : null}
+
+      {instagramHref ? (
+        <div className="flex items-start gap-4">
+          <div className="flex size-11 shrink-0 items-center justify-center rounded-full bg-surface-container text-primary">
+            <Instagram className="size-5" strokeWidth={2} aria-hidden />
+          </div>
+          <div className="min-w-0 pt-0.5">
+            <p className="mb-1 text-sm font-medium text-on-surface-variant">
+              인스타그램
+            </p>
+            <a
+              href={instagramHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex max-w-full text-base leading-relaxed font-semibold text-on-surface transition-colors hover:text-primary focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+            >
+              @{gym.instagramId?.replace(/^@/, "")}
+            </a>
+          </div>
+        </div>
+      ) : null}
+
+      {gym.phone && (
+        <div className="flex items-start gap-4">
+          <div className="flex size-11 shrink-0 items-center justify-center rounded-full bg-surface-container text-primary">
+            <Phone className="size-5" strokeWidth={2} aria-hidden />
+          </div>
+          <div className="min-w-0 pt-0.5">
+            <p className="mb-1 text-sm font-medium text-on-surface-variant">
+              연락처
+            </p>
+            <a
+              href={`tel:${gym.phone}`}
+              className="inline-flex max-w-full text-base leading-relaxed font-semibold text-on-surface transition-colors hover:text-primary focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+            >
+              {gym.phone}
+            </a>
+          </div>
+        </div>
+      )}
+
+      {hasHours && (
         <div className="flex items-start gap-4">
           <div className="flex size-11 shrink-0 items-center justify-center rounded-full bg-surface-container text-primary">
             <Clock className="size-5" strokeWidth={2} aria-hidden />
@@ -42,14 +149,27 @@ const GymBasicInfoSection: React.FC<IProps> = ({ gym }) => {
             <p className="mb-1 text-sm font-medium text-on-surface-variant">
               운영 시간
             </p>
-            <ul className="space-y-1 text-base font-semibold text-on-surface">
-              {hoursLines.map((line) => (
-                <li key={line}>{line}</li>
-              ))}
-            </ul>
+            {scheduleLines.length > 0 ? (
+              <ul className="space-y-1 text-base font-semibold text-on-surface">
+                {scheduleLines.map((line) => (
+                  <li key={line}>{line}</li>
+                ))}
+              </ul>
+            ) : null}
+            {notice ? (
+              <p
+                className={
+                  scheduleLines.length > 0
+                    ? "mt-2 text-sm leading-relaxed text-on-surface-variant"
+                    : "text-base font-semibold text-on-surface"
+                }
+              >
+                안내: {notice}
+              </p>
+            ) : null}
           </div>
         </div>
-      ) : null}
+      )}
     </section>
   );
 };

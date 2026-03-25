@@ -53,7 +53,10 @@ export const GET = async () => {
 
     if (!user) return errorResponse("유저를 찾을 수 없습니다.", 404);
 
-    const { visitCount, sendCount } = await getUserProfileStats(user.id, "owner");
+    const { visitCount, sendCount } = await getUserProfileStats(
+      user.id,
+      "owner",
+    );
 
     const supabase = await createClient();
     const {

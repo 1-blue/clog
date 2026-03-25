@@ -19,7 +19,7 @@ export async function seedComments(
   for (let i = 0; i < posts.length; i++) {
     const numComments = 1 + Math.floor(Math.random() * 4);
     for (let j = 0; j < numComments; j++) {
-      const comment = await prisma.comment.create({
+      const comment = await prisma.postComment.create({
         data: {
           postId: posts[i]!.id,
           authorId: users[(i + j + 1) % 5]!.id,
@@ -28,7 +28,7 @@ export async function seedComments(
       });
 
       if (j === 0 && Math.random() > 0.5) {
-        await prisma.comment.create({
+        await prisma.postComment.create({
           data: {
             postId: posts[i]!.id,
             authorId: users[(i + j + 2) % 5]!.id,
@@ -39,7 +39,7 @@ export async function seedComments(
       }
     }
 
-    const count = await prisma.comment.count({
+    const count = await prisma.postComment.count({
       where: { postId: posts[i]!.id },
     });
     const likes = Math.floor(Math.random() * 5);

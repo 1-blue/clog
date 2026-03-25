@@ -8,9 +8,7 @@ function sessionWhereForScope(
   userId: string,
   scope: ProfileStatsScope,
 ): { userId: string; isPublic?: boolean } {
-  return scope === "owner"
-    ? { userId }
-    : { userId, isPublic: true };
+  return scope === "owner" ? { userId } : { userId, isPublic: true };
 }
 
 /** 방문한 서로 다른 암장 수 */
@@ -30,7 +28,7 @@ export async function getUserSendCount(
   userId: string,
   scope: ProfileStatsScope,
 ): Promise<number> {
-  return prisma.route.count({
+  return prisma.climbingRoute.count({
     where: {
       result: "SEND",
       session: sessionWhereForScope(userId, scope),
@@ -84,8 +82,7 @@ export async function getUserActivityHeatmap(
       const key = format(day, "yyyy-MM-dd");
       dayKeys.push(key);
       const n = countByDay.get(key) ?? 0;
-      const level =
-        n === 0 ? 0 : n === 1 ? 1 : n <= 2 ? 2 : n <= 4 ? 3 : 4;
+      const level = n === 0 ? 0 : n === 1 ? 1 : n <= 2 ? 2 : n <= 4 ? 3 : 4;
       levels.push(level);
     }
   }

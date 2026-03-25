@@ -1,17 +1,25 @@
 "use client";
 
+import { Star } from "lucide-react";
+
 import { openapi } from "#web/apis/openapi";
+
+import { cn } from "#web/libs/utils";
 
 import ReviewListItem from "./ReviewListItem";
 
 interface IProps {
   gymId: string;
+  avgRating: number;
+  reviewCount: number;
   /** 탭 안에 넣을 때 상단 제목·여백 축소 */
   variant?: "default" | "embedded";
 }
 
 const ReviewListSection: React.FC<IProps> = ({
   gymId,
+  avgRating,
+  reviewCount,
   variant = "default",
 }) => {
   const { data: reviewsData } = openapi.useSuspenseQuery(
@@ -29,6 +37,32 @@ const ReviewListSection: React.FC<IProps> = ({
           <h2 className="font-semibold text-on-surface">리뷰</h2>
         </div>
       ) : null}
+      <div
+        className={cn(
+          "flex flex-wrap items-center gap-2 border-b border-white/5 pb-4",
+          variant === "embedded" ? "mb-4" : "mt-3 mb-4",
+        )}
+      >
+        <div className="flex items-center gap-1">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Star
+              key={i}
+              className={cn(
+                "size-5 text-tertiary",
+                i < Math.round(avgRating) ? "fill-tertiary" : "fill-none",
+              )}
+              strokeWidth={2}
+              aria-hidden
+            />
+          ))}
+        </div>
+        <span className="text-sm font-medium text-on-surface">
+          {avgRating.toFixed(1)}
+        </span>
+        <span className="text-sm text-on-surface-variant">
+          ({reviewCount}개 리뷰)
+        </span>
+      </div>
       <div className={variant === "embedded" ? "space-y-3" : "mt-3 space-y-3"}>
         {reviews.map((review) => (
           <ReviewListItem key={review.id} review={review} />

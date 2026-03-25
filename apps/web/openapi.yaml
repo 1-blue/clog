@@ -783,7 +783,10 @@ components:
       enum: [SEOUL, GYEONGGI, INCHEON, BUSAN, DAEGU, DAEJEON, GWANGJU, ULSAN, SEJONG, GANGWON, CHUNGBUK, CHUNGNAM, JEONBUK, JEONNAM, GYEONGBUK, GYEONGNAM, JEJU]
     Difficulty:
       type: string
-      enum: [V0, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V_PLUS]
+      enum: [VB, V0, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V_PLUS]
+    GymPerceivedDifficulty:
+      type: string
+      enum: [EASY, NORMAL, HARD]
     CommunityCategory:
       type: string
       enum: [FREE, TIPS, REVIEW, MEETUP, GEAR]
@@ -823,12 +826,13 @@ components:
     # ── Gym ──
     GymImage:
       type: object
-      required: [id, gymId, url, order]
+      required: [id, gymId, url, order, createdAt]
       properties:
         id: { type: string, format: uuid }
         gymId: { type: string, format: uuid }
         url: { type: string }
         order: { type: integer }
+        createdAt: { type: string, format: date-time }
 
     GymFacility:
       type: object
@@ -837,6 +841,22 @@ components:
         id: { type: string, format: uuid }
         gymId: { type: string, format: uuid }
         type: { $ref: "#/components/schemas/FacilityType" }
+
+    GymOpenHoursTimeSlot:
+      type: object
+      required: [open, close]
+      properties:
+        open: { type: string, description: "HH:mm" }
+        close: { type: string, description: "HH:mm" }
+
+    GymOpenHours:
+      type: object
+      properties:
+        weekday: { $ref: "#/components/schemas/GymOpenHoursTimeSlot" }
+        saturday: { $ref: "#/components/schemas/GymOpenHoursTimeSlot" }
+        sunday: { $ref: "#/components/schemas/GymOpenHoursTimeSlot" }
+        holiday: { $ref: "#/components/schemas/GymOpenHoursTimeSlot" }
+        notice: { type: string, description: "비정기 휴무·안내 문구" }
 
     GymListItem:
       type: object
@@ -847,7 +867,10 @@ components:
         address: { type: string }
         region: { $ref: "#/components/schemas/Region" }
         phone: { type: string, nullable: true }
-        openHours: { nullable: true }
+        openHours:
+          oneOf:
+            - type: "null"
+            - $ref: "#/components/schemas/GymOpenHours"
         congestion: { type: integer }
         visitorCount: { type: integer, description: "현재 체크인 기준 이용 인원" }
         visitorCapacity: { type: integer, description: "수용 인원(표시 상한)" }
@@ -856,6 +879,14 @@ components:
         description: { type: string, nullable: true }
         avgRating: { type: number }
         reviewCount: { type: integer }
+        website: { type: string, nullable: true, description: "웹사이트 URL" }
+        thumbnailUrl: { type: string, nullable: true, description: "목록/카드용 썸네일" }
+        instagramId: { type: string, nullable: true }
+        priceInfo:
+          description: "가격 정보 (암장별 JSON 구조)"
+          nullable: true
+          type: object
+          additionalProperties: true
         createdAt: { type: string, format: date-time }
         updatedAt: { type: string, format: date-time }
         facilities:
@@ -891,13 +922,14 @@ components:
 
     CongestionLog:
       type: object
-      required: [id, gymId, dayOfWeek, hour, congestion]
+      required: [id, gymId, dayOfWeek, hour, congestion, createdAt]
       properties:
         id: { type: string, format: uuid }
         gymId: { type: string, format: uuid }
         dayOfWeek: { type: integer }
         hour: { type: integer }
         congestion: { type: integer }
+        createdAt: { type: string, format: date-time }
 
     PaginatedGymListItem:
       type: object
@@ -911,12 +943,13 @@ components:
     # ── Review ──
     ReviewImage:
       type: object
-      required: [id, reviewId, url, order]
+      required: [id, reviewId, url, order, createdAt]
       properties:
         id: { type: string, format: uuid }
         reviewId: { type: string, format: uuid }
         url: { type: string }
         order: { type: integer }
+        createdAt: { type: string, format: date-time }
 
     Review:
       type: object
@@ -927,6 +960,12 @@ components:
         gymId: { type: string, format: uuid }
         rating: { type: integer }
         content: { type: string }
+        perceivedDifficulty:
+          $ref: "#/components/schemas/GymPerceivedDifficulty"
+          nullable: true
+        features:
+          type: array
+          items: { $ref: "#/components/schemas/GymReviewFeature" }
         createdAt: { type: string, format: date-time }
         updatedAt: { type: string, format: date-time }
 
@@ -939,6 +978,9 @@ components:
         gymId: { type: string, format: uuid }
         rating: { type: integer }
         content: { type: string }
+        perceivedDifficulty:
+          $ref: "#/components/schemas/GymPerceivedDifficulty"
+          nullable: true
         createdAt: { type: string, format: date-time }
         updatedAt: { type: string, format: date-time }
         user: { $ref: "#/components/schemas/AuthorSummary" }
@@ -974,24 +1016,29 @@ components:
     # ── Record / Session ──
     Route:
       type: object
-      required: [id, sessionId, difficulty, result, attempts, memo, order]
+      required: [id, sessionId, difficulty, result, attempts, memo, order, createdAt]
       properties:
         id: { type: string, format: uuid }
         sessionId: { type: string, format: uuid }
         difficulty: { $ref: "#/components/schemas/Difficulty" }
         result: { $ref: "#/components/schemas/AttemptResult" }
         attempts: { type: integer }
+        perceivedDifficulty:
+          $ref: "#/components/schemas/GymPerceivedDifficulty"
+          nullable: true
         memo: { type: string, nullable: true }
         order: { type: integer }
+        createdAt: { type: string, format: date-time }
 
     SessionImage:
       type: object
-      required: [id, sessionId, url, order]
+      required: [id, sessionId, url, order, createdAt]
       properties:
         id: { type: string, format: uuid }
         sessionId: { type: string, format: uuid }
         url: { type: string }
         order: { type: integer }
+        createdAt: { type: string, format: date-time }
 
     GymSummary:
       type: object
@@ -1113,12 +1160,13 @@ components:
 
     PostImage:
       type: object
-      required: [id, postId, url, order]
+      required: [id, postId, url, order, createdAt]
       properties:
         id: { type: string, format: uuid }
         postId: { type: string, format: uuid }
         url: { type: string }
         order: { type: integer }
+        createdAt: { type: string, format: date-time }
 
     Post:
       type: object
@@ -1296,9 +1344,11 @@ components:
     # ── User ──
     User:
       type: object
-      required: [id, email, nickname, bio, profileImage, coverImage, instagramId, youtubeUrl, maxDifficulty, role, createdAt, updatedAt]
+      required:
+        [id, email, nickname, bio, profileImage, coverImage, instagramId, youtubeUrl, maxDifficulty, role, checkInAutoDurationMinutes, createdAt, updatedAt]
       properties:
         id: { type: string, format: uuid }
+        homeGymId: { type: string, format: uuid, nullable: true }
         email: { type: string, format: email }
         nickname: { type: string }
         bio: { type: string, nullable: true }
@@ -1308,6 +1358,11 @@ components:
         youtubeUrl: { type: string, nullable: true }
         maxDifficulty: { $ref: "#/components/schemas/Difficulty", nullable: true }
         role: { $ref: "#/components/schemas/Role" }
+        checkInAutoDurationMinutes:
+          type: integer
+          minimum: 30
+          maximum: 720
+          description: "체크인 후 자동 체크아웃까지 분 (기본 240)"
         createdAt: { type: string, format: date-time }
         updatedAt: { type: string, format: date-time }
 
@@ -1334,6 +1389,7 @@ components:
       required: [id, email, nickname, bio, profileImage, coverImage, instagramId, youtubeUrl, maxDifficulty, role, createdAt, updatedAt, _count, visitCount, sendCount, checkInAutoDurationMinutes, linkedProviders, activeCheckIn]
       properties:
         id: { type: string, format: uuid }
+        homeGymId: { type: string, format: uuid, nullable: true }
         email: { type: string, format: email }
         nickname: { type: string }
         bio: { type: string, nullable: true }
@@ -1415,7 +1471,7 @@ components:
     # ── Notification ──
     Notification:
       type: object
-      required: [id, userId, type, title, message, isRead, link, createdAt]
+      required: [id, userId, type, title, message, isRead, createdAt]
       properties:
         id: { type: string, format: uuid }
         userId: { type: string, format: uuid }

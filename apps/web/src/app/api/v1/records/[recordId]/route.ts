@@ -56,10 +56,12 @@ export const PATCH = async (
 
     // 루트 교체 시 기존 삭제 후 재생성
     if (data.routes) {
-      await prisma.route.deleteMany({ where: { sessionId: recordId } });
+      await prisma.climbingRoute.deleteMany({ where: { sessionId: recordId } });
     }
     if (data.imageUrls) {
-      await prisma.sessionImage.deleteMany({ where: { sessionId: recordId } });
+      await prisma.climbingSessionImage.deleteMany({
+        where: { sessionId: recordId },
+      });
     }
 
     const session = await prisma.climbingSession.update({

@@ -1,10 +1,11 @@
 import type { Difficulty } from "./schemas/enums";
 
 /**
- * 난이도(V0→V1→…) 순서와 1:1 매핑.
- * V0=빨, V1=주, V2=노, V3=연두, V4=초, V5=파, V6=남, V7=보, V8=핑크, V9=흰, V10=검, V_PLUS=회
+ * 난이도(VB 입문 → V0→V1→…) 순서와 1:1 매핑.
+ * VB=입문, V0=빨, V1=주, V2=노, V3=연두, V4=초, V5=파, V6=남, V7=보, V8=핑크, V9=흰, V10=검, V_PLUS=회
  */
 export const DIFFICULTY_RAINBOW_ORDER: readonly Difficulty[] = [
+  "VB",
   "V0",
   "V1",
   "V2",
@@ -33,6 +34,11 @@ export interface IRouteRainbowStyle {
 }
 
 const RAINBOW: IRouteRainbowStyle[] = [
+  {
+    chipClass: "bg-sky-500/20 ring-1 ring-sky-500/35",
+    gradeTextClass: "text-sky-400",
+    labelKo: "입문",
+  },
   {
     chipClass: "bg-red-500/20 ring-1 ring-red-500/35",
     gradeTextClass: "text-red-400",

@@ -446,7 +446,9 @@ export interface components {
         /** @enum {string} */
         Region: "SEOUL" | "GYEONGGI" | "INCHEON" | "BUSAN" | "DAEGU" | "DAEJEON" | "GWANGJU" | "ULSAN" | "SEJONG" | "GANGWON" | "CHUNGBUK" | "CHUNGNAM" | "JEONBUK" | "JEONNAM" | "GYEONGBUK" | "GYEONGNAM" | "JEJU";
         /** @enum {string} */
-        Difficulty: "V0" | "V1" | "V2" | "V3" | "V4" | "V5" | "V6" | "V7" | "V8" | "V9" | "V10" | "V_PLUS";
+        Difficulty: "VB" | "V0" | "V1" | "V2" | "V3" | "V4" | "V5" | "V6" | "V7" | "V8" | "V9" | "V10" | "V_PLUS";
+        /** @enum {string} */
+        GymPerceivedDifficulty: "EASY" | "NORMAL" | "HARD";
         /** @enum {string} */
         CommunityCategory: "FREE" | "TIPS" | "REVIEW" | "MEETUP" | "GEAR";
         /** @enum {string} */
@@ -472,6 +474,8 @@ export interface components {
             gymId: string;
             url: string;
             order: number;
+            /** Format: date-time */
+            createdAt: string;
         };
         GymFacility: {
             /** Format: uuid */
@@ -480,6 +484,20 @@ export interface components {
             gymId: string;
             type: components["schemas"]["FacilityType"];
         };
+        GymOpenHoursTimeSlot: {
+            /** @description HH:mm */
+            open: string;
+            /** @description HH:mm */
+            close: string;
+        };
+        GymOpenHours: {
+            weekday?: components["schemas"]["GymOpenHoursTimeSlot"];
+            saturday?: components["schemas"]["GymOpenHoursTimeSlot"];
+            sunday?: components["schemas"]["GymOpenHoursTimeSlot"];
+            holiday?: components["schemas"]["GymOpenHoursTimeSlot"];
+            /** @description 비정기 휴무·안내 문구 */
+            notice?: string;
+        };
         GymListItem: {
             /** Format: uuid */
             id: string;
@@ -487,7 +505,7 @@ export interface components {
             address: string;
             region: components["schemas"]["Region"];
             phone: string | null;
-            openHours: unknown;
+            openHours: null | components["schemas"]["GymOpenHours"];
             congestion: number;
             /** @description 현재 체크인 기준 이용 인원 */
             visitorCount: number;
@@ -498,6 +516,15 @@ export interface components {
             description: string | null;
             avgRating: number;
             reviewCount: number;
+            /** @description 웹사이트 URL */
+            website?: string | null;
+            /** @description 목록/카드용 썸네일 */
+            thumbnailUrl?: string | null;
+            instagramId?: string | null;
+            /** @description 가격 정보 (암장별 JSON 구조) */
+            priceInfo?: {
+                [key: string]: unknown;
+            } | null;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -526,6 +553,8 @@ export interface components {
             dayOfWeek: number;
             hour: number;
             congestion: number;
+            /** Format: date-time */
+            createdAt: string;
         };
         PaginatedGymListItem: {
             items: components["schemas"]["GymListItem"][];
@@ -538,6 +567,8 @@ export interface components {
             reviewId: string;
             url: string;
             order: number;
+            /** Format: date-time */
+            createdAt: string;
         };
         Review: {
             /** Format: uuid */
@@ -548,6 +579,8 @@ export interface components {
             gymId: string;
             rating: number;
             content: string;
+            perceivedDifficulty?: components["schemas"]["GymPerceivedDifficulty"];
+            features?: components["schemas"]["GymReviewFeature"][];
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -562,6 +595,7 @@ export interface components {
             gymId: string;
             rating: number;
             content: string;
+            perceivedDifficulty?: components["schemas"]["GymPerceivedDifficulty"];
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -588,8 +622,11 @@ export interface components {
             difficulty: components["schemas"]["Difficulty"];
             result: components["schemas"]["AttemptResult"];
             attempts: number;
+            perceivedDifficulty?: components["schemas"]["GymPerceivedDifficulty"];
             memo: string | null;
             order: number;
+            /** Format: date-time */
+            createdAt: string;
         };
         SessionImage: {
             /** Format: uuid */
@@ -598,6 +635,8 @@ export interface components {
             sessionId: string;
             url: string;
             order: number;
+            /** Format: date-time */
+            createdAt: string;
         };
         GymSummary: {
             /** Format: uuid */
@@ -708,6 +747,8 @@ export interface components {
             postId: string;
             url: string;
             order: number;
+            /** Format: date-time */
+            createdAt: string;
         };
         Post: {
             /** Format: uuid */
@@ -842,6 +883,8 @@ export interface components {
         User: {
             /** Format: uuid */
             id: string;
+            /** Format: uuid */
+            homeGymId?: string | null;
             /** Format: email */
             email: string;
             nickname: string;
@@ -852,6 +895,8 @@ export interface components {
             youtubeUrl: string | null;
             maxDifficulty: components["schemas"]["Difficulty"];
             role: components["schemas"]["Role"];
+            /** @description 체크인 후 자동 체크아웃까지 분 (기본 240) */
+            checkInAutoDurationMinutes: number;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -876,6 +921,8 @@ export interface components {
         UserMe: {
             /** Format: uuid */
             id: string;
+            /** Format: uuid */
+            homeGymId?: string | null;
             /** Format: email */
             email: string;
             nickname: string;
@@ -948,7 +995,7 @@ export interface components {
             title: string;
             message: string;
             isRead: boolean;
-            link: string | null;
+            link?: string | null;
             /** Format: date-time */
             createdAt: string;
         };

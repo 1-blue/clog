@@ -35,7 +35,7 @@ export async function seedReviews(
       const shuffled = [...FEATURE_POOL].sort(() => Math.random() - 0.5);
       const features = shuffled.slice(0, count);
 
-      await prisma.review.create({
+      await prisma.gymReview.create({
         data: {
           userId: users[i]!.id,
           gymId: gyms[gymIdx]!.id,
@@ -49,7 +49,7 @@ export async function seedReviews(
   }
 
   for (const gym of gyms) {
-    const agg = await prisma.review.aggregate({
+    const agg = await prisma.gymReview.aggregate({
       where: { gymId: gym.id },
       _avg: { rating: true },
       _count: true,

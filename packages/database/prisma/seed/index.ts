@@ -3,14 +3,17 @@ import "./load-env";
 import { prisma } from "../../src/index";
 import { seedComments } from "./comments";
 import { seedCongestionLogs } from "./congestion";
+import { seedDifficultyColors } from "./difficulty-colors";
 import { seedFacilities } from "./facilities";
 import { seedFollows } from "./follows";
+import { seedGymBookmarks } from "./gym-bookmarks";
 import { seedGyms } from "./gyms";
 import { seedPostLikes } from "./likes";
 import { seedNotifications } from "./notifications";
 import { seedPosts } from "./posts";
 import { seedReviews } from "./reviews";
 import { seedClimbingSessions } from "./sessions";
+import { seedSettingSchedules } from "./setting-schedules";
 import { seedUsers } from "./users";
 
 async function main() {
@@ -22,8 +25,11 @@ async function main() {
 
   await seedFacilities(prisma, gyms);
   await seedCongestionLogs(prisma, gyms);
+  await seedDifficultyColors(prisma, gyms);
+  await seedSettingSchedules(prisma, gyms);
   await seedClimbingSessions(prisma, users, gyms);
   await seedReviews(prisma, users, gyms);
+  await seedGymBookmarks(prisma, users, gyms);
 
   const posts = await seedPosts(prisma, users);
   await seedComments(prisma, posts, users);
@@ -36,6 +42,29 @@ async function main() {
     user2,
     user3,
   });
+
+  // 유저 홈짐 설정
+  await prisma.user.update({
+    where: { id: admin.id },
+    data: { homeGymId: gyms[0]!.id },
+  });
+  await prisma.user.update({
+    where: { id: manager.id },
+    data: { homeGymId: gyms[1]!.id },
+  });
+  await prisma.user.update({
+    where: { id: user1.id },
+    data: { homeGymId: gyms[2]!.id },
+  });
+  await prisma.user.update({
+    where: { id: user2.id },
+    data: { homeGymId: gyms[5]!.id },
+  });
+  await prisma.user.update({
+    where: { id: user3.id },
+    data: { homeGymId: gyms[0]!.id },
+  });
+  console.log("  ✅ 유저 홈짐 설정 완료");
 
   console.log("\n🎉 시드 데이터 생성 완료!");
 }

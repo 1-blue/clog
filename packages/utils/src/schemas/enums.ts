@@ -28,6 +28,7 @@ export const regionEnum = z.enum([
 export type Region = z.infer<typeof regionEnum>;
 
 export const difficultyEnum = z.enum([
+  "VB",
   "V0",
   "V1",
   "V2",

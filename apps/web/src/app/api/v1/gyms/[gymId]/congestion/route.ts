@@ -10,7 +10,7 @@ export const GET = async (
   const { gymId } = await params;
 
   try {
-    const logs = await prisma.congestionLog.findMany({
+    const logs = await prisma.gymCongestionLog.findMany({
       where: { gymId },
       orderBy: [{ dayOfWeek: "asc" }, { hour: "asc" }],
     });

@@ -1,7 +1,219 @@
-/** seed `openHours` JSON: `{ lines: string[] }` */
-export function parseOpenHoursLines(openHours: unknown): string[] {
-  if (!openHours || typeof openHours !== "object") return [];
-  const lines = (openHours as { lines?: unknown }).lines;
-  if (!Array.isArray(lines)) return [];
-  return lines.filter((l): l is string => typeof l === "string");
-}
+/**
+ * Gym.openHours JSON (Prisma `Json`)
+ */
+export type TGymOpenHoursSlot = {
+  open: string;
+  close: string;
+};
+
+export type TGymOpenHours = {
+  weekday?: TGymOpenHoursSlot;
+  saturday?: TGymOpenHoursSlot;
+  sunday?: TGymOpenHoursSlot;
+  holiday?: TGymOpenHoursSlot;
+  notice?: string;
+};
+
+const isTimeSlot = (v: unknown): v is TGymOpenHoursSlot => {
+  if (!v || typeof v !== "object") return false;
+  const o = v as Record<string, unknown>;
+  return (
+    typeof o.open === "string" &&
+    typeof o.close === "string" &&
+    o.open.length > 0 &&
+    o.close.length > 0
+  );
+};
+
+/** DB에 저장된 JSON → 구조体 (레거시 `lines` 형식은 null 처리) */
+export const parseGymOpenHours = (raw: unknown): TGymOpenHours | null => {
+  if (!raw || typeof raw !== "object") return null;
+  const o = raw as Record<string, unknown>;
+
+  if (Array.isArray((o as { lines?: unknown }).lines)) {
+    return null;
+  }
+
+  const out: TGymOpenHours = {};
+  if (isTimeSlot(o.weekday)) out.weekday = o.weekday;
+  if (isTimeSlot(o.saturday)) out.saturday = o.saturday;
+  if (isTimeSlot(o.sunday)) out.sunday = o.sunday;
+  if (isTimeSlot(o.holiday)) out.holiday = o.holiday;
+  if (typeof o.notice === "string" && o.notice.trim())
+    out.notice = o.notice.trim();
+
+  const hasSchedule =
+    !!out.weekday || !!out.saturday || !!out.sunday || !!out.holiday;
+  if (!hasSchedule && !out.notice) return null;
+  return out;
+};
+
+const formatRange = (slot: TGymOpenHoursSlot): string =>
+  `${slot.open} ~ ${slot.close}`;
+
+export type TGymOpenHoursDisplay = {
+  /** 운영 시간 본문 (한 줄씩) */
+  scheduleLines: string[];
+  /** 비정기 휴무·안내 (있으면 별도 스타일로) */
+  notice?: string;
+};
+
+/** 화면용: 월–금 / 토·일(또는 분리) / 공휴일 / notice */
+const SEOUL_TZ = "Asia/Seoul";
+
+/** en-US short weekday with Asia/Seoul zoned instant → Sun … Sat */
+const SEOUL_WEEKDAY_TO_SLOT: Record<
+  string,
+  keyof TGymOpenHours | undefined
+> = {
+  Sun: "sunday",
+  Mon: "weekday",
+  Tue: "weekday",
+  Wed: "weekday",
+  Thu: "weekday",
+  Fri: "weekday",
+  Sat: "saturday",
+};
+
+const parseHHMmToMinutes = (
+  s: string,
+  role: "open" | "close",
+): number | null => {
+  const trimmed = s.trim();
+  const match = /^(\d{1,2}):(\d{2})$/.exec(trimmed);
+  if (!match) return null;
+  const hh = Number(match[1]);
+  const mm = Number(match[2]);
+  if (!Number.isFinite(hh) || !Number.isFinite(mm) || mm < 0 || mm > 59)
+    return null;
+  if (role === "close" && hh === 24 && mm === 0) return 24 * 60;
+  if (hh < 0 || hh > 23) return null;
+  return hh * 60 + mm;
+};
+
+const getSeoulWeekdayKeyAndMinutes = (
+  at: Date,
+): { weekdayKey: string; minutes: number } | null => {
+  const fmt = new Intl.DateTimeFormat("en-US", {
+    timeZone: SEOUL_TZ,
+    weekday: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  });
+  const parts = fmt.formatToParts(at);
+  const weekdayKey = parts.find((p) => p.type === "weekday")?.value;
+  const hourRaw = parts.find((p) => p.type === "hour")?.value;
+  const minuteRaw = parts.find((p) => p.type === "minute")?.value;
+  if (!weekdayKey || hourRaw === undefined || minuteRaw === undefined) {
+    return null;
+  }
+  const hour = Number(hourRaw);
+  const minute = Number(minuteRaw);
+  if (!Number.isFinite(hour) || !Number.isFinite(minute)) return null;
+  const minutes = hour * 60 + minute;
+  return { weekdayKey, minutes };
+};
+
+/**
+ * 해당 슬롯 구간 안이면 true. 파싱 실패 시 null.
+ * - 종료가 익일인 경우(open > close) 익일 0시 전까지 포함.
+ * - 종료 `24:00`은 자정 직전까지(분 단위에서는 < 1440).
+ */
+const isNowWithinSlot = (
+  minutesSinceMidnight: number,
+  slot: TGymOpenHoursSlot,
+): boolean | null => {
+  const openM = parseHHMmToMinutes(slot.open, "open");
+  const closeM = parseHHMmToMinutes(slot.close, "close");
+  if (openM === null || closeM === null) return null;
+  if (openM === closeM) return false;
+
+  if (closeM > openM) {
+    return (
+      minutesSinceMidnight >= openM && minutesSinceMidnight < closeM
+    );
+  }
+
+  return (
+    minutesSinceMidnight >= openM || minutesSinceMidnight < closeM
+  );
+};
+
+export type TGymOpenNowStatus = "open" | "closed" | "unknown";
+
+/**
+ * `gym.openHours` JSON 기준, 서울 시각에서 현재 영업 여부.
+ * - 요일별 슬롯(`weekday` / `saturday` / `sunday`)만 사용.
+ * - `holiday`는 법정 공휴일 판별이 없어 반영하지 않음(추후 플래그/API로 확장 가능).
+ * - 레거시 `{ lines }` 전용이거나 파싱 불가면 `unknown`.
+ */
+export const getGymOpenNowStatus = (
+  raw: unknown,
+  options?: { at?: Date },
+): TGymOpenNowStatus => {
+  if (raw && typeof raw === "object") {
+    const lines = (raw as { lines?: unknown }).lines;
+    if (Array.isArray(lines)) {
+      const hasLine = lines.some((l): l is string => typeof l === "string");
+      if (hasLine) return "unknown";
+    }
+  }
+
+  const parsed = parseGymOpenHours(raw);
+  if (!parsed) return "unknown";
+
+  const zoned = getSeoulWeekdayKeyAndMinutes(options?.at ?? new Date());
+  if (!zoned) return "unknown";
+
+  const slotName = SEOUL_WEEKDAY_TO_SLOT[zoned.weekdayKey];
+  if (!slotName) return "unknown";
+
+  const slot = parsed[slotName];
+  if (!isTimeSlot(slot)) return "unknown";
+
+  const within = isNowWithinSlot(zoned.minutes, slot);
+  if (within === null) return "unknown";
+  return within ? "open" : "closed";
+};
+
+export const formatGymOpenHoursDisplay = (
+  raw: unknown,
+): TGymOpenHoursDisplay => {
+  if (raw && typeof raw === "object") {
+    const lines = (raw as { lines?: unknown }).lines;
+    if (Array.isArray(lines)) {
+      const scheduleLines = lines.filter((l): l is string => typeof l === "string");
+      if (scheduleLines.length > 0) {
+        return { scheduleLines, notice: undefined };
+      }
+    }
+  }
+
+  const parsed = parseGymOpenHours(raw);
+  if (!parsed) return { scheduleLines: [] };
+
+  const scheduleLines: string[] = [];
+
+  if (parsed.weekday) {
+    scheduleLines.push(`월–금: ${formatRange(parsed.weekday)}`);
+  }
+
+  const sat = parsed.saturday;
+  const sun = parsed.sunday;
+  if (sat && sun && sat.open === sun.open && sat.close === sun.close) {
+    scheduleLines.push(`토–일: ${formatRange(sat)}`);
+  } else {
+    if (sat) scheduleLines.push(`토: ${formatRange(sat)}`);
+    if (sun) scheduleLines.push(`일: ${formatRange(sun)}`);
+  }
+
+  if (parsed.holiday) {
+    scheduleLines.push(`공휴일: ${formatRange(parsed.holiday)}`);
+  }
+
+  return {
+    scheduleLines,
+    notice: parsed.notice,
+  };
+};

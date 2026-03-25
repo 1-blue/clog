@@ -20,7 +20,7 @@ export const GET = async (
     const searchParams = getSearchParams(request);
     const query = reviewQuerySchema.parse(searchParams);
 
-    const reviews = await prisma.review.findMany({
+    const reviews = await prisma.gymReview.findMany({
       where: { gymId },
       orderBy: { createdAt: "desc" },
       take: query.limit + 1,
@@ -55,12 +55,12 @@ export const POST = async (
     const data = createReviewSchema.parse(body);
 
     // 중복 리뷰 체크
-    const existing = await prisma.review.findUnique({
+    const existing = await prisma.gymReview.findUnique({
       where: { userId_gymId: { userId: userId!, gymId } },
     });
     if (existing) return errorResponse("이미 리뷰를 작성하셨습니다.");
 
-    const review = await prisma.review.create({
+    const review = await prisma.gymReview.create({
       data: {
         userId: userId!,
         gymId,
@@ -75,7 +75,7 @@ export const POST = async (
     });
 
     // 평균 평점 + 리뷰 수 업데이트
-    const agg = await prisma.review.aggregate({
+    const agg = await prisma.gymReview.aggregate({
       where: { gymId },
       _avg: { rating: true },
       _count: true,

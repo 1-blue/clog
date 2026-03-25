@@ -1,8 +1,11 @@
 "use client";
 
+import { Share2 } from "lucide-react";
+import { toast } from "sonner";
 import { Suspense } from "react";
 
 import { openapi } from "#web/apis/openapi";
+import TopBar from "#web/components/layout/TopBar";
 import {
   Tabs,
   TabsContent,
@@ -10,10 +13,10 @@ import {
   TabsTrigger,
 } from "#web/components/ui/tabs";
 
+import GymHeroSection from "./gym-hero/GymHeroSection";
 import GymBasicInfoSection from "./GymBasicInfoSection";
 import GymCheckInBar from "./GymCheckInBar";
 import GymCongestionSection from "./GymCongestionSection";
-import GymHeroSection from "./GymHeroSection";
 import GymInfoTabContent from "./GymInfoTabContent";
 import GymPhotosTabContent from "./GymPhotosTabContent";
 import ReviewListSection from "./review-list/ReviewListSection";
@@ -23,8 +26,10 @@ interface IProps {
   gymId: string;
 }
 
+/** line 탭: 기본 하단 라인 + 활성 라인 강조 */
 const tabTriggerClass =
-  "shrink-0 rounded-none px-0 py-3 text-base font-medium text-muted-foreground hover:text-foreground data-active:font-bold data-active:text-primary";
+  "after:hidden relative shrink-0 rounded-none border-0 border-b-2 border-outline-variant/30 px-1 py-3 text-base font-medium text-muted-foreground transition-colors hover:text-foreground " +
+  "data-active:border-primary data-active:font-bold data-active:text-primary";
 
 const GymDetailMain: React.FC<IProps> = ({ gymId }) => {
   const { data: gym } = openapi.useSuspenseQuery(
@@ -47,25 +52,68 @@ const GymDetailMain: React.FC<IProps> = ({ gymId }) => {
     },
   );
 
+  const { data: congestionLogs, refetch: refetchCongestion } = openapi.useQuery(
+    "get",
+    "/api/v1/gyms/{gymId}/congestion",
+    { params: { path: { gymId } } },
+    { select: (d) => d.payload },
+  );
+
   const visitorCount = liveVisitor?.visitorCount ?? gym.visitorCount;
   const myCheckIn = liveVisitor?.myCheckIn ?? gym.myCheckIn ?? null;
   const capacity = gym.visitorCapacity;
 
+  const shareGym = async () => {
+    try {
+      const url = window.location.href;
+      if (navigator.share) {
+        await navigator.share({ title: gym.name, url });
+      } else {
+        await navigator.clipboard.writeText(url);
+        toast.message("링크를 복사했어요");
+      }
+    } catch {
+      /* 사용자 취소 등 */
+    }
+  };
+
   return (
     <div className="relative pb-[calc(5.75rem+env(safe-area-inset-bottom))]">
+      <TopBar
+        showBack
+        title={gym.name ?? "암장 상세"}
+        action={
+          <div className="flex shrink-0 items-center gap-0.5">
+            <button
+              type="button"
+              onClick={() => void shareGym()}
+              className="flex size-10 cursor-pointer items-center justify-center rounded-full text-primary hover:bg-white/5"
+              aria-label="공유"
+            >
+              <Share2 className="size-5" strokeWidth={2} aria-hidden />
+            </button>
+          </div>
+        }
+      />
+
       <GymHeroSection gym={gym} />
-      <GymBasicInfoSection gym={gym} />
+
       <GymCongestionSection
         visitorCount={visitorCount}
         capacity={capacity}
-        onRefresh={() => void refetchGym()}
+        congestionLogs={congestionLogs ?? []}
+        onRefresh={async () => {
+          await Promise.all([refetchGym(), refetchCongestion()]);
+        }}
       />
+
+      <GymBasicInfoSection gym={gym} />
 
       <Tabs defaultValue="info" className="flex w-full flex-col">
         <div className="sticky top-14 z-20 border-b border-outline-variant/10 bg-background/90 backdrop-blur-lg">
           <TabsList
             variant="line"
-            className="scrollbar-hide mx-0 h-auto w-full min-w-0 justify-start gap-8 overflow-x-auto rounded-none border-0 bg-transparent px-6 pt-2 pb-0 shadow-none"
+            className="scrollbar-hide mx-0 h-auto w-full min-w-0 justify-start gap-2 overflow-x-auto overflow-y-visible rounded-none border-0 bg-transparent px-4 pt-2 pb-1 shadow-none sm:gap-4 sm:px-6"
           >
             <TabsTrigger value="info" className={tabTriggerClass}>
               정보
@@ -86,13 +134,18 @@ const GymDetailMain: React.FC<IProps> = ({ gymId }) => {
         <TabsContent value="reviews" className="mt-0 flex-none p-0 text-base">
           <div className="px-6 py-6">
             <Suspense fallback={<ReviewListSkeleton />}>
-              <ReviewListSection gymId={gymId} variant="embedded" />
+              <ReviewListSection
+                gymId={gymId}
+                variant="embedded"
+                avgRating={gym.avgRating}
+                reviewCount={gym.reviewCount}
+              />
             </Suspense>
           </div>
         </TabsContent>
 
         <TabsContent value="photos" className="mt-0 flex-none p-0 text-base">
-          <GymPhotosTabContent images={gym.images} />
+          <GymPhotosTabContent images={gym.images} gymName={gym.name} />
         </TabsContent>
       </Tabs>
 

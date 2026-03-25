@@ -2,6 +2,7 @@ import type { Difficulty } from "../schemas/enums";
 
 /** 난이도를 한글 라벨로 맵핑 */
 export const difficultyToKoreanMap: Record<Difficulty, string> = {
+  VB: "입문",
   V0: "V0",
   V1: "V1",
   V2: "V2",

@@ -7,12 +7,15 @@ import {
   normalizeSessionTimeRange,
 } from "@clog/utils";
 
+const PERCEIVED_DIFFICULTIES = ["EASY", "NORMAL", "HARD"] as const;
+
 export async function seedClimbingSessions(
   prisma: PrismaClient,
   users: User[],
   gyms: Gym[],
 ): Promise<void> {
   const difficulties = [
+    "VB",
     "V0",
     "V1",
     "V2",
@@ -75,10 +78,16 @@ export async function seedClimbingSessions(
           create: Array.from({ length: routeCount }, (_, j) => ({
             difficulty:
               difficulties[
-                Math.min(userIdx * 2 + Math.floor(Math.random() * 3), 8)
+                Math.min(userIdx * 2 + Math.floor(Math.random() * 3), 9)
               ]!,
             result: results[Math.floor(Math.random() * 4)]!,
             attempts: 1 + Math.floor(Math.random() * 3),
+            perceivedDifficulty:
+              Math.random() > 0.5
+                ? PERCEIVED_DIFFICULTIES[
+                    Math.floor(Math.random() * PERCEIVED_DIFFICULTIES.length)
+                  ]
+                : undefined,
             order: j,
           })),
         },

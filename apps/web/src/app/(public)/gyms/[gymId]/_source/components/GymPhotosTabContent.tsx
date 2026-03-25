@@ -1,34 +1,35 @@
 import type { components } from "#web/@types/openapi";
+import ImageStripLightbox from "#web/components/shared/ImageStripLightbox";
 
 type TGymImage = components["schemas"]["GymImage"];
 
 interface IProps {
   images: TGymImage[];
+  gymName: string;
 }
 
-const GymPhotosTabContent: React.FC<IProps> = ({ images }) => {
+const GymPhotosTabContent: React.FC<IProps> = ({ images, gymName }) => {
+  const urls = [...images]
+    .sort((a, b) => a.order - b.order)
+    .map((img) => img.url);
+
+  if (urls.length === 0) {
+    return (
+      <section className="px-6 py-8">
+        <p className="py-6 text-center text-sm text-on-surface-variant">
+          등록된 사진이 없습니다
+        </p>
+      </section>
+    );
+  }
+
   return (
     <section className="px-6 py-8">
-      {images.length > 1 ? (
-        <div className="scrollbar-hide flex gap-2 overflow-x-auto">
-          {images.map((img) => (
-            <div
-              key={img.id}
-              className="size-28 shrink-0 overflow-hidden rounded-xl sm:size-32"
-            >
-              <img
-                src={img.url}
-                alt=""
-                className="size-full object-cover"
-              />
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p className="py-6 text-center text-sm text-on-surface-variant">
-          추가 사진이 없습니다
-        </p>
-      )}
+      <ImageStripLightbox
+        urls={urls}
+        altPrefix={`${gymName} 사진`}
+        maxSlots={4}
+      />
     </section>
   );
 };

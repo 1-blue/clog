@@ -5,6 +5,7 @@ import { difficultyToKoreanMap, type Difficulty } from "@clog/utils";
 import { cn } from "#web/libs/utils";
 
 const DIFFICULTY_COLORS: Record<Difficulty, string> = {
+  VB: "bg-sky-900/30 text-sky-400",
   V0: "bg-red-900/30 text-red-400",
   V1: "bg-orange-900/30 text-orange-400",
   V2: "bg-yellow-900/30 text-yellow-400",

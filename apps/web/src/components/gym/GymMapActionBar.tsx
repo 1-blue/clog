@@ -54,7 +54,14 @@ const GymMapActionBar: React.FC<IProps> = ({
       (pos) => {
         const uLat = pos.coords.latitude;
         const uLng = pos.coords.longitude;
-        const url = kakaoTrafficUrl("내 위치", uLat, uLng, gymName, latitude, longitude);
+        const url = kakaoTrafficUrl(
+          "내 위치",
+          uLat,
+          uLng,
+          gymName,
+          latitude,
+          longitude,
+        );
         window.open(url, "_blank", "noopener,noreferrer");
       },
       () => {
@@ -73,8 +80,8 @@ const GymMapActionBar: React.FC<IProps> = ({
       aria-label="카카오맵 바로가기"
     >
       <p className="pointer-events-none px-1 text-center text-[10px] text-on-surface-variant">
-        주변 지하철역은 지도에 표시됩니다. 버스·지하철 노선은 카카오맵 앱에서 확인할 수
-        있어요.
+        주변 지하철역은 지도에 표시됩니다. 버스·지하철 노선은 카카오맵 앱에서
+        확인할 수 있어요.
       </p>
       <div className="flex flex-wrap items-stretch justify-center gap-2 sm:flex-nowrap">
         <a
@@ -83,8 +90,12 @@ const GymMapActionBar: React.FC<IProps> = ({
           rel="noopener noreferrer"
           className={btnClass}
         >
-          <MapPinned className="size-4 shrink-0 text-primary" strokeWidth={2} aria-hidden />
-          카카오맵에서 보기
+          <MapPinned
+            className="size-4 shrink-0 text-primary"
+            strokeWidth={2}
+            aria-hidden
+          />
+          카카오맵
         </a>
         <a
           href={toHref}
@@ -92,11 +103,23 @@ const GymMapActionBar: React.FC<IProps> = ({
           rel="noopener noreferrer"
           className={btnClass}
         >
-          <Route className="size-4 shrink-0 text-secondary" strokeWidth={2} aria-hidden />
+          <Route
+            className="size-4 shrink-0 text-secondary"
+            strokeWidth={2}
+            aria-hidden
+          />
           길찾기
         </a>
-        <button type="button" onClick={openTrafficDirections} className={btnClass}>
-          <Bus className="size-4 shrink-0 text-tertiary" strokeWidth={2} aria-hidden />
+        <button
+          type="button"
+          onClick={openTrafficDirections}
+          className={btnClass}
+        >
+          <Bus
+            className="size-4 shrink-0 text-tertiary"
+            strokeWidth={2}
+            aria-hidden
+          />
           대중교통
         </button>
       </div>

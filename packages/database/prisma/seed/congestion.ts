@@ -19,7 +19,7 @@ export async function seedCongestionLogs(
           100,
           Math.max(0, base + Math.floor(Math.random() * 20 - 10)),
         );
-        await prisma.congestionLog.create({
+        await prisma.gymCongestionLog.create({
           data: { gymId: gym.id, dayOfWeek: day, hour, congestion },
         });
       }
