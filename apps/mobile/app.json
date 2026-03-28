@@ -1,7 +1,7 @@
 {
   "expo": {
     "owner": "1-blue",
-    "name": "클로그", 
+    "name": "클로그",
     "slug": "clog",
     "scheme": "clog",
     "version": "1.0.0",
@@ -17,14 +17,14 @@
       "supportsTablet": true
     },
     "android": {
-      "backgroundColor": "#151515", 
+      "backgroundColor": "#151515",
       "navigationBar": {
         "backgroundColor": "#151515",
         "barStyle": "light-content"
       },
       "adaptiveIcon": {
         "foregroundImage": "./assets/logo.png",
-        "backgroundColor": "#151515"
+        "backgroundColor": "#FFFFFF"
       },
       "package": "blog.clog"
     },
