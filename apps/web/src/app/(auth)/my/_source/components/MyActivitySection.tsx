@@ -146,7 +146,7 @@ const MyActivitySection = () => {
 
       <Link
         href={ROUTES.RECORDS.NEW.path}
-        className="fixed right-4 bottom-20 z-30 flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105"
+        className="fixed right-4 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-30 flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105"
       >
         <Plus className="size-6" strokeWidth={2} />
       </Link>

@@ -36,7 +36,7 @@ const BottomNav = () => {
   if (HIDDEN_PATHS.some((p) => pathname.startsWith(p))) return null;
 
   return (
-    <nav className="fixed right-0 bottom-0 left-0 z-50 border-t border-outline-variant bg-surface-container/80 backdrop-blur-xl">
+    <nav className="fixed right-0 bottom-0 left-0 z-50 border-t border-outline-variant bg-surface-container/80 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-lg items-center justify-around">
         {NAV_ITEMS.map((item) => {
           const isActive =
@@ -49,6 +49,7 @@ const BottomNav = () => {
             <Link
               key={item.path}
               href={item.path}
+              replace
               className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${
                 isActive
                   ? "text-primary"
@@ -64,9 +65,8 @@ const BottomNav = () => {
           );
         })}
       </div>
-      {/* Safe area 하단 여백 */}
-      <div className="h-[env(safe-area-inset-bottom)]" />
     </nav>
   );
 };
+
 export default BottomNav;

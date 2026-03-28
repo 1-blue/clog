@@ -1,30 +1,41 @@
 {
   "expo": {
-    "name": "clog",
+    "owner": "1-blue",
+    "name": "클로그", 
     "slug": "clog",
     "scheme": "clog",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "icon": "./assets/logo.png",
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/logo.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#151515"
     },
     "ios": {
       "supportsTablet": true
     },
     "android": {
+      "backgroundColor": "#151515", 
+      "navigationBar": {
+        "backgroundColor": "#151515",
+        "barStyle": "light-content"
+      },
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
-      }
+        "foregroundImage": "./assets/logo.png",
+        "backgroundColor": "#151515"
+      },
+      "package": "blog.clog"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
-    }
+      "favicon": "./assets/favicon.ico"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "d39d6c86-8f47-4104-b4aa-4fb4b467d40f"
+      }
+    },
+    "plugins": ["expo-router"]
   }
 }

@@ -18,7 +18,7 @@
       "persistent": true
     },
     "build": {
-      "dependsOn": ["^build", "^db:generate"],
+      "dependsOn": ["^build", "^db:generate", "db:generate"], 
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
     "lint": {

@@ -2,8 +2,8 @@
 
 import { usePathname } from "next/navigation";
 
-import { cn } from "#web/libs/utils";
 import { shouldShowBottomNav } from "#web/libs/layout/bottomNavVisibility";
+import { cn } from "#web/libs/utils";
 
 import BottomNav from "./BottomNav";
 import CheckInStatusBanner from "./CheckInStatusBanner";
@@ -14,7 +14,14 @@ const NavShell: React.FC<React.PropsWithChildren> = ({ children }) => {
 
   return (
     <>
-      <main className={cn("flex-1", show && "pb-16")}>{children}</main>
+      <main
+        className={cn(
+          "flex-1",
+          show && "pb-[calc(4rem+env(safe-area-inset-bottom))]",
+        )}
+      >
+        {children}
+      </main>
       {show ? (
         <>
           <CheckInStatusBanner />
