@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 
 import "./globals.css";
 
@@ -6,6 +6,12 @@ import { Toaster } from "sonner";
 
 import QueryProvider from "#web/providers/QueryProvider";
 import ThemeProvider from "#web/providers/ThemeProvider";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
 
 export const metadata: Metadata = {
   title: "Clog - 클라이밍 커뮤니티",

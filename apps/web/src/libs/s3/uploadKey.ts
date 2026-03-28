@@ -39,8 +39,8 @@ function encodeS3KeyPath(key: string): string {
 
 /** 가상 호스팅 스타일 공개 URL */
 export function buildPublicObjectUrl(key: string): string {
-  const bucket = process.env.AWS_S3_BUCKET ?? "climbing-log";
-  const region = process.env.AWS_REGION ?? "ap-northeast-2";
+  const bucket = process.env.APP_AWS_S3_BUCKET ?? "climbing-log";
+  const region = process.env.APP_AWS_REGION ?? "ap-northeast-2";
   const pathKey = encodeS3KeyPath(key);
   return `https://${bucket}.s3.${region}.amazonaws.com/${pathKey}`;
 }

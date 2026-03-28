@@ -48,7 +48,9 @@ export const GET = async (request: Request) => {
     const nextCursor = hasMore ? items[items.length - 1]!.id : null;
 
     return paginatedJson(items, nextCursor);
-  } catch {
+  } catch (error) {
+    console.log("🐬 게시글 불러올 수 없음 error >> ", error);
+
     return errorResponse("게시글을 불러올 수 없습니다.");
   }
 };

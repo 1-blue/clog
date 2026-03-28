@@ -27,30 +27,19 @@ function assertContentTypeMatchesAssetType(
 
 /** 브라우저 PUT은 체크섬 헤더를 보내지 않으므로, 기본(WHEN_SUPPORTED) 시 URL에 붙는 CRC32 쿼리로 S3가 400을 반환하지 않게 함 */
 const s3 = new S3Client({
-  region: process.env.AWS_REGION,
+  region: process.env.APP_AWS_REGION,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    accessKeyId: process.env.APP_AWS_ACCESS_KEY,
+    secretAccessKey: process.env.APP_AWS_SECRET_ACCESS_KEY,
   },
 });
 
-const bucket = process.env.AWS_S3_BUCKET;
+const bucket = process.env.APP_AWS_S3_BUCKET;
 
 /** S3 Presigned URL 발급 — 객체 키: `{실행환경}/{images|videos}/{원본명}_{timestamp}.{ext}` */
 export const POST = async (request: Request) => {
   const { error } = await requireAuth();
   if (error) return error;
-
-  console.log("🐬 process.env.AWS_REGION >> ", process.env.AWS_REGION);
-  console.log(
-    "🐬 process.env.AWS_ACCESS_KEY_ID >> ",
-    process.env.AWS_ACCESS_KEY,
-  );
-  console.log(
-    "🐬 process.env.AWS_SECRET_ACCESS_KEY >> ",
-    process.env.AWS_SECRET_ACCESS_KEY,
-  );
-  console.log("🐬 process.env.AWS_S3_BUCKET >> ", process.env.AWS_S3_BUCKET);
 
   try {
     const raw = await request.json();
