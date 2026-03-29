@@ -1199,6 +1199,8 @@ export interface operations {
             query?: {
                 cursor?: string;
                 limit?: number;
+                /** 조회 월(yyyy-MM) — 지정 시 해당 월의 기록만 */
+                month?: string;
             };
             header?: never;
             path?: never;
