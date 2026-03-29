@@ -1,9 +1,9 @@
 "use client";
 
 import {
+  Calendar,
   Home,
   MessageSquare,
-  PlusCircle,
   Search,
   User,
   type LucideIcon,
@@ -23,7 +23,7 @@ const NAV_ITEMS: INavItem[] = [
   { path: ROUTES.HOME.path, label: "홈", icon: Home },
   { path: ROUTES.GYMS.path, label: "암장", icon: Search },
   { path: ROUTES.COMMUNITY.path, label: "커뮤니티", icon: MessageSquare },
-  { path: ROUTES.RECORDS.NEW.path, label: "기록", icon: PlusCircle },
+  { path: ROUTES.RECORDS.path, label: "기록", icon: Calendar },
   { path: ROUTES.MY.path, label: "마이", icon: User },
 ];
 

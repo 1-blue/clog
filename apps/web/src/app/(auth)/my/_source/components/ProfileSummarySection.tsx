@@ -17,8 +17,6 @@ const ProfileSummarySection = () => {
     { select: (d) => d.payload },
   );
 
-  console.log("🐬 me >> ", me);
-
   const fans = me._count?.followers ?? 0;
   const crew = me._count?.following ?? 0;
 

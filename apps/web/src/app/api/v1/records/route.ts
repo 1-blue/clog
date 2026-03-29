@@ -18,11 +18,25 @@ export const GET = async (request: Request) => {
     const params = getSearchParams(request);
     const query = recordQuerySchema.parse(params);
 
+    let dateFilter: { gte: Date; lt: Date } | undefined;
+    if (query.month) {
+      const [year, mon] = query.month.split("-").map(Number);
+      dateFilter = {
+        gte: new Date(year!, mon! - 1, 1),
+        lt: new Date(year!, mon!, 1),
+      };
+    }
+
+    const MONTH_LIMIT = 200;
+
     const sessions = await prisma.climbingSession.findMany({
-      where: { userId: userId! },
+      where: {
+        userId: userId!,
+        ...(dateFilter && { date: dateFilter }),
+      },
       orderBy: { date: "desc" },
-      take: query.limit + 1,
-      ...(query.cursor && { cursor: { id: query.cursor }, skip: 1 }),
+      take: dateFilter ? MONTH_LIMIT : query.limit + 1,
+      ...(query.cursor && !dateFilter && { cursor: { id: query.cursor }, skip: 1 }),
       include: {
         gym: { select: { id: true, name: true } },
         routes: { orderBy: { order: "asc" } },
@@ -30,7 +44,7 @@ export const GET = async (request: Request) => {
       },
     });
 
-    const hasMore = sessions.length > query.limit;
+    const hasMore = dateFilter ? false : sessions.length > query.limit;
     const items = hasMore ? sessions.slice(0, query.limit) : sessions;
     const nextCursor = hasMore ? items[items.length - 1]!.id : null;
 

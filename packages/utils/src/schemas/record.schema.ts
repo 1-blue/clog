@@ -43,4 +43,9 @@ export const recordQuerySchema = z.object({
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/)
     .optional(),
+  /** 조회 월(yyyy-MM) — 지정 시 해당 월의 기록만 */
+  month: z
+    .string()
+    .regex(/^\d{4}-\d{2}$/)
+    .optional(),
 });
