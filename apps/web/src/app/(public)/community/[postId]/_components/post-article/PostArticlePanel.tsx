@@ -27,11 +27,7 @@ const PostArticlePanel = ({ post }: IProps) => {
     <>
       {cover ? (
         <div className="relative -mx-6 aspect-4/5 w-screen max-w-none overflow-hidden bg-surface-container-low shadow-2xl sm:mx-0 sm:w-full sm:rounded-2xl">
-          <img
-            src={cover.url}
-            alt=""
-            className="size-full object-cover"
-          />
+          <img src={cover.url} alt="" className="size-full object-cover" />
         </div>
       ) : null}
 
@@ -39,7 +35,7 @@ const PostArticlePanel = ({ post }: IProps) => {
         <span className="mb-3 inline-block rounded-full bg-primary-container/20 px-3 py-1 text-xs font-bold tracking-wide text-primary">
           {categoryToKoreanMap[post.category as CommunityCategory]}
         </span>
-        <h2 className="mb-6 font-semibold text-3xl leading-tight tracking-tight break-keep text-on-surface">
+        <h2 className="mb-6 text-3xl leading-tight font-semibold tracking-tight break-keep text-on-surface">
           {post.title}
         </h2>
       </section>
@@ -69,7 +65,7 @@ const PostArticlePanel = ({ post }: IProps) => {
           <div className="min-w-0">
             <Link
               href={ROUTES.USERS.PROFILE.path(post.author.id)}
-              className="block truncate font-semibold text-sm text-on-surface hover:text-primary"
+              className="block truncate text-sm font-semibold text-on-surface hover:text-primary"
             >
               {post.author.nickname}
             </Link>
@@ -82,8 +78,10 @@ const PostArticlePanel = ({ post }: IProps) => {
         </div>
       </section>
 
-      <article className="space-y-6 text-base leading-loose break-keep text-on-surface wrap-break-word">
-        <p className="whitespace-pre-wrap">{post.content}</p>
+      <article className="space-y-6 text-base leading-loose wrap-break-word break-keep text-on-surface">
+        <p className="rounded-sm bg-primary/20 px-3 py-1 whitespace-pre-wrap">
+          {post.content}
+        </p>
 
         {post.tags.length > 0 ? (
           <div className="flex flex-wrap gap-2 pt-6">

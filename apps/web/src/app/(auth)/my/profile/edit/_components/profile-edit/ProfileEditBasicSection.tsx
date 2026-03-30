@@ -43,7 +43,7 @@ const ProfileEditBasicSection = ({
   onNicknameRecheck,
 }: IProps) => {
   return (
-    <Card className="rounded-2xl border-outline-variant/50 bg-surface-container-low py-0 shadow-none ring-1 ring-outline-variant/30">
+    <Card className="rounded-2xl border-outline-variant/50 bg-surface-container-low py-4 shadow-none ring-1 ring-outline-variant/30">
       <CardHeader className="pb-2">
         <h2 className="text-base font-bold text-on-surface">기본 정보</h2>
       </CardHeader>
@@ -89,7 +89,7 @@ const ProfileEditBasicSection = ({
             className="mt-1.5 min-h-24 resize-none rounded-xl bg-surface-container-high"
             placeholder="예: V5 프로젝트 중 · 주말 볼더러"
           />
-          <p className="mt-1 text-right text-xs tabular-nums text-on-surface-variant">
+          <p className="mt-1 text-right text-xs text-on-surface-variant tabular-nums">
             {bio.length} / 200
           </p>
         </div>

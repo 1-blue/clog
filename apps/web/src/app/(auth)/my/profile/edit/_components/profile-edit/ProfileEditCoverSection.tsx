@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef, useState } from "react";
 import { Camera, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useRef, useState } from "react";
 
 import { Button } from "#web/components/ui/button";
 import useUserMutations from "#web/hooks/mutations/users/useUserMutations";
@@ -48,11 +48,7 @@ const ProfileEditCoverSection = ({ coverImage }: IProps) => {
     <div className="relative h-44 w-full overflow-hidden bg-surface-container-low">
       {coverImage ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={coverImage}
-          alt=""
-          className="size-full object-cover"
-        />
+        <img src={coverImage} alt="" className="size-full object-cover" />
       ) : (
         <div className="flex size-full items-center justify-center bg-gradient-to-b from-primary/25 to-surface-container-low" />
       )}

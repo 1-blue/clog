@@ -14,10 +14,9 @@ const UserProfileSelectionCaption = ({ selectedYmd }: IProps) => {
           <span className="font-semibold text-on-surface">
             {formatYmdLongKorean(selectedYmd)}
           </span>
+          <br />
           <span className="text-on-surface-variant">
-            {" "}
-            · 이 날의 기록만 표시 중입니다. 같은 칸을 다시 누르면 전체 목록으로
-            돌아갑니다.
+            같은 칸을 다시 누르면 전체 목록으로 돌아갑니다.
           </span>
         </p>
       ) : (

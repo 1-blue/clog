@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useEffect, useState } from "react";
 
 import { openapi } from "#web/apis/openapi";
 import useUserMutations from "#web/hooks/mutations/users/useUserMutations";
@@ -80,10 +80,7 @@ const ProfileEditMain = () => {
   const hasDirty = nickDirty || bioDirty || instagramDirty || youtubeDirty;
 
   const saveDisabled =
-    !hasDirty ||
-    !nickOk ||
-    trimmedNick.length < 1 ||
-    trimmedNick.length > 20;
+    !hasDirty || !nickOk || trimmedNick.length < 1 || trimmedNick.length > 20;
 
   const save = () => {
     if (saveDisabled) {
@@ -98,7 +95,9 @@ const ProfileEditMain = () => {
           ...(nickDirty ? { nickname: trimmedNick } : {}),
           ...(bioDirty ? { bio: bio.trim() } : {}),
           ...(instagramDirty ? { instagramId: instagramId.trim() } : {}),
-          ...(youtubeDirty ? { youtubeUrl: youtubeUrl.trim() || undefined } : {}),
+          ...(youtubeDirty
+            ? { youtubeUrl: youtubeUrl.trim() || undefined }
+            : {}),
         },
       },
       {
@@ -122,7 +121,7 @@ const ProfileEditMain = () => {
           profileImage={me.profileImage}
         />
       </div>
-      <div className="mx-auto max-w-lg space-y-5 px-4 pb-8 pt-4">
+      <div className="mx-auto mt-10 max-w-lg space-y-5 px-4 pb-8">
         <ProfileEditBasicSection
           nickname={nickname}
           onNicknameChange={setNickname}

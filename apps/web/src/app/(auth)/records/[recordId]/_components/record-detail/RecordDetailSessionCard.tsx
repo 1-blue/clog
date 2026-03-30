@@ -19,11 +19,7 @@ interface IProps {
   className?: string;
 }
 
-const RecordDetailSessionCard = ({
-  record,
-  exercise,
-  className,
-}: IProps) => (
+const RecordDetailSessionCard = ({ record, exercise, className }: IProps) => (
   <div
     className={cn(
       "rounded-2xl border border-white/10 bg-surface-container-low p-5 shadow-2xl",
@@ -45,7 +41,10 @@ const RecordDetailSessionCard = ({
 
     <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm font-medium text-on-surface-variant">
       <span className="inline-flex items-center gap-1.5">
-        <CalendarDays className="size-4 shrink-0 text-primary" strokeWidth={2} />
+        <CalendarDays
+          className="size-4 shrink-0 text-primary"
+          strokeWidth={2}
+        />
         {format(new Date(record.date), "yyyy.MM.dd", { locale: ko })}
       </span>
       {exercise && (
@@ -53,9 +52,6 @@ const RecordDetailSessionCard = ({
           <span className="inline-flex items-center gap-1.5">
             <Clock className="size-4 shrink-0 text-primary" strokeWidth={2} />
             <span>{exercise.rangeLabel}</span>
-          </span>
-          <span className="text-xs text-on-surface-variant">
-            {exercise.totalLabel}
           </span>
         </div>
       )}

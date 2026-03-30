@@ -31,7 +31,7 @@ const ProfileEditAccountSection = ({ email, linkedProviders }: IProps) => {
   };
 
   return (
-    <Card className="rounded-2xl border-outline-variant/50 bg-surface-container-low py-0 shadow-none ring-1 ring-outline-variant/30">
+    <Card className="rounded-2xl border-outline-variant/50 bg-surface-container-low py-4 shadow-none ring-1 ring-outline-variant/30">
       <CardHeader className="pb-2">
         <h2 className="text-base font-bold text-on-surface">계정 정보</h2>
       </CardHeader>

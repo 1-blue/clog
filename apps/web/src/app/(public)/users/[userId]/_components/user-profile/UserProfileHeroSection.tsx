@@ -44,7 +44,6 @@ const UserProfileHeroSection: React.FC<IProps> = ({ user }) => {
               </div>
             )}
           </div>
-          <div className="absolute right-1 bottom-1 size-6 rounded-full border-4 border-surface bg-secondary" />
         </div>
 
         <div className="mt-4 text-center">

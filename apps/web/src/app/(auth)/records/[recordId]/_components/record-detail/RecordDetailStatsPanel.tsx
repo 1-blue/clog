@@ -21,16 +21,11 @@ interface IProps {
   className?: string;
 }
 
-const RecordDetailStatsPanel = ({
-  record,
-  exercise,
-  className,
-}: IProps) => {
+const RecordDetailStatsPanel = ({ record, exercise, className }: IProps) => {
   const sends = sendCount(record.routes);
   const best = maxDifficultyLabel(record.routes);
   const spread = difficultySpreadLabel(record.routes);
-  const kcal =
-    exercise != null ? estimateKcal(exercise.durationMin) : null;
+  const kcal = exercise != null ? estimateKcal(exercise.durationMin) : null;
 
   return (
     <div className={cn("mt-4 space-y-4", className)}>
@@ -39,7 +34,7 @@ const RecordDetailStatsPanel = ({
           <p className="text-xs font-bold tracking-wider text-on-surface-variant uppercase">
             총 완등
           </p>
-          <p className="text-3xl font-bold tabular-nums text-primary">
+          <p className="text-3xl font-bold text-primary tabular-nums">
             {sends}회
           </p>
         </div>
@@ -68,11 +63,11 @@ const RecordDetailStatsPanel = ({
           </p>
           {exercise ? (
             <>
-              <p className="mt-1 text-sm font-bold leading-snug text-on-surface">
-                {exercise.rangeLabel}
-              </p>
-              <p className="mt-1 text-sm font-semibold tabular-nums text-on-surface-variant">
+              <p className="mt-1 text-sm leading-snug font-bold text-on-surface">
                 {exercise.totalLabel}
+              </p>
+              <p className="mt-1 text-sm font-semibold text-on-surface-variant tabular-nums">
+                ( {exercise.rangeLabel} )
               </p>
             </>
           ) : (
@@ -87,9 +82,7 @@ const RecordDetailStatsPanel = ({
           <p className="mt-1 text-base font-bold text-on-surface">
             {kcal != null ? `${kcal} kcal` : "—"}
           </p>
-          <p className="mt-0.5 text-xs text-on-surface-variant/80">
-            추정치
-          </p>
+          <p className="mt-0.5 text-xs text-on-surface-variant/80">추정치</p>
         </div>
       </div>
     </div>

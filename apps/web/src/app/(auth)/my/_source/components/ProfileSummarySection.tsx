@@ -17,8 +17,8 @@ const ProfileSummarySection = () => {
     { select: (d) => d.payload },
   );
 
-  const fans = me._count?.followers ?? 0;
-  const crew = me._count?.following ?? 0;
+  const follower = me._count?.followers ?? 0;
+  const following = me._count?.following ?? 0;
 
   return (
     <div className="w-full">
@@ -150,18 +150,18 @@ const ProfileSummarySection = () => {
           </div>
           <div className="flex flex-col items-center rounded-2xl border border-outline-variant/10 bg-surface-container-low py-3">
             <span className="text-xl leading-none font-bold text-on-surface">
-              {formatProfileCount(fans)}
+              {formatProfileCount(follower)}
             </span>
             <span className="mt-1.5 text-xs font-bold tracking-wider text-outline uppercase">
-              팬
+              팔로워
             </span>
           </div>
           <div className="flex flex-col items-center rounded-2xl border border-outline-variant/10 bg-surface-container-low py-3">
             <span className="text-xl leading-none font-bold text-on-surface">
-              {formatProfileCount(crew)}
+              {formatProfileCount(following)}
             </span>
             <span className="mt-1.5 text-xs font-bold tracking-wider text-outline uppercase">
-              크루
+              팔로잉
             </span>
           </div>
         </div>

@@ -36,7 +36,7 @@ const CongestionRankingSection = () => {
   const { data } = openapi.useSuspenseQuery(
     "get",
     "/api/v1/gyms",
-    { params: { query: { sort: "congestion", limit: 3 } } },
+    { params: { query: { sort: "congestion", limit: 5 } } },
     { select: (d) => d.payload },
   );
   const topGyms = data?.items ?? [];
@@ -81,7 +81,7 @@ const CongestionRankingSection = () => {
                     "rounded px-2 py-0.5 text-xs font-bold",
                     isTop
                       ? "bg-secondary text-black"
-                      : "bg-gray-600 text-on-tertiary",
+                      : "text-on-tertiary bg-gray-600",
                   )}
                 >
                   {i + 1}위
