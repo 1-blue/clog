@@ -2,7 +2,7 @@
 
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
-import { FileText, Heart, MessageCircle } from "lucide-react";
+import { Bookmark, FileText, Heart, MessageCircle } from "lucide-react";
 import Link from "next/link";
 
 import { categoryToKoreanMap, type CommunityCategory } from "@clog/utils";
@@ -29,11 +29,12 @@ const CommunityPreviewSection = () => {
 
       <div className="space-y-6">
         {recentPosts.map((post, index) => (
-          <div key={post.id} className="group flex gap-4">
-            <Link
-              href={ROUTES.COMMUNITY.DETAIL.path(post.id)}
-              className="relative size-20 shrink-0 overflow-hidden rounded-lg bg-surface-container-highest"
-            >
+          <Link
+            key={post.id}
+            className="group flex gap-4"
+            href={ROUTES.COMMUNITY.DETAIL.path(post.id)}
+          >
+            <div className="relative size-20 shrink-0 overflow-hidden rounded-lg bg-surface-container-highest">
               {post.images[0]?.url ? (
                 <img
                   src={post.images[0].url}
@@ -49,7 +50,7 @@ const CommunityPreviewSection = () => {
                   />
                 </div>
               )}
-            </Link>
+            </div>
             <div
               className={cn(
                 "min-w-0 flex-1 pb-4",
@@ -67,11 +68,9 @@ const CommunityPreviewSection = () => {
                   })}
                 </span>
               </div>
-              <Link href={ROUTES.COMMUNITY.DETAIL.path(post.id)}>
-                <h3 className="mb-2 line-clamp-1 text-sm font-medium text-on-surface/90">
-                  {post.title}
-                </h3>
-              </Link>
+              <h3 className="mb-2 line-clamp-1 text-sm font-medium text-on-surface/90">
+                {post.title}
+              </h3>
               <div className="flex items-center gap-3 text-on-surface-variant">
                 <span
                   className={cn(
@@ -99,9 +98,21 @@ const CommunityPreviewSection = () => {
                   />
                   {post.commentCount}
                 </span>
+                <span className="flex items-center gap-1 text-xs">
+                  <Bookmark
+                    className={cn(
+                      "size-3.5 shrink-0",
+                      (post.bookmarks?.length ?? 0) > 0
+                        ? "fill-primary text-primary"
+                        : "text-on-surface-variant",
+                    )}
+                    strokeWidth={2}
+                    aria-hidden
+                  />
+                </span>
               </div>
             </div>
-          </div>
+          </Link>
         ))}
         {recentPosts.length === 0 && (
           <p className="py-8 text-center text-sm text-on-surface-variant">

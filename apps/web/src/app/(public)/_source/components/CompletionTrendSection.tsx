@@ -42,6 +42,8 @@ const CompletionTrendSection = () => {
           <LineChart
             data={chartData}
             margin={{ top: 4, right: 8, left: 0, bottom: 0 }}
+            style={{ outline: "none" }}
+            tabIndex={-1}
           >
             <CartesianGrid
               strokeDasharray="4 4"
@@ -75,6 +77,7 @@ const CompletionTrendSection = () => {
               stroke="#c0c1ff"
               strokeWidth={2}
               dot={{ fill: "#c0c1ff", r: 3 }}
+              activeDot={false}
             />
           </LineChart>
         </ResponsiveContainer>

@@ -69,7 +69,7 @@ const CongestionRankingSection = () => {
               key={gym.id}
               href={ROUTES.GYMS.DETAIL.path(gym.id)}
               className={cn(
-                "flex w-52 shrink-0 flex-col rounded-lg border p-5 transition-transform hover:scale-105",
+                "flex w-52 shrink-0 flex-col rounded-lg border p-5 transition-all hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/10",
                 isTop
                   ? "border-primary/10 bg-surface-container"
                   : "border-white/5 bg-surface-container-low opacity-90",

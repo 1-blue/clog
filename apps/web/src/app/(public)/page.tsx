@@ -1,10 +1,12 @@
 import { Suspense } from "react";
+import type { NextPage } from "next";
+
+import AppTopBar from "#web/components/layout/AppTopBar";
 
 import CommunityPreviewSection from "./_source/components/CommunityPreviewSection";
 import CompletionTrendSection from "./_source/components/CompletionTrendSection";
 import CongestionRankingSection from "./_source/components/CongestionRankingSection";
 import HomeCheckInSection from "./_source/components/HomeCheckInSection";
-import HomeTopBar from "./_source/components/HomeTopBar";
 import HotSpotSection from "./_source/components/HotSpotSection";
 import NearbyGymsSection from "./_source/components/NearbyGymsSection";
 import CommunityPreviewSkeleton from "./_source/components/skeleton/CommunityPreviewSkeleton";
@@ -20,16 +22,16 @@ import NearbyGymsSkeleton from "./_source/components/skeleton/NearbyGymsSkeleton
 export const dynamic = "force-dynamic";
 
 /** 홈 / 탐색 페이지 */
-const HomePage = () => {
+const HomePage: NextPage = () => {
   return (
     <div className="pb-8">
       {/* 상단 바 */}
-      <HomeTopBar />
+      <AppTopBar />
 
-      {/* 중간 피드 — 스티치「홈 피드 (최종)」main과 동일 구조 */}
       <div className="mt-4 space-y-12 px-6">
         {/* 빠른 체크인 (로그인 유저 전용) */}
         <HomeCheckInSection />
+
         <Suspense fallback={<CongestionRankingSkeleton />}>
           <CongestionRankingSection />
         </Suspense>
