@@ -68,6 +68,7 @@ const PostListSection = ({ category }: IProps) => {
             createdAt={post.createdAt}
             imageUrl={post.images?.[0]?.url}
             isLiked={(post.likes?.length ?? 0) > 0}
+            isBookmarked={(post.bookmarks?.length ?? 0) > 0}
           />
         ))}
       </div>

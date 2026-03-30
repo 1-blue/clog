@@ -1,6 +1,6 @@
 import { Mountain, Star } from "lucide-react";
-import Link from "next/link";
 import React from "react";
+import Link from "next/link";
 
 import { ROUTES } from "#web/constants";
 
@@ -10,7 +10,6 @@ interface IProps {
   id: string;
   name: string;
   address: string;
-  congestion: number;
   visitorCount: number;
   avgRating: number;
   reviewCount: number;
@@ -21,12 +20,14 @@ const GymCard: React.FC<IProps> = ({
   id,
   name,
   address,
-  congestion,
   visitorCount,
   avgRating,
   reviewCount,
   imageUrl,
 }) => {
+  // visitorCount 기준: ~20 여유 / 21~40 보통 / 41~ 혼잡
+  const visitorLevel = visitorCount <= 20 ? 0 : visitorCount <= 40 ? 45 : 75;
+
   return (
     <Link
       href={ROUTES.GYMS.DETAIL.path(id)}
@@ -48,7 +49,7 @@ const GymCard: React.FC<IProps> = ({
         <div>
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="font-semibold text-on-surface">{name}</h3>
-            <CongestionBadge level={congestion} />
+            <CongestionBadge level={visitorLevel} />
             <span className="text-xs text-on-surface-variant">
               {visitorCount}명
             </span>

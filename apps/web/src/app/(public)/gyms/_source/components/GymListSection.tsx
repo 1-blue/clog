@@ -67,7 +67,6 @@ const GymListSection: React.FC<IProps> = ({ search, region }) => {
             id={gym.id}
             name={gym.name}
             address={gym.address}
-            congestion={gym.congestion}
             visitorCount={gym.visitorCount}
             avgRating={gym.avgRating}
             reviewCount={gym.reviewCount}

@@ -20,7 +20,7 @@ const GymSearchBar: React.FC<IProps> = ({
   setRegion,
 }) => {
   return (
-    <div className="sticky top-0 z-10 mt-4 space-y-3 bg-surface pb-3">
+    <div className="sticky top-14 z-30 space-y-3 bg-surface pt-4 pb-3">
       <div className="relative">
         <Search className="absolute top-1/2 left-3 size-5 -translate-y-1/2 text-on-surface-variant" strokeWidth={2} aria-hidden />
         <input
