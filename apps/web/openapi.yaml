@@ -558,6 +558,46 @@ paths:
                     properties:
                       available: { type: boolean }
 
+  /api/v1/users/me/followers:
+    get:
+      operationId: getMyFollowers
+      summary: 내 팔로워 목록
+      tags: [Users]
+      parameters:
+        - { name: cursor, in: query, schema: { type: string, format: uuid } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 50, default: 20 } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    $ref: "#/components/schemas/PaginatedFollowUser"
+
+  /api/v1/users/me/following:
+    get:
+      operationId: getMyFollowing
+      summary: 내 팔로잉 목록
+      tags: [Users]
+      parameters:
+        - { name: cursor, in: query, schema: { type: string, format: uuid } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 50, default: 20 } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    $ref: "#/components/schemas/PaginatedFollowUser"
+
   /api/v1/users/me/bookmarked-posts:
     get:
       operationId: getMyBookmarkedPosts
@@ -1255,6 +1295,15 @@ components:
             required: [id]
             properties:
               id: { type: string, format: uuid }
+
+    PaginatedFollowUser:
+      type: object
+      required: [items, nextCursor]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/AuthorSummary" }
+        nextCursor: { type: string, format: uuid, nullable: true }
 
     PaginatedPostListItem:
       type: object

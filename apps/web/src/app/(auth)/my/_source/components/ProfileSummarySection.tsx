@@ -1,13 +1,17 @@
 "use client";
 
 import { Bell, Check, Instagram, Settings, User, Youtube } from "lucide-react";
+import { useState } from "react";
 import Link from "next/link";
 
 import { difficultyToKoreanMap, type Difficulty } from "@clog/utils";
 
 import { openapi } from "#web/apis/openapi";
+import AppTopBar from "#web/components/layout/AppTopBar";
 import { ROUTES } from "#web/constants";
 import { formatProfileCount } from "#web/libs/format/formatProfileCount";
+
+import FollowListSheet from "./FollowListSheet";
 
 const ProfileSummarySection = () => {
   const { data: me } = openapi.useSuspenseQuery(
@@ -17,33 +21,41 @@ const ProfileSummarySection = () => {
     { select: (d) => d.payload },
   );
 
+  const [followSheet, setFollowSheet] = useState<
+    "followers" | "following" | null
+  >(null);
+
   const follower = me._count?.followers ?? 0;
   const following = me._count?.following ?? 0;
 
   return (
     <div className="w-full">
       {/* 헤더 */}
-      <header className="sticky top-0 z-40 flex w-full items-center justify-between bg-background/80 px-6 py-4 backdrop-blur-md">
-        <span className="text-2xl font-extrabold tracking-tighter text-primary uppercase">
-          Clog
-        </span>
-        <div className="flex items-center gap-4">
-          <Link
-            href={ROUTES.MY.SETTINGS.path}
-            className="text-primary transition-opacity hover:opacity-80 active:scale-95"
-            aria-label="설정"
-          >
-            <Settings className="size-6" strokeWidth={1.75} />
-          </Link>
-          <Link
-            href={ROUTES.NOTIFICATIONS.path}
-            className="text-primary transition-opacity hover:opacity-80 active:scale-95"
-            aria-label="알림"
-          >
-            <Bell className="size-6" strokeWidth={1.75} />
-          </Link>
-        </div>
-      </header>
+      <AppTopBar
+        left={
+          <span className="text-2xl font-extrabold tracking-tighter text-primary uppercase">
+            내 정보
+          </span>
+        }
+        right={
+          <div className="flex items-center gap-4">
+            <Link
+              href={ROUTES.MY.SETTINGS.path}
+              className="text-primary transition-opacity hover:opacity-80 active:scale-95"
+              aria-label="설정"
+            >
+              <Settings className="size-6" strokeWidth={1.75} />
+            </Link>
+            <Link
+              href={ROUTES.NOTIFICATIONS.path}
+              className="text-primary transition-opacity hover:opacity-80 active:scale-95"
+              aria-label="알림"
+            >
+              <Bell className="size-6" strokeWidth={1.75} />
+            </Link>
+          </div>
+        }
+      />
 
       {/* 커버 이미지 */}
       <section className="relative h-56 w-full overflow-hidden">
@@ -148,32 +160,45 @@ const ProfileSummarySection = () => {
               완등
             </span>
           </div>
-          <div className="flex flex-col items-center rounded-2xl border border-outline-variant/10 bg-surface-container-low py-3">
+          <button
+            type="button"
+            onClick={() => setFollowSheet("followers")}
+            className="flex flex-col items-center rounded-2xl border border-outline-variant/10 bg-surface-container-low py-3 transition-colors hover:bg-surface-container active:scale-95"
+          >
             <span className="text-xl leading-none font-bold text-on-surface">
               {formatProfileCount(follower)}
             </span>
             <span className="mt-1.5 text-xs font-bold tracking-wider text-outline uppercase">
               팔로워
             </span>
-          </div>
-          <div className="flex flex-col items-center rounded-2xl border border-outline-variant/10 bg-surface-container-low py-3">
+          </button>
+          <button
+            type="button"
+            onClick={() => setFollowSheet("following")}
+            className="flex flex-col items-center rounded-2xl border border-outline-variant/10 bg-surface-container-low py-3 transition-colors hover:bg-surface-container active:scale-95"
+          >
             <span className="text-xl leading-none font-bold text-on-surface">
               {formatProfileCount(following)}
             </span>
             <span className="mt-1.5 text-xs font-bold tracking-wider text-outline uppercase">
               팔로잉
             </span>
-          </div>
+          </button>
         </div>
 
-        {/* 프로필 편집 버튼 - ROUTES.MY.PROFILE_EDIT.path로 수정 */}
+        {/* 프로필 편집 버튼 */}
         <Link
           href={ROUTES.MY.PROFILE_EDIT.path}
-          className="mt-8 flex w-full max-w-sm items-center justify-center rounded-xl bg-gradient-to-b from-primary to-primary-container py-3.5 text-base font-bold text-on-primary-container shadow-lg transition-all hover:opacity-90 active:scale-95"
+          className="mt-8 flex w-full max-w-sm items-center justify-center rounded-xl border border-outline-variant/40 bg-surface-container-low py-3.5 text-base font-semibold text-on-surface transition-all hover:bg-surface-container active:scale-95"
         >
           프로필 편집
         </Link>
       </section>
+
+      <FollowListSheet
+        type={followSheet}
+        onClose={() => setFollowSheet(null)}
+      />
     </div>
   );
 };

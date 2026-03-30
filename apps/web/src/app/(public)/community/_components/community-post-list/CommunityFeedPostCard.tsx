@@ -2,13 +2,7 @@
 
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
-import {
-  Bookmark,
-  Eye,
-  MessageCircle,
-  ThumbsUp,
-  User,
-} from "lucide-react";
+import { Bookmark, Eye, MessageCircle, ThumbsUp, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -113,12 +107,9 @@ const CommunityFeedPostCard = ({
           </span>
         </Link>
       </div>
-      <div className="flex items-center gap-4 border-t border-outline-variant/10 pt-4 text-on-surface-variant">
+      <div className="flex items-center gap-4 border-t border-outline-variant/10 text-on-surface-variant">
         <div
-          className={cn(
-            "flex items-center gap-1.5",
-            isLiked && "text-primary",
-          )}
+          className={cn("flex items-center gap-1.5", isLiked && "text-primary")}
         >
           <ThumbsUp
             className={cn("size-5", isLiked && "fill-primary")}

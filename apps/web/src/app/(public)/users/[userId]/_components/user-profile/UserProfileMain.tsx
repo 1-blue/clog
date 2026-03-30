@@ -1,8 +1,11 @@
 "use client";
 
+import { ArrowLeft, MoreVertical } from "lucide-react";
 import { useCallback, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { openapi } from "#web/apis/openapi";
+import AppTopBar from "#web/components/layout/AppTopBar";
 import useUserMutations from "#web/hooks/mutations/users/useUserMutations";
 
 import UserProfileActionRow from "./UserProfileActionRow";
@@ -13,13 +16,14 @@ import UserProfileHeroSection from "./UserProfileHeroSection";
 import UserProfileRecordsSection from "./UserProfileRecordsSection";
 import UserProfileSelectionCaption from "./UserProfileSelectionCaption";
 import UserProfileStatsGrid from "./UserProfileStatsGrid";
-import UserProfileTopBar from "./UserProfileTopBar";
 
 interface IProps {
   userId: string;
 }
 
 const UserProfileMain = ({ userId }: IProps) => {
+  const router = useRouter();
+
   const { data: user } = openapi.useSuspenseQuery(
     "get",
     "/api/v1/users/{userId}",
@@ -43,9 +47,32 @@ const UserProfileMain = ({ userId }: IProps) => {
 
   return (
     <div className="pb-24">
-      <UserProfileTopBar />
+      <AppTopBar
+        left={
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => router.back()}
+              className="flex size-9 items-center justify-center rounded-full text-on-surface hover:bg-surface-container-high"
+              aria-label="뒤로"
+            >
+              <ArrowLeft className="size-5" strokeWidth={2} />
+            </button>
+            <span className="text-lg font-semibold text-on-surface">프로필</span>
+          </div>
+        }
+        right={
+          <button
+            type="button"
+            className="flex size-9 items-center justify-center rounded-full text-on-surface hover:bg-surface-container-high"
+            aria-label="메뉴"
+          >
+            <MoreVertical className="size-5" strokeWidth={2} />
+          </button>
+        }
+      />
 
-      <main className="mx-auto max-w-lg pt-16">
+      <main className="mx-auto max-w-lg">
         <UserProfileHeroSection user={user} />
         <div className="mt-4 space-y-6">
           <UserProfileBioLine user={user} />

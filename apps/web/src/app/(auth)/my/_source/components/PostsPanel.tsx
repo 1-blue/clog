@@ -5,7 +5,7 @@ import Link from "next/link";
 
 import type { CommunityCategory } from "@clog/utils";
 
-import PostCard from "#web/components/community/PostCard";
+import CommunityFeedPostCard from "#web/app/(public)/community/_components/community-post-list/CommunityFeedPostCard";
 import EmptyState from "#web/components/shared/EmptyState";
 import InfiniteScroll from "#web/components/shared/InfiniteScroll";
 import { ROUTES } from "#web/constants";
@@ -23,6 +23,7 @@ interface IProps {
     };
     likeCount: number;
     commentCount: number;
+    viewCount: number;
     createdAt: string;
     images: Array<{ url: string }>;
     likes?: Array<{ id: string }>;
@@ -57,7 +58,7 @@ const PostsPanel: React.FC<IProps> = ({
         {Array.from({ length: 4 }).map((_, i) => (
           <div
             key={i}
-            className="h-24 animate-pulse rounded-2xl bg-surface-container-low"
+            className="h-32 animate-pulse rounded-2xl bg-surface-container-low"
           />
         ))}
       </div>
@@ -88,9 +89,9 @@ const PostsPanel: React.FC<IProps> = ({
       hasMore={!!hasNextPage}
       isLoading={isFetchingNextPage}
     >
-      <div className="space-y-2">
+      <div className="space-y-5">
         {posts.map((post) => (
-          <PostCard
+          <CommunityFeedPostCard
             key={post.id}
             id={post.id}
             title={post.title}
@@ -101,12 +102,11 @@ const PostsPanel: React.FC<IProps> = ({
             authorImage={post.author.profileImage}
             likeCount={post.likeCount}
             commentCount={post.commentCount}
+            viewCount={post.viewCount}
             createdAt={post.createdAt}
             imageUrl={post.images[0]?.url}
             isLiked={forceLiked || (post.likes?.length ?? 0) > 0}
-            isBookmarked={
-              forceBookmarked || (post.bookmarks?.length ?? 0) > 0
-            }
+            isBookmarked={forceBookmarked || (post.bookmarks?.length ?? 0) > 0}
           />
         ))}
       </div>

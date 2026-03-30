@@ -39,10 +39,10 @@ const UserProfileActionRow = ({
         isLoading={followPending}
         onClick={onFollowToggle}
         className={cn(
-          "h-12 w-full rounded-xl font-bold",
+          "h-12 w-full rounded-xl font-semibold",
           isFollowing
-            ? "border border-outline-variant bg-transparent text-primary shadow-none"
-            : "border-0 bg-gradient-to-b from-primary to-primary-container text-on-primary shadow-lg",
+            ? "border border-outline-variant/40 bg-surface-container-low text-on-surface-variant hover:bg-surface-container"
+            : "border-0 bg-primary text-on-primary shadow-md hover:bg-primary/90",
         )}
       />
     </div>

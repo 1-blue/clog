@@ -286,6 +286,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/users/me/followers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 내 팔로워 목록 */
+        get: operations["getMyFollowers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/me/following": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 내 팔로잉 목록 */
+        get: operations["getMyFollowing"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/users/me/bookmarked-posts": {
         parameters: {
             query?: never;
@@ -820,6 +854,11 @@ export interface components {
                 id: string;
             }[];
         };
+        PaginatedFollowUser: {
+            items: components["schemas"]["AuthorSummary"][];
+            /** Format: uuid */
+            nextCursor: string | null;
+        };
         PaginatedPostListItem: {
             items: components["schemas"]["PostListItem"][];
             nextCursor: string | null;
@@ -1199,7 +1238,6 @@ export interface operations {
             query?: {
                 cursor?: string;
                 limit?: number;
-                /** 조회 월(yyyy-MM) — 지정 시 해당 월의 기록만 */
                 month?: string;
             };
             header?: never;
@@ -1685,6 +1723,56 @@ export interface operations {
                         payload: {
                             available: boolean;
                         };
+                    };
+                };
+            };
+        };
+    };
+    getMyFollowers: {
+        parameters: {
+            query?: {
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payload: components["schemas"]["PaginatedFollowUser"];
+                    };
+                };
+            };
+        };
+    };
+    getMyFollowing: {
+        parameters: {
+            query?: {
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payload: components["schemas"]["PaginatedFollowUser"];
                     };
                 };
             };
