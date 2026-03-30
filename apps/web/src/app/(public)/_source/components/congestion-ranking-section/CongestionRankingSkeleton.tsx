@@ -1,4 +1,4 @@
-const CongestionRankingSkeleton = () => {
+const CongestionRankingSkeleton: React.FC = () => {
   return (
     <section>
       <div className="mb-6 flex justify-between">

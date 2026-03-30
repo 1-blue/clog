@@ -3,17 +3,15 @@ import type { NextPage } from "next";
 
 import AppTopBar from "#web/components/layout/AppTopBar";
 
-import CommunityPreviewSection from "./_source/components/CommunityPreviewSection";
-import CompletionTrendSection from "./_source/components/CompletionTrendSection";
-import CongestionRankingSection from "./_source/components/CongestionRankingSection";
+import CommunityPreviewSection from "./_source/components/community-preview-section/CommunityPreviewSection";
+import CommunityPreviewSkeleton from "./_source/components/community-preview-section/CommunityPreviewSkeleton";
+import CompletionTrendSection from "./_source/components/completion-trend-section/CompletionTrendSection";
+import CompletionTrendSkeleton from "./_source/components/completion-trend-section/CompletionTrendSkeleton";
+import CongestionRankingSection from "./_source/components/congestion-ranking-section/CongestionRankingSection";
+import CongestionRankingSkeleton from "./_source/components/congestion-ranking-section/CongestionRankingSkeleton";
 import HomeCheckInSection from "./_source/components/HomeCheckInSection";
-import HotSpotSection from "./_source/components/HotSpotSection";
-import NearbyGymsSection from "./_source/components/NearbyGymsSection";
-import CommunityPreviewSkeleton from "./_source/components/skeleton/CommunityPreviewSkeleton";
-import CompletionTrendSkeleton from "./_source/components/skeleton/CompletionTrendSkeleton";
-import CongestionRankingSkeleton from "./_source/components/skeleton/CongestionRankingSkeleton";
-import HotSpotSkeleton from "./_source/components/skeleton/HotSpotSkeleton";
-import NearbyGymsSkeleton from "./_source/components/skeleton/NearbyGymsSkeleton";
+import HotSpotSection from "./_source/components/hot-spot-section/HotSpotSection";
+import HotSpotSkeleton from "./_source/components/hot-spot-section/HotSpotSkeleton";
 
 /**
  * 빌드 시 정적 프리렌더에서 클라이언트 섹션 SSR이 `NEXT_PUBLIC_API_URL`로 fetch 하면
@@ -28,7 +26,7 @@ const HomePage: NextPage = () => {
       {/* 상단 바 */}
       <AppTopBar />
 
-      <div className="mt-4 space-y-12 px-6">
+      <div className="mt-4 flex flex-col gap-10 px-6">
         {/* 빠른 체크인 (로그인 유저 전용) */}
         <HomeCheckInSection />
 
@@ -42,10 +40,6 @@ const HomePage: NextPage = () => {
 
         <Suspense fallback={<HotSpotSkeleton />}>
           <HotSpotSection />
-        </Suspense>
-
-        <Suspense fallback={<NearbyGymsSkeleton />}>
-          <NearbyGymsSection />
         </Suspense>
 
         <Suspense fallback={<CommunityPreviewSkeleton />}>

@@ -543,6 +543,8 @@ export interface components {
             congestion: number;
             /** @description 현재 체크인 기준 이용 인원 */
             visitorCount: number;
+            /** @description 이번 달 체크인 횟수 */
+            monthlyCheckInCount?: number | null;
             /** @description 수용 인원(표시 상한) */
             visitorCapacity: number;
             latitude: number | null;
@@ -1058,7 +1060,7 @@ export interface operations {
                 limit?: number;
                 region?: components["schemas"]["Region"];
                 search?: string;
-                sort?: "name" | "rating" | "congestion" | "reviewCount";
+                sort?: "name" | "rating" | "congestion" | "reviewCount" | "visitorCount" | "monthlyCheckInCount";
             };
             header?: never;
             path?: never;

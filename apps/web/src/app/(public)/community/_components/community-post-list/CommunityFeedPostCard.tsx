@@ -6,12 +6,16 @@ import { Bookmark, Eye, MessageCircle, ThumbsUp, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { categoryToKoreanMap, type CommunityCategory } from "@clog/utils";
+import {
+  categoryToKoreanMap,
+  postCategoryMap,
+  type CommunityCategory,
+} from "@clog/utils";
 
+import { Badge } from "#web/components/ui/badge";
 import { ROUTES } from "#web/constants";
 import { cn } from "#web/libs/utils";
 
-import { communityCategoryBadgeClassMap } from "../community-category/categoryBadgeClassMap";
 import { formatCompactCount } from "./formatCompactCount";
 
 interface IProps {
@@ -49,7 +53,6 @@ const CommunityFeedPostCard = ({
 }: IProps) => {
   const router = useRouter();
   const detailHref = ROUTES.COMMUNITY.DETAIL.path(id);
-  const badgeClass = communityCategoryBadgeClassMap[category];
 
   const goDetail = () => {
     void router.push(detailHref);
@@ -58,14 +61,9 @@ const CommunityFeedPostCard = ({
   const body = (
     <>
       <div className="mb-3 flex items-center justify-between">
-        <span
-          className={cn(
-            "rounded px-2 py-0.5 text-xs font-bold tracking-wide",
-            badgeClass,
-          )}
-        >
+        <Badge color={postCategoryMap[category]}>
           {categoryToKoreanMap[category]}
-        </span>
+        </Badge>
         <span className="text-xs font-medium text-on-surface-variant">
           {formatDistanceToNow(new Date(createdAt), {
             addSuffix: true,

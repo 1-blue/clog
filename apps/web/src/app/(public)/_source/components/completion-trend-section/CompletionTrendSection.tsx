@@ -31,13 +31,16 @@ const CompletionTrendSection = () => {
     })) ?? [];
 
   return (
-    <section className="rounded-2xl border border-outline-variant/20 bg-surface-container-low p-4">
-      <h2 className="text-lg font-bold text-on-surface">이번 주 완등 추이</h2>
-      <p className="mt-1 text-xs leading-relaxed text-on-surface-variant">
-        세팅 주기에 맞춰 가장 많은 완등 기록이 올라오고 있어요. (시도 제외 루트
-        기준)
-      </p>
-      <div className="mt-4 h-52 w-full min-w-0">
+    <section className="flex flex-col gap-4 rounded-2xl border border-outline-variant/20 bg-surface-container-low p-4">
+      <div className="flex flex-col gap-1">
+        <h2 className="text-lg font-bold text-on-surface">이번 주 완등 추이</h2>
+        <p className="text-xs leading-relaxed text-on-surface-variant">
+          세팅 주기에 맞춰 가장 많은 완등 기록이 올라오고 있어요. (시도 제외
+          루트 기준)
+        </p>
+      </div>
+
+      <div className="h-52 w-full min-w-0">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
             data={chartData}

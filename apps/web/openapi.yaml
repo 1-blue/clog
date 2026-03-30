@@ -17,10 +17,27 @@ paths:
       tags: [Gyms]
       parameters:
         - { name: cursor, in: query, schema: { type: string, format: uuid } }
-        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 50, default: 20 } }
-        - { name: region, in: query, schema: { $ref: "#/components/schemas/Region" } }
+        - {
+            name: limit,
+            in: query,
+            schema: { type: integer, minimum: 1, maximum: 50, default: 20 },
+          }
+        - {
+            name: region,
+            in: query,
+            schema: { $ref: "#/components/schemas/Region" },
+          }
         - { name: search, in: query, schema: { type: string } }
-        - { name: sort, in: query, schema: { type: string, enum: [name, rating, congestion, reviewCount], default: name } }
+        - {
+            name: sort,
+            in: query,
+            schema:
+              {
+                type: string,
+                enum: [name, rating, congestion, reviewCount, visitorCount, monthlyCheckInCount],
+                default: name,
+              },
+          }
       responses:
         "200":
           description: OK
@@ -39,7 +56,12 @@ paths:
       summary: 암장 상세
       tags: [Gyms]
       parameters:
-        - { name: gymId, in: path, required: true, schema: { type: string, format: uuid } }
+        - {
+            name: gymId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
       responses:
         "200":
           description: OK
@@ -58,7 +80,12 @@ paths:
       summary: 암장 체크인
       tags: [Gyms]
       parameters:
-        - { name: gymId, in: path, required: true, schema: { type: string, format: uuid } }
+        - {
+            name: gymId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
       responses:
         "200":
           description: OK
@@ -78,7 +105,12 @@ paths:
       summary: 암장 체크아웃
       tags: [Gyms]
       parameters:
-        - { name: gymId, in: path, required: true, schema: { type: string, format: uuid } }
+        - {
+            name: gymId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
       responses:
         "200":
           description: OK
@@ -98,7 +130,12 @@ paths:
       summary: 시간대별 혼잡도
       tags: [Gyms]
       parameters:
-        - { name: gymId, in: path, required: true, schema: { type: string, format: uuid } }
+        - {
+            name: gymId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
       responses:
         "200":
           description: OK
@@ -119,9 +156,18 @@ paths:
       summary: 리뷰 목록 (무한스크롤)
       tags: [Reviews]
       parameters:
-        - { name: gymId, in: path, required: true, schema: { type: string, format: uuid } }
+        - {
+            name: gymId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
         - { name: cursor, in: query, schema: { type: string, format: uuid } }
-        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 50, default: 20 } }
+        - {
+            name: limit,
+            in: query,
+            schema: { type: integer, minimum: 1, maximum: 50, default: 20 },
+          }
       responses:
         "200":
           description: OK
@@ -138,7 +184,12 @@ paths:
       summary: 리뷰 작성
       tags: [Reviews]
       parameters:
-        - { name: gymId, in: path, required: true, schema: { type: string, format: uuid } }
+        - {
+            name: gymId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
       requestBody:
         required: true
         content:
@@ -166,8 +217,16 @@ paths:
       tags: [Records]
       parameters:
         - { name: cursor, in: query, schema: { type: string, format: uuid } }
-        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 50, default: 20 } }
-        - { name: month, in: query, schema: { type: string, pattern: '^\d{4}-\d{2}$' } }
+        - {
+            name: limit,
+            in: query,
+            schema: { type: integer, minimum: 1, maximum: 50, default: 20 },
+          }
+        - {
+            name: month,
+            in: query,
+            schema: { type: string, pattern: '^\d{4}-\d{2}$' },
+          }
       responses:
         "200":
           description: OK
@@ -208,7 +267,12 @@ paths:
       summary: 기록 상세
       tags: [Records]
       parameters:
-        - { name: recordId, in: path, required: true, schema: { type: string, format: uuid } }
+        - {
+            name: recordId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
       responses:
         "200":
           description: OK
@@ -225,7 +289,12 @@ paths:
       summary: 기록 수정
       tags: [Records]
       parameters:
-        - { name: recordId, in: path, required: true, schema: { type: string, format: uuid } }
+        - {
+            name: recordId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
       requestBody:
         required: true
         content:
@@ -249,7 +318,12 @@ paths:
       summary: 기록 삭제
       tags: [Records]
       parameters:
-        - { name: recordId, in: path, required: true, schema: { type: string, format: uuid } }
+        - {
+            name: recordId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
       responses:
         "200":
           description: OK
@@ -270,8 +344,16 @@ paths:
       tags: [Posts]
       parameters:
         - { name: cursor, in: query, schema: { type: string, format: uuid } }
-        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 50, default: 20 } }
-        - { name: category, in: query, schema: { $ref: "#/components/schemas/CommunityCategory" } }
+        - {
+            name: limit,
+            in: query,
+            schema: { type: integer, minimum: 1, maximum: 50, default: 20 },
+          }
+        - {
+            name: category,
+            in: query,
+            schema: { $ref: "#/components/schemas/CommunityCategory" },
+          }
         - { name: search, in: query, schema: { type: string } }
       responses:
         "200":
@@ -313,7 +395,12 @@ paths:
       summary: 게시글 상세
       tags: [Posts]
       parameters:
-        - { name: postId, in: path, required: true, schema: { type: string, format: uuid } }
+        - {
+            name: postId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
       responses:
         "200":
           description: OK
@@ -330,7 +417,12 @@ paths:
       summary: 게시글 수정
       tags: [Posts]
       parameters:
-        - { name: postId, in: path, required: true, schema: { type: string, format: uuid } }
+        - {
+            name: postId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
       requestBody:
         required: true
         content:
@@ -354,7 +446,12 @@ paths:
       summary: 게시글 삭제
       tags: [Posts]
       parameters:
-        - { name: postId, in: path, required: true, schema: { type: string, format: uuid } }
+        - {
+            name: postId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
       responses:
         "200":
           description: OK
@@ -373,7 +470,12 @@ paths:
       summary: 게시글 조회수 증가 (세션당 1회 호출 권장)
       tags: [Posts]
       parameters:
-        - { name: postId, in: path, required: true, schema: { type: string, format: uuid } }
+        - {
+            name: postId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
       responses:
         "200":
           description: OK
@@ -395,7 +497,12 @@ paths:
       summary: 좋아요 토글
       tags: [Posts]
       parameters:
-        - { name: postId, in: path, required: true, schema: { type: string, format: uuid } }
+        - {
+            name: postId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
       responses:
         "200":
           description: OK
@@ -417,7 +524,12 @@ paths:
       summary: 북마크 토글
       tags: [Posts]
       parameters:
-        - { name: postId, in: path, required: true, schema: { type: string, format: uuid } }
+        - {
+            name: postId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
       responses:
         "200":
           description: OK
@@ -439,9 +551,18 @@ paths:
       summary: 댓글 목록 (무한스크롤)
       tags: [Comments]
       parameters:
-        - { name: postId, in: path, required: true, schema: { type: string, format: uuid } }
+        - {
+            name: postId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
         - { name: cursor, in: query, schema: { type: string, format: uuid } }
-        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 50, default: 20 } }
+        - {
+            name: limit,
+            in: query,
+            schema: { type: integer, minimum: 1, maximum: 50, default: 20 },
+          }
       responses:
         "200":
           description: OK
@@ -458,7 +579,12 @@ paths:
       summary: 댓글 작성
       tags: [Comments]
       parameters:
-        - { name: postId, in: path, required: true, schema: { type: string, format: uuid } }
+        - {
+            name: postId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
       requestBody:
         required: true
         content:
@@ -565,7 +691,11 @@ paths:
       tags: [Users]
       parameters:
         - { name: cursor, in: query, schema: { type: string, format: uuid } }
-        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 50, default: 20 } }
+        - {
+            name: limit,
+            in: query,
+            schema: { type: integer, minimum: 1, maximum: 50, default: 20 },
+          }
       responses:
         "200":
           description: OK
@@ -585,7 +715,11 @@ paths:
       tags: [Users]
       parameters:
         - { name: cursor, in: query, schema: { type: string, format: uuid } }
-        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 50, default: 20 } }
+        - {
+            name: limit,
+            in: query,
+            schema: { type: integer, minimum: 1, maximum: 50, default: 20 },
+          }
       responses:
         "200":
           description: OK
@@ -605,7 +739,11 @@ paths:
       tags: [Users]
       parameters:
         - { name: cursor, in: query, schema: { type: string, format: uuid } }
-        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 50, default: 20 } }
+        - {
+            name: limit,
+            in: query,
+            schema: { type: integer, minimum: 1, maximum: 50, default: 20 },
+          }
       responses:
         "200":
           description: OK
@@ -625,7 +763,11 @@ paths:
       tags: [Users]
       parameters:
         - { name: cursor, in: query, schema: { type: string, format: uuid } }
-        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 50, default: 20 } }
+        - {
+            name: limit,
+            in: query,
+            schema: { type: integer, minimum: 1, maximum: 50, default: 20 },
+          }
       responses:
         "200":
           description: OK
@@ -644,7 +786,12 @@ paths:
       summary: 유저 프로필
       tags: [Users]
       parameters:
-        - { name: userId, in: path, required: true, schema: { type: string, format: uuid } }
+        - {
+            name: userId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
       responses:
         "200":
           description: OK
@@ -663,7 +810,12 @@ paths:
       summary: 팔로우 토글
       tags: [Users]
       parameters:
-        - { name: userId, in: path, required: true, schema: { type: string, format: uuid } }
+        - {
+            name: userId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
       responses:
         "200":
           description: OK
@@ -685,9 +837,18 @@ paths:
       summary: 유저 공개 기록 목록 (프로필 그리드)
       tags: [Users]
       parameters:
-        - { name: userId, in: path, required: true, schema: { type: string, format: uuid } }
+        - {
+            name: userId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
         - { name: cursor, in: query, schema: { type: string, format: uuid } }
-        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 50, default: 20 } }
+        - {
+            name: limit,
+            in: query,
+            schema: { type: integer, minimum: 1, maximum: 50, default: 20 },
+          }
         - name: day
           in: query
           description: 방문일 필터 (yyyy-MM-dd)
@@ -740,8 +901,16 @@ paths:
       tags: [Notifications]
       parameters:
         - { name: cursor, in: query, schema: { type: string, format: uuid } }
-        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 50, default: 20 } }
-        - { name: type, in: query, schema: { $ref: "#/components/schemas/NotificationType" } }
+        - {
+            name: limit,
+            in: query,
+            schema: { type: integer, minimum: 1, maximum: 50, default: 20 },
+          }
+        - {
+            name: type,
+            in: query,
+            schema: { $ref: "#/components/schemas/NotificationType" },
+          }
       responses:
         "200":
           description: OK
@@ -785,8 +954,10 @@ paths:
               type: object
               required: [filename, contentType, type]
               properties:
-                filename: { type: string, description: "원본 파일명 (확장자 포함)" }
-                contentType: { type: string, description: "image/* 또는 video/*" }
+                filename:
+                  { type: string, description: "원본 파일명 (확장자 포함)" }
+                contentType:
+                  { type: string, description: "image/* 또는 video/*" }
                 type:
                   type: string
                   enum: [images, videos]
@@ -821,7 +992,26 @@ components:
     # ── Enums ──
     Region:
       type: string
-      enum: [SEOUL, GYEONGGI, INCHEON, BUSAN, DAEGU, DAEJEON, GWANGJU, ULSAN, SEJONG, GANGWON, CHUNGBUK, CHUNGNAM, JEONBUK, JEONNAM, GYEONGBUK, GYEONGNAM, JEJU]
+      enum:
+        [
+          SEOUL,
+          GYEONGGI,
+          INCHEON,
+          BUSAN,
+          DAEGU,
+          DAEJEON,
+          GWANGJU,
+          ULSAN,
+          SEJONG,
+          GANGWON,
+          CHUNGBUK,
+          CHUNGNAM,
+          JEONBUK,
+          JEONNAM,
+          GYEONGBUK,
+          GYEONGNAM,
+          JEJU,
+        ]
     Difficulty:
       type: string
       enum: [VB, V0, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V_PLUS]
@@ -901,7 +1091,27 @@ components:
 
     GymListItem:
       type: object
-      required: [id, name, address, region, phone, openHours, congestion, visitorCount, visitorCapacity, latitude, longitude, description, avgRating, reviewCount, createdAt, updatedAt, facilities, images]
+      required:
+        [
+          id,
+          name,
+          address,
+          region,
+          phone,
+          openHours,
+          congestion,
+          visitorCount,
+          visitorCapacity,
+          latitude,
+          longitude,
+          description,
+          avgRating,
+          reviewCount,
+          createdAt,
+          updatedAt,
+          facilities,
+          images,
+        ]
       properties:
         id: { type: string, format: uuid }
         name: { type: string }
@@ -913,7 +1123,12 @@ components:
             - type: "null"
             - $ref: "#/components/schemas/GymOpenHours"
         congestion: { type: integer }
-        visitorCount: { type: integer, description: "현재 체크인 기준 이용 인원" }
+        visitorCount:
+          { type: integer, description: "현재 체크인 기준 이용 인원" }
+        monthlyCheckInCount:
+          type: integer
+          nullable: true
+          description: "이번 달 체크인 횟수"
         visitorCapacity: { type: integer, description: "수용 인원(표시 상한)" }
         latitude: { type: number, nullable: true }
         longitude: { type: number, nullable: true }
@@ -921,7 +1136,8 @@ components:
         avgRating: { type: number }
         reviewCount: { type: integer }
         website: { type: string, nullable: true, description: "웹사이트 URL" }
-        thumbnailUrl: { type: string, nullable: true, description: "목록/카드용 썸네일" }
+        thumbnailUrl:
+          { type: string, nullable: true, description: "목록/카드용 썸네일" }
         instagramId: { type: string, nullable: true }
         priceInfo:
           description: "가격 정보 (암장별 JSON 구조)"
@@ -1012,7 +1228,19 @@ components:
 
     ReviewListItem:
       type: object
-      required: [id, userId, gymId, rating, content, createdAt, updatedAt, user, features, images]
+      required:
+        [
+          id,
+          userId,
+          gymId,
+          rating,
+          content,
+          createdAt,
+          updatedAt,
+          user,
+          features,
+          images,
+        ]
       properties:
         id: { type: string, format: uuid }
         userId: { type: string, format: uuid }
@@ -1057,7 +1285,8 @@ components:
     # ── Record / Session ──
     Route:
       type: object
-      required: [id, sessionId, difficulty, result, attempts, memo, order, createdAt]
+      required:
+        [id, sessionId, difficulty, result, attempts, memo, order, createdAt]
       properties:
         id: { type: string, format: uuid }
         sessionId: { type: string, format: uuid }
@@ -1090,7 +1319,22 @@ components:
 
     RecordListItem:
       type: object
-      required: [id, userId, gymId, date, startTime, endTime, memo, isPublic, createdAt, updatedAt, gym, routes, images]
+      required:
+        [
+          id,
+          userId,
+          gymId,
+          date,
+          startTime,
+          endTime,
+          memo,
+          isPublic,
+          createdAt,
+          updatedAt,
+          gym,
+          routes,
+          images,
+        ]
       properties:
         id: { type: string, format: uuid }
         userId: { type: string, format: uuid }
@@ -1112,7 +1356,23 @@ components:
 
     RecordDetail:
       type: object
-      required: [id, userId, gymId, date, startTime, endTime, memo, isPublic, createdAt, updatedAt, gym, routes, images, user]
+      required:
+        [
+          id,
+          userId,
+          gymId,
+          date,
+          startTime,
+          endTime,
+          memo,
+          isPublic,
+          createdAt,
+          updatedAt,
+          gym,
+          routes,
+          images,
+          user,
+        ]
       properties:
         id: { type: string, format: uuid }
         userId: { type: string, format: uuid }
@@ -1211,7 +1471,19 @@ components:
 
     Post:
       type: object
-      required: [id, authorId, category, title, content, viewCount, likeCount, commentCount, createdAt, updatedAt]
+      required:
+        [
+          id,
+          authorId,
+          category,
+          title,
+          content,
+          viewCount,
+          likeCount,
+          commentCount,
+          createdAt,
+          updatedAt,
+        ]
       properties:
         id: { type: string, format: uuid }
         authorId: { type: string, format: uuid }
@@ -1226,7 +1498,22 @@ components:
 
     PostListItem:
       type: object
-      required: [id, authorId, category, title, content, viewCount, likeCount, commentCount, createdAt, updatedAt, author, tags, images]
+      required:
+        [
+          id,
+          authorId,
+          category,
+          title,
+          content,
+          viewCount,
+          likeCount,
+          commentCount,
+          createdAt,
+          updatedAt,
+          author,
+          tags,
+          images,
+        ]
       properties:
         id: { type: string, format: uuid }
         authorId: { type: string, format: uuid }
@@ -1262,7 +1549,22 @@ components:
 
     PostDetail:
       type: object
-      required: [id, authorId, category, title, content, viewCount, likeCount, commentCount, createdAt, updatedAt, author, tags, images]
+      required:
+        [
+          id,
+          authorId,
+          category,
+          title,
+          content,
+          viewCount,
+          likeCount,
+          commentCount,
+          createdAt,
+          updatedAt,
+          author,
+          tags,
+          images,
+        ]
       properties:
         id: { type: string, format: uuid }
         authorId: { type: string, format: uuid }
@@ -1348,7 +1650,8 @@ components:
     # ── Comment ──
     CommentWithAuthor:
       type: object
-      required: [id, postId, authorId, parentId, content, createdAt, updatedAt, author]
+      required:
+        [id, postId, authorId, parentId, content, createdAt, updatedAt, author]
       properties:
         id: { type: string, format: uuid }
         postId: { type: string, format: uuid }
@@ -1361,7 +1664,18 @@ components:
 
     CommentListItem:
       type: object
-      required: [id, postId, authorId, parentId, content, createdAt, updatedAt, author, replies]
+      required:
+        [
+          id,
+          postId,
+          authorId,
+          parentId,
+          content,
+          createdAt,
+          updatedAt,
+          author,
+          replies,
+        ]
       properties:
         id: { type: string, format: uuid }
         postId: { type: string, format: uuid }
@@ -1395,7 +1709,21 @@ components:
     User:
       type: object
       required:
-        [id, email, nickname, bio, profileImage, coverImage, instagramId, youtubeUrl, maxDifficulty, role, checkInAutoDurationMinutes, createdAt, updatedAt]
+        [
+          id,
+          email,
+          nickname,
+          bio,
+          profileImage,
+          coverImage,
+          instagramId,
+          youtubeUrl,
+          maxDifficulty,
+          role,
+          checkInAutoDurationMinutes,
+          createdAt,
+          updatedAt,
+        ]
       properties:
         id: { type: string, format: uuid }
         homeGymId: { type: string, format: uuid, nullable: true }
@@ -1406,7 +1734,8 @@ components:
         coverImage: { type: string, nullable: true }
         instagramId: { type: string, nullable: true }
         youtubeUrl: { type: string, nullable: true }
-        maxDifficulty: { $ref: "#/components/schemas/Difficulty", nullable: true }
+        maxDifficulty:
+          { $ref: "#/components/schemas/Difficulty", nullable: true }
         role: { $ref: "#/components/schemas/Role" }
         checkInAutoDurationMinutes:
           type: integer
@@ -1436,7 +1765,27 @@ components:
 
     UserMe:
       type: object
-      required: [id, email, nickname, bio, profileImage, coverImage, instagramId, youtubeUrl, maxDifficulty, role, createdAt, updatedAt, _count, visitCount, sendCount, checkInAutoDurationMinutes, linkedProviders, activeCheckIn]
+      required:
+        [
+          id,
+          email,
+          nickname,
+          bio,
+          profileImage,
+          coverImage,
+          instagramId,
+          youtubeUrl,
+          maxDifficulty,
+          role,
+          createdAt,
+          updatedAt,
+          _count,
+          visitCount,
+          sendCount,
+          checkInAutoDurationMinutes,
+          linkedProviders,
+          activeCheckIn,
+        ]
       properties:
         id: { type: string, format: uuid }
         homeGymId: { type: string, format: uuid, nullable: true }
@@ -1447,7 +1796,8 @@ components:
         coverImage: { type: string, nullable: true }
         instagramId: { type: string, nullable: true }
         youtubeUrl: { type: string, nullable: true }
-        maxDifficulty: { $ref: "#/components/schemas/Difficulty", nullable: true }
+        maxDifficulty:
+          { $ref: "#/components/schemas/Difficulty", nullable: true }
         role: { $ref: "#/components/schemas/Role" }
         createdAt: { type: string, format: date-time }
         updatedAt: { type: string, format: date-time }
@@ -1472,7 +1822,23 @@ components:
 
     UserProfile:
       type: object
-      required: [id, nickname, bio, profileImage, coverImage, instagramId, youtubeUrl, maxDifficulty, createdAt, _count, visitCount, sendCount, activityHeatmap, activityHeatmapDays]
+      required:
+        [
+          id,
+          nickname,
+          bio,
+          profileImage,
+          coverImage,
+          instagramId,
+          youtubeUrl,
+          maxDifficulty,
+          createdAt,
+          _count,
+          visitCount,
+          sendCount,
+          activityHeatmap,
+          activityHeatmapDays,
+        ]
       properties:
         id: { type: string, format: uuid }
         nickname: { type: string }
@@ -1481,7 +1847,8 @@ components:
         coverImage: { type: string, nullable: true }
         instagramId: { type: string, nullable: true }
         youtubeUrl: { type: string, nullable: true }
-        maxDifficulty: { $ref: "#/components/schemas/Difficulty", nullable: true }
+        maxDifficulty:
+          { $ref: "#/components/schemas/Difficulty", nullable: true }
         createdAt: { type: string, format: date-time }
         _count: { $ref: "#/components/schemas/UserCounts" }
         visitCount: { type: integer }
