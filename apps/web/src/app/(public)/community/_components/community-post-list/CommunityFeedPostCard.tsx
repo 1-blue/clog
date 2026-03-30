@@ -3,6 +3,7 @@
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
 import {
+  Bookmark,
   Eye,
   MessageCircle,
   ThumbsUp,
@@ -33,6 +34,7 @@ interface IProps {
   createdAt: string | Date;
   imageUrl?: string | null;
   isLiked?: boolean;
+  isBookmarked?: boolean;
 }
 
 const CommunityFeedPostCard = ({
@@ -49,6 +51,7 @@ const CommunityFeedPostCard = ({
   createdAt,
   imageUrl,
   isLiked = false,
+  isBookmarked,
 }: IProps) => {
   const router = useRouter();
   const detailHref = ROUTES.COMMUNITY.DETAIL.path(id);
@@ -138,6 +141,20 @@ const CommunityFeedPostCard = ({
             {formatCompactCount(viewCount)}
           </span>
         </div>
+        {isBookmarked !== undefined && (
+          <div
+            className={cn(
+              "flex items-center gap-1.5",
+              isBookmarked && "text-secondary",
+            )}
+          >
+            <Bookmark
+              className={cn("size-5", isBookmarked && "fill-secondary")}
+              strokeWidth={2}
+              aria-hidden
+            />
+          </div>
+        )}
       </div>
     </>
   );
@@ -155,21 +172,18 @@ const CommunityFeedPostCard = ({
       }}
       className="cursor-pointer overflow-hidden rounded-2xl border border-outline-variant/5 bg-surface-container-low transition-all active:scale-95"
     >
-      {imageUrl ? (
-        <div className="flex flex-col sm:flex-row">
-          <div className="order-2 flex-1 p-5 sm:order-1">{body}</div>
-          <div className="relative order-1 h-44 w-full shrink-0 overflow-hidden sm:order-2 sm:h-auto sm:min-h-44 sm:w-40">
+      <div className="flex gap-4 p-5">
+        <div className="flex-1">{body}</div>
+        {imageUrl && (
+          <div className="size-24 shrink-0 overflow-hidden rounded-xl">
             <img
               src={imageUrl}
               alt=""
               className="size-full object-cover opacity-90"
             />
-            <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent sm:bg-linear-to-l" />
           </div>
-        </div>
-      ) : (
-        <div className="p-5">{body}</div>
-      )}
+        )}
+      </div>
     </article>
   );
 };

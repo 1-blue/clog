@@ -2,7 +2,7 @@ import { Info } from "lucide-react";
 
 const CommunityGuestNotice = () => {
   return (
-    <div className="mb-6 flex items-center gap-3 rounded-xl border border-outline-variant/30 bg-surface-container-high p-4">
+    <div className="mb-2 flex items-center gap-3 rounded-xl border border-outline-variant/30 bg-surface-container-high p-4">
       <Info
         className="size-5 shrink-0 text-secondary"
         strokeWidth={2}
