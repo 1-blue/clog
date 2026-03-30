@@ -1,4 +1,4 @@
-import { Clock } from "lucide-react";
+import { CheckCircle2, Clock } from "lucide-react";
 import Link from "next/link";
 import { useMemo } from "react";
 
@@ -39,6 +39,15 @@ const RecordDayCard: React.FC<IProps> = ({ record }) => {
     return Object.entries(acc);
   }, [record.routes]);
 
+  const sendCount = useMemo(
+    () =>
+      record.routes.filter((r) =>
+        ["SEND", "FLASH", "ONSIGHT"].includes(r.result),
+      ).length,
+    [record.routes],
+  );
+  const totalRoutes = record.routes.length;
+
   const heroImage = record.images?.[0]?.url;
 
   return (
@@ -72,6 +81,15 @@ const RecordDayCard: React.FC<IProps> = ({ record }) => {
               {exercise.rangeLabel}
             </span>
             <span>{exercise.totalLabel}</span>
+          </div>
+        )}
+
+        {totalRoutes > 0 && (
+          <div className="mb-2 flex items-center gap-1 text-xs text-on-surface-variant">
+            <CheckCircle2 className="size-3.5 text-primary" />
+            <span>
+              완등 {sendCount}/{totalRoutes}
+            </span>
           </div>
         )}
 

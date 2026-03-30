@@ -1,15 +1,16 @@
 "use client";
 
 import { Clock } from "lucide-react";
+import { useFormContext, useWatch } from "react-hook-form";
 
 import {
+  normalizeSessionTimeRange,
   SESSION_CLOCK_HOUR_MAX,
   SESSION_CLOCK_HOUR_MIN,
   SESSION_HOUR_OPTIONS,
   SESSION_MAX_MINUTES,
   SESSION_MIN_MINUTES,
   SESSION_MINUTE_OPTIONS,
-  normalizeSessionTimeRange,
 } from "@clog/utils";
 
 import {
@@ -21,11 +22,9 @@ import {
 } from "#web/components/ui/select";
 import { cn } from "#web/libs/utils";
 
+import type { TRecordFormData } from "../../hooks/useRecordForm";
+
 interface IProps {
-  /** 자정 기준 분 (08:00 ~ 23:55) */
-  startMinutes: number;
-  endMinutes: number;
-  onChange: (range: { startMinutes: number; endMinutes: number }) => void;
   className?: string;
 }
 
@@ -68,13 +67,7 @@ const TimePair = ({ totalMinutes, onPick }: ITimePairProps) => {
   const minuteValue = snapMinuteToStep(m);
 
   const apply = (nextH: number, nextM: number) => {
-    onPick(
-      clamp(
-        nextH * 60 + nextM,
-        SESSION_MIN_MINUTES,
-        SESSION_MAX_MINUTES,
-      ),
-    );
+    onPick(clamp(nextH * 60 + nextM, SESSION_MIN_MINUTES, SESSION_MAX_MINUTES));
   };
 
   return (
@@ -113,18 +106,21 @@ const TimePair = ({ totalMinutes, onPick }: ITimePairProps) => {
   );
 };
 
-const RecordDurationField = ({
-  startMinutes,
-  endMinutes,
-  onChange,
-  className,
-}: IProps) => {
+const RecordDurationField = ({ className }: IProps) => {
+  const { control, setValue } = useFormContext<TRecordFormData>();
+  const startMinutes = useWatch({ control, name: "startMinutes" });
+  const endMinutes = useWatch({ control, name: "endMinutes" });
+
   const setStart = (next: number) => {
-    onChange(normalizeSessionTimeRange(next, endMinutes));
+    const normalized = normalizeSessionTimeRange(next, endMinutes);
+    setValue("startMinutes", normalized.startMinutes);
+    setValue("endMinutes", normalized.endMinutes);
   };
 
   const setEnd = (next: number) => {
-    onChange(normalizeSessionTimeRange(startMinutes, next));
+    const normalized = normalizeSessionTimeRange(startMinutes, next);
+    setValue("startMinutes", normalized.startMinutes);
+    setValue("endMinutes", normalized.endMinutes);
   };
 
   const gap = formatGapKo(startMinutes, endMinutes);
@@ -162,8 +158,8 @@ const RecordDurationField = ({
         </span>
         {gap ? ` · 약 ${gap}` : ""}
         <span className="mt-0.5 block">
-          {SESSION_CLOCK_HOUR_MIN}시~{SESSION_CLOCK_HOUR_MAX}시 사이, 방문일 당일
-          기준
+          {SESSION_CLOCK_HOUR_MIN}시~{SESSION_CLOCK_HOUR_MAX}시 사이, 방문일
+          당일 기준
         </span>
       </p>
     </div>

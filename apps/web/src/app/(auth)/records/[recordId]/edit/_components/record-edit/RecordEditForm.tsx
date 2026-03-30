@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { FormProvider } from "react-hook-form";
 
 import { normalizeSessionTimeRange } from "@clog/utils";
 
@@ -8,28 +8,22 @@ import type { components } from "#web/@types/openapi";
 import RecordDiscardRow from "#web/app/(auth)/records/_source/components/RecordDiscardRow";
 import RecordFormTopBar from "#web/app/(auth)/records/_source/components/RecordFormTopBar";
 import RecordGymReadonlyCard from "#web/app/(auth)/records/_source/components/RecordGymReadonlyCard";
-import type { IRecordSessionRouteEntry } from "#web/app/(auth)/records/_source/components/record-session-types";
 import {
   initialSessionMinutesFromRecord,
   recordDateToYmd,
 } from "#web/app/(auth)/records/_source/components/sessionTimesFromRecord";
+import RecordDurationField from "#web/app/(auth)/records/new/_source/components/record-new/RecordDurationField";
+import RecordGallerySection from "#web/app/(auth)/records/new/_source/components/record-new/RecordGallerySection";
+import RecordMemoField from "#web/app/(auth)/records/new/_source/components/record-new/RecordMemoField";
+import RecordPublicToggleCard from "#web/app/(auth)/records/new/_source/components/record-new/RecordPublicToggleCard";
+import RecordRoutesSection from "#web/app/(auth)/records/new/_source/components/record-new/RecordRoutesSection";
+import RecordVisitDateField from "#web/app/(auth)/records/new/_source/components/record-new/RecordVisitDateField";
+import useRecordForm, {
+  type TRecordFormData,
+} from "#web/app/(auth)/records/new/_source/hooks/useRecordForm";
 import useRecordMutations from "#web/hooks/mutations/records/useRecordMutations";
 
-import RecordDurationField from "../../../../new/_components/record-new/RecordDurationField";
-import RecordGallerySection from "../../../../new/_components/record-new/RecordGallerySection";
-import RecordMemoField from "../../../../new/_components/record-new/RecordMemoField";
-import RecordPublicToggleCard from "../../../../new/_components/record-new/RecordPublicToggleCard";
-import RecordRoutesSection from "../../../../new/_components/record-new/RecordRoutesSection";
-import RecordVisitDateField from "../../../../new/_components/record-new/RecordVisitDateField";
-
 type TRecordDetail = components["schemas"]["RecordDetail"];
-
-const routesFromRecord = (record: TRecordDetail): IRecordSessionRouteEntry[] =>
-  record.routes.map((r) => ({
-    difficulty: r.difficulty,
-    result: r.result,
-    attempts: r.attempts,
-  }));
 
 interface IProps {
   recordId: string;
@@ -37,106 +31,91 @@ interface IProps {
 }
 
 const RecordEditForm: React.FC<IProps> = ({ recordId, record }) => {
-  const [dateYmd, setDateYmd] = useState(() => recordDateToYmd(record.date));
-  const [sessionTimes, setSessionTimes] = useState(() =>
-    initialSessionMinutesFromRecord(record.startTime, record.endTime),
+  const { startMinutes, endMinutes } = initialSessionMinutesFromRecord(
+    record.startTime,
+    record.endTime,
   );
-  const [memo, setMemo] = useState(() => record.memo ?? "");
-  const [routes, setRoutes] = useState<IRecordSessionRouteEntry[]>(() =>
-    routesFromRecord(record),
-  );
-  const [imageUrls, setImageUrls] = useState<string[]>(() =>
-    record.images.map((img) => img.url),
-  );
-  const [isPublic, setIsPublic] = useState(() => record.isPublic);
+
+  const methods = useRecordForm({
+    defaultValues: {
+      gymId: record.gym.id,
+      gymName: record.gym.name,
+      dateYmd: recordDateToYmd(record.date),
+      startMinutes,
+      endMinutes,
+      memo: record.memo ?? "",
+      isPublic: record.isPublic,
+      routes: record.routes.map(({ difficulty, result, attempts }) => ({
+        difficulty,
+        result,
+        attempts,
+      })),
+      imageUrls: record.images.map((img) => img.url),
+    },
+  });
+
+  const { handleSubmit, watch } = methods;
+  const routesLen = watch("routes").length;
 
   const { recordPatchMutation } = useRecordMutations();
 
-  const atVisitDay = (minutes: number) => {
-    const h = Math.floor(minutes / 60);
-    const m = minutes % 60;
-    return new Date(
-      `${dateYmd}T${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:00`,
+  const onSubmit = (data: TRecordFormData) => {
+    const { startMinutes: sMin, endMinutes: eMin } = normalizeSessionTimeRange(
+      data.startMinutes,
+      data.endMinutes,
     );
-  };
-
-  const save = () => {
-    const { startMinutes, endMinutes } = normalizeSessionTimeRange(
-      sessionTimes.startMinutes,
-      sessionTimes.endMinutes,
-    );
-    const visitNoon = new Date(`${dateYmd}T12:00:00`);
+    const visitNoon = new Date(`${data.dateYmd}T12:00:00`);
+    const atDay = (min: number) => {
+      const h = Math.floor(min / 60);
+      const m = min % 60;
+      return new Date(
+        `${data.dateYmd}T${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:00`,
+      ).toISOString();
+    };
 
     recordPatchMutation.mutate({
       params: { path: { recordId } },
       body: {
         date: visitNoon.toISOString(),
-        startTime: atVisitDay(startMinutes).toISOString(),
-        endTime: atVisitDay(endMinutes).toISOString(),
-        memo: memo.trim() === "" ? null : memo.trim(),
-        isPublic,
-        routes: routes.map((r) => ({
-          difficulty: r.difficulty,
-          result: r.result,
-          attempts: r.attempts,
+        startTime: atDay(sMin),
+        endTime: atDay(eMin),
+        memo: data.memo?.trim() === "" ? null : data.memo?.trim(),
+        isPublic: data.isPublic,
+        routes: data.routes.map(({ difficulty, result, attempts }) => ({
+          difficulty,
+          result,
+          attempts,
         })),
-        imageUrls,
+        imageUrls: data.imageUrls ?? [],
       },
     });
   };
 
   return (
-    <div className="min-h-svh bg-background pb-10">
-      <RecordFormTopBar
-        title="기록 수정"
-        onSave={save}
-        saveDisabled={routes.length === 0}
-        savePending={recordPatchMutation.isPending}
-      />
-
-      <div className="mx-auto max-w-lg space-y-5 px-4 pt-4">
-        <RecordGallerySection
-          urls={imageUrls}
-          onUrlsChange={setImageUrls}
-          maxFiles={5}
+    <FormProvider {...methods}>
+      <div className="min-h-svh bg-background pb-10">
+        <RecordFormTopBar
+          title="기록 수정"
+          onSave={handleSubmit(onSubmit)}
+          saveDisabled={routesLen === 0}
+          savePending={recordPatchMutation.isPending}
         />
 
-        <RecordVisitDateField value={dateYmd} onChange={setDateYmd} />
-
-        <RecordGymReadonlyCard
-          name={record.gym.name}
-          address={record.gym.address}
-        />
-
-        <RecordDurationField
-          startMinutes={sessionTimes.startMinutes}
-          endMinutes={sessionTimes.endMinutes}
-          onChange={setSessionTimes}
-        />
-
-        <RecordRoutesSection
-          routes={routes}
-          onAddRoute={(entry) => setRoutes((prev) => [...prev, entry])}
-          onRemoveRoute={(i) =>
-            setRoutes((prev) => prev.filter((_, idx) => idx !== i))
-          }
-          onChangeAttempts={(i, n) =>
-            setRoutes((prev) =>
-              prev.map((r, idx) => (idx === i ? { ...r, attempts: n } : r)),
-            )
-          }
-        />
-
-        <RecordMemoField value={memo} onChange={setMemo} />
-
-        <RecordPublicToggleCard
-          checked={isPublic}
-          onCheckedChange={setIsPublic}
-        />
-
-        <RecordDiscardRow label="수정 취소" />
+        <div className="mx-auto max-w-lg space-y-5 px-4 pt-4">
+          <RecordGallerySection maxFiles={5} />
+          <RecordVisitDateField />
+          <RecordGymReadonlyCard
+            name={record.gym.name}
+            address={record.gym.address}
+          />
+          <RecordDurationField />
+          <RecordRoutesSection />
+          <RecordMemoField />
+          <RecordPublicToggleCard />
+          <RecordDiscardRow label="수정 취소" />
+        </div>
       </div>
-    </div>
+    </FormProvider>
   );
 };
 

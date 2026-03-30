@@ -2,28 +2,27 @@
 
 import { Combobox } from "@base-ui/react/combobox";
 import { MapPin, Search } from "lucide-react";
+import { useFormContext, useWatch } from "react-hook-form";
 import { useEffect, useMemo, useState } from "react";
 
 import type { components } from "#web/@types/openapi";
 import { openapi } from "#web/apis/openapi";
 import { cn } from "#web/libs/utils";
 
+import type { TRecordFormData } from "../../hooks/useRecordForm";
+
 type GymListItem = components["schemas"]["GymListItem"];
 type GymOption = Pick<GymListItem, "id" | "name">;
 
 interface IProps {
-  gymId: string;
-  gymName: string;
-  onSelect: (id: string, name: string) => void;
   className?: string;
 }
 
-const RecordGymSearchField = ({
-  gymId,
-  gymName,
-  onSelect,
-  className,
-}: IProps) => {
+const RecordGymSearchField = ({ className }: IProps) => {
+  const { control, setValue } = useFormContext<TRecordFormData>();
+  const gymId = useWatch({ control, name: "gymId" });
+  const gymName = useWatch({ control, name: "gymName" });
+
   const [draft, setDraft] = useState("");
   const [debounced, setDebounced] = useState("");
 
@@ -67,8 +66,13 @@ const RecordGymSearchField = ({
         autoHighlight
         value={value}
         onValueChange={(next) => {
-          if (next) onSelect(next.id, next.name);
-          else onSelect("", "");
+          if (next) {
+            setValue("gymId", next.id, { shouldValidate: true });
+            setValue("gymName", next.name);
+          } else {
+            setValue("gymId", "", { shouldValidate: true });
+            setValue("gymName", "");
+          }
         }}
         onInputValueChange={(v) => setDraft(v)}
         isItemEqualToValue={(a, b) => a.id === b.id}
@@ -100,7 +104,7 @@ const RecordGymSearchField = ({
           >
             <Combobox.Popup
               className={cn(
-                "box-border max-h-[min(var(--available-height),15rem)] max-w-[var(--available-width)] w-[var(--anchor-width)] min-w-0",
+                "box-border max-h-[min(var(--available-height),15rem)] w-[var(--anchor-width)] max-w-[var(--available-width)] min-w-0",
                 "origin-[var(--transform-origin)] overflow-y-auto overscroll-contain",
                 "rounded-2xl border border-outline-variant bg-popover py-2 text-on-surface shadow-lg",
                 "scroll-pt-2 scroll-pb-2 outline-none",
@@ -114,7 +118,7 @@ const RecordGymSearchField = ({
                   <Combobox.Item
                     key={item.id}
                     value={item}
-                    className="grid w-full min-w-0 cursor-default select-none grid-cols-1 px-4 py-2.5 text-left text-sm text-on-surface outline-none data-highlighted:bg-surface-container-high"
+                    className="grid w-full min-w-0 cursor-default grid-cols-1 px-4 py-2.5 text-left text-sm text-on-surface outline-none select-none data-highlighted:bg-surface-container-high"
                   >
                     <span className="min-w-0 font-medium break-words">
                       {item.name}

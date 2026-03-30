@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 
+import AppTopBar from "#web/components/layout/AppTopBar";
 import { getSharedMetadata } from "#web/libs/sharedMetadata";
 
 import RecordsListSection from "./_source/components/RecordsListSection";
@@ -16,6 +17,10 @@ export const generateMetadata = async (): Promise<Metadata> =>
 
 const RecordsPage = () => (
   <div className="pb-24">
+    <AppTopBar
+      left={<span className="text-lg font-bold text-on-surface">기록</span>}
+    />
+
     <Suspense fallback={<RecordsListSkeleton />}>
       <RecordsListSection />
     </Suspense>

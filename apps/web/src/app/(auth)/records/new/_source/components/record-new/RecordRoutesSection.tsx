@@ -1,30 +1,43 @@
 "use client";
 
 import { ListPlus } from "lucide-react";
+import { useFormContext, useWatch } from "react-hook-form";
 import { useState } from "react";
 
+import type { IRecordSessionRouteEntry } from "#web/app/(auth)/records/_source/components/record-session-types";
 import { cn } from "#web/libs/utils";
 
-import type { IRecordSessionRouteEntry } from "#web/app/(auth)/records/_source/components/record-session-types";
+import type { TRecordFormData } from "../../hooks/useRecordForm";
 import RecordRouteAddSheet from "./RecordRouteAddSheet";
 import RecordRouteRow from "./RecordRouteRow";
 
 interface IProps {
-  routes: IRecordSessionRouteEntry[];
-  onAddRoute: (entry: IRecordSessionRouteEntry) => void;
-  onRemoveRoute: (index: number) => void;
-  onChangeAttempts: (index: number, attempts: number) => void;
   className?: string;
 }
 
-const RecordRoutesSection = ({
-  routes,
-  onAddRoute,
-  onRemoveRoute,
-  onChangeAttempts,
-  className,
-}: IProps) => {
+const RecordRoutesSection = ({ className }: IProps) => {
   const [sheetOpen, setSheetOpen] = useState(false);
+  const { control, setValue } = useFormContext<TRecordFormData>();
+  const routes = useWatch({ control, name: "routes" }) ?? [];
+
+  const handleAdd = (entry: IRecordSessionRouteEntry) => {
+    setValue("routes", [...routes, entry], { shouldValidate: true });
+  };
+
+  const handleRemove = (index: number) => {
+    setValue(
+      "routes",
+      routes.filter((_, idx) => idx !== index),
+      { shouldValidate: true },
+    );
+  };
+
+  const handleChangeAttempts = (index: number, attempts: number) => {
+    setValue(
+      "routes",
+      routes.map((r, idx) => (idx === index ? { ...r, attempts } : r)),
+    );
+  };
 
   return (
     <section className={cn("space-y-3", className)}>
@@ -44,8 +57,8 @@ const RecordRoutesSection = ({
             difficulty={route.difficulty}
             result={route.result}
             attempts={route.attempts}
-            onChangeAttempts={(n) => onChangeAttempts(i, n)}
-            onRemove={() => onRemoveRoute(i)}
+            onChangeAttempts={(n) => handleChangeAttempts(i, n)}
+            onRemove={() => handleRemove(i)}
           />
         ))}
       </div>
@@ -62,7 +75,7 @@ const RecordRoutesSection = ({
       <RecordRouteAddSheet
         open={sheetOpen}
         onOpenChange={setSheetOpen}
-        onAdd={onAddRoute}
+        onAdd={handleAdd}
       />
     </section>
   );

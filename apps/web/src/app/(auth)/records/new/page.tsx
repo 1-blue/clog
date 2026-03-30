@@ -1,12 +1,12 @@
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { cache } from "react";
 import type { Metadata } from "next";
-import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
 import { prefetchGymsForRecordForm } from "#web/app/(auth)/records/_source/components/record-form-prefetch";
 import { getQueryClient } from "#web/libs/getQueryClient";
 import { getSharedMetadata } from "#web/libs/sharedMetadata";
 
-import RecordNewMain from "./_components/record-new/RecordNewMain";
+import RecordNewMain from "./_source/components/record-new/RecordNewMain";
 
 export const revalidate = 0;
 

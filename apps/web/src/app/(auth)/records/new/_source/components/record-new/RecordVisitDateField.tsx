@@ -3,6 +3,7 @@
 import { format, isValid, parse } from "date-fns";
 import { ko } from "date-fns/locale";
 import { CalendarDays, ChevronDown } from "lucide-react";
+import { useFormContext, useWatch } from "react-hook-form";
 import { useState } from "react";
 
 import { Calendar } from "#web/components/ui/calendar";
@@ -14,16 +15,18 @@ import {
 } from "#web/components/ui/sheet";
 import { cn } from "#web/libs/utils";
 
+import type { TRecordFormData } from "../../hooks/useRecordForm";
+
 interface IProps {
-  value: string;
-  onChange: (ymd: string) => void;
   className?: string;
 }
 
-const RecordVisitDateField = ({ value, onChange, className }: IProps) => {
+const RecordVisitDateField = ({ className }: IProps) => {
   const [open, setOpen] = useState(false);
+  const { control, setValue } = useFormContext<TRecordFormData>();
+  const dateYmd = useWatch({ control, name: "dateYmd" });
 
-  const parsed = parse(value, "yyyy-MM-dd", new Date());
+  const parsed = parse(dateYmd, "yyyy-MM-dd", new Date());
   const selected = isValid(parsed) ? parsed : new Date();
 
   const label = format(selected, "yyyy년 M월 d일 (EEE)", { locale: ko });
@@ -68,7 +71,9 @@ const RecordVisitDateField = ({ value, onChange, className }: IProps) => {
               selected={selected}
               onSelect={(d) => {
                 if (d) {
-                  onChange(format(d, "yyyy-MM-dd"));
+                  setValue("dateYmd", format(d, "yyyy-MM-dd"), {
+                    shouldValidate: true,
+                  });
                   setOpen(false);
                 }
               }}

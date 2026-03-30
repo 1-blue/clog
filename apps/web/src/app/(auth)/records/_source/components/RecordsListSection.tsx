@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { format, isSameDay } from "date-fns";
 import { ko } from "date-fns/locale";
 import { ChevronLeft, ChevronRight, Mountain, Plus } from "lucide-react";
@@ -17,7 +17,6 @@ import { ROUTES } from "#web/constants";
 import { cn } from "#web/libs/utils";
 
 import RecordDayCard from "./RecordDayCard";
-import RecordsListSkeleton from "./RecordsListSkeleton";
 
 /** 날짜 문자열(ISO)을 로컬 자정 Date로 변환 (타임존 안전) */
 const toLocalDate = (isoDate: string): Date => {
