@@ -4,6 +4,8 @@ import { ArrowLeft } from "lucide-react";
 import React from "react";
 import { useRouter } from "next/navigation";
 
+import { cn } from "#web/libs/utils";
+
 interface IProps {
   /** 페이지 제목 */
   title?: string;
@@ -25,11 +27,12 @@ const TopBar: React.FC<IProps> = ({
 
   return (
     <header
-      className={`sticky top-0 z-40 flex h-14 items-center gap-2 px-4 ${
+      className={cn(
+        "sticky top-0 z-40 flex h-14 items-center gap-2 px-4",
         transparent
           ? "bg-transparent"
-          : "border-b border-outline-variant bg-surface-container/80 backdrop-blur-xl"
-      }`}
+          : "border-b border-outline-variant bg-surface-container/80 backdrop-blur-xl",
+      )}
     >
       {showBack && (
         <button

@@ -90,6 +90,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/gyms/{gymId}/reviews/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 내 리뷰 (해당 암장) */
+        get: operations["getMyGymReview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/gyms/{gymId}/reviews/{reviewId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 리뷰 단건 */
+        get: operations["getGymReviewById"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** 리뷰 수정 */
+        patch: operations["updateGymReview"];
+        trace?: never;
+    };
     "/api/v1/records": {
         parameters: {
             query?: never;
@@ -686,9 +721,11 @@ export interface components {
         CreateReviewBody: {
             rating: number;
             content: string;
+            perceivedDifficulty?: components["schemas"]["GymPerceivedDifficulty"];
             features?: components["schemas"]["GymReviewFeature"][];
             imageUrls?: string[];
         };
+        UpdateReviewBody: components["schemas"]["CreateReviewBody"];
         /** @description 클라이밍 루트 기록 (routes 테이블) */
         Route: {
             /** Format: uuid */
@@ -1231,6 +1268,113 @@ export interface operations {
                         payload: components["schemas"]["Review"];
                     };
                 };
+            };
+        };
+    };
+    getMyGymReview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                gymId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payload: components["schemas"]["ReviewListItem"] | null;
+                    };
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getGymReviewById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                gymId: string;
+                reviewId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payload: components["schemas"]["ReviewListItem"];
+                    };
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    updateGymReview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                gymId: string;
+                reviewId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateReviewBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        toast: string;
+                        payload: components["schemas"]["Review"];
+                    };
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

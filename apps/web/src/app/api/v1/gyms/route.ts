@@ -218,6 +218,7 @@ export const GET = async (request: Request) => {
       }),
       include: {
         images: { take: 1, orderBy: { order: "asc" } },
+        openHours: true,
       },
     });
 

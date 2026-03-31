@@ -1,4 +1,9 @@
-import type { DayType, Gym, GymFacilityType, PrismaClient } from "@prisma/client";
+import type {
+  DayType,
+  Gym,
+  GymFacilityType,
+  PrismaClient,
+} from "@prisma/client";
 
 interface IGymSeed {
   key: string;
@@ -14,7 +19,12 @@ interface IGymSeed {
   instagramId?: string;
   thumbnailUrl?: string;
   priceImageUrl?: string;
-  priceInfo: { daily: number; monthly: number; threeMonths: number; tenSession: number };
+  priceInfo: {
+    daily: number;
+    monthly: number;
+    threeMonths: number;
+    tenSession: number;
+  };
   facilities: GymFacilityType[];
   notice?: string;
 }
@@ -43,7 +53,12 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%8B%E1%85%A7%E1%86%AB%E1%84%82%E1%85%A1%E1%86%B7.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    priceInfo: { daily: 22000, monthly: 140000, threeMonths: 330000, tenSession: 170000 },
+    priceInfo: {
+      daily: 22000,
+      monthly: 140000,
+      threeMonths: 330000,
+      tenSession: 170000,
+    },
     facilities: ["SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
   },
   {
@@ -63,7 +78,12 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%92%E1%85%A9%E1%86%BC%E1%84%83%E1%85%A2B.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.pngg",
-    priceInfo: { daily: 22000, monthly: 140000, threeMonths: 330000, tenSession: 170000 },
+    priceInfo: {
+      daily: 22000,
+      monthly: 140000,
+      threeMonths: 330000,
+      tenSession: 170000,
+    },
     facilities: ["SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
   },
   {
@@ -82,7 +102,12 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%8B%E1%85%B5%E1%86%AF%E1%84%89%E1%85%A1%E1%86%AB.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    priceInfo: { daily: 22000, monthly: 140000, threeMonths: 330000, tenSession: 170000 },
+    priceInfo: {
+      daily: 22000,
+      monthly: 140000,
+      threeMonths: 330000,
+      tenSession: 170000,
+    },
     facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
   },
   {
@@ -102,7 +127,12 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%86%E1%85%A1%E1%84%80%E1%85%A9%E1%86%A8.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    priceInfo: { daily: 22000, monthly: 140000, threeMonths: 330000, tenSession: 170000 },
+    priceInfo: {
+      daily: 22000,
+      monthly: 140000,
+      threeMonths: 330000,
+      tenSession: 170000,
+    },
     facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
   },
   {
@@ -122,7 +152,12 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%8B%E1%85%A3%E1%86%BC%E1%84%8C%E1%85%A2.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    priceInfo: { daily: 22000, monthly: 140000, threeMonths: 330000, tenSession: 170000 },
+    priceInfo: {
+      daily: 22000,
+      monthly: 140000,
+      threeMonths: 330000,
+      tenSession: 170000,
+    },
     facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
   },
   {
@@ -142,7 +177,12 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%89%E1%85%B5%E1%86%AB%E1%84%85%E1%85%B5%E1%86%B7.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    priceInfo: { daily: 22000, monthly: 140000, threeMonths: 330000, tenSession: 170000 },
+    priceInfo: {
+      daily: 22000,
+      monthly: 140000,
+      threeMonths: 330000,
+      tenSession: 170000,
+    },
     facilities: ["SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
   },
   {
@@ -162,7 +202,12 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%86%BC%E1%84%82%E1%85%A1%E1%86%B7.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    priceInfo: { daily: 22000, monthly: 140000, threeMonths: 330000, tenSession: 170000 },
+    priceInfo: {
+      daily: 22000,
+      monthly: 140000,
+      threeMonths: 330000,
+      tenSession: 170000,
+    },
     facilities: ["SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
   },
   {
@@ -182,7 +227,12 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%89%E1%85%A1%E1%84%83%E1%85%A1%E1%86%BC.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    priceInfo: { daily: 22000, monthly: 140000, threeMonths: 330000, tenSession: 170000 },
+    priceInfo: {
+      daily: 22000,
+      monthly: 140000,
+      threeMonths: 330000,
+      tenSession: 170000,
+    },
     facilities: ["SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
   },
   {
@@ -202,7 +252,12 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%89%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A1.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    priceInfo: { daily: 22000, monthly: 140000, threeMonths: 330000, tenSession: 170000 },
+    priceInfo: {
+      daily: 22000,
+      monthly: 140000,
+      threeMonths: 330000,
+      tenSession: 170000,
+    },
     facilities: ["SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
   },
   {
@@ -222,7 +277,12 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%82%E1%85%A9%E1%86%AB%E1%84%92%E1%85%A7%E1%86%AB.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    priceInfo: { daily: 22000, monthly: 140000, threeMonths: 330000, tenSession: 170000 },
+    priceInfo: {
+      daily: 22000,
+      monthly: 140000,
+      threeMonths: 330000,
+      tenSession: 170000,
+    },
     facilities: ["SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
   },
   {
@@ -242,7 +302,12 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%86%E1%85%AE%E1%86%AB%E1%84%85%E1%85%A2.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    priceInfo: { daily: 22000, monthly: 140000, threeMonths: 330000, tenSession: 170000 },
+    priceInfo: {
+      daily: 22000,
+      monthly: 140000,
+      threeMonths: 330000,
+      tenSession: 170000,
+    },
     facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
   },
   {
@@ -262,7 +327,12 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%8B%E1%85%B5%E1%84%89%E1%85%AE.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    priceInfo: { daily: 22000, monthly: 140000, threeMonths: 330000, tenSession: 170000 },
+    priceInfo: {
+      daily: 22000,
+      monthly: 140000,
+      threeMonths: 330000,
+      tenSession: 170000,
+    },
     facilities: ["SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
   },
   {
@@ -282,7 +352,12 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%89%E1%85%A5%E1%86%BC%E1%84%89%E1%85%AE.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    priceInfo: { daily: 22000, monthly: 140000, threeMonths: 330000, tenSession: 170000 },
+    priceInfo: {
+      daily: 22000,
+      monthly: 140000,
+      threeMonths: 330000,
+      tenSession: 170000,
+    },
     facilities: ["SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
   },
   // 서울숲클라이밍
@@ -302,7 +377,12 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%8C%E1%85%A9%E1%86%BC%E1%84%85%E1%85%A9.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    priceInfo: { daily: 20000, monthly: 130000, threeMonths: 330000, tenSession: 170000 },
+    priceInfo: {
+      daily: 20000,
+      monthly: 130000,
+      threeMonths: 330000,
+      tenSession: 170000,
+    },
     facilities: ["SHOWER", "LOCKER", "REST_AREA"],
   },
   {
@@ -321,7 +401,12 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%8C%E1%85%A1%E1%86%B7%E1%84%89%E1%85%B5%E1%86%AF.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.pngg",
-    priceInfo: { daily: 20000, monthly: 130000, threeMonths: 330000, tenSession: 170000 },
+    priceInfo: {
+      daily: 20000,
+      monthly: 130000,
+      threeMonths: 330000,
+      tenSession: 170000,
+    },
     facilities: ["SHOWER", "LOCKER", "REST_AREA"],
   },
   {
@@ -340,7 +425,12 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%8B%E1%85%A7%E1%86%BC%E1%84%83%E1%85%B3%E1%86%BC%E1%84%91%E1%85%A9.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    priceInfo: { daily: 20000, monthly: 130000, threeMonths: 330000, tenSession: 170000 },
+    priceInfo: {
+      daily: 20000,
+      monthly: 130000,
+      threeMonths: 330000,
+      tenSession: 170000,
+    },
     facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA"],
   },
   {
@@ -358,7 +448,12 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%80%E1%85%AE%E1%84%85%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%B7.png",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    priceInfo: { daily: 20000, monthly: 130000, threeMonths: 330000, tenSession: 170000 },
+    priceInfo: {
+      daily: 20000,
+      monthly: 130000,
+      threeMonths: 330000,
+      tenSession: 170000,
+    },
     facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA"],
   },
   // 클라이밍파크
@@ -378,7 +473,12 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%80%E1%85%A1%E1%86%BC%E1%84%82%E1%85%A1%E1%86%B7.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.jpegg",
-    priceInfo: { daily: 22000, monthly: 130000, threeMonths: 330000, tenSession: 170000 },
+    priceInfo: {
+      daily: 22000,
+      monthly: 130000,
+      threeMonths: 330000,
+      tenSession: 170000,
+    },
     facilities: ["SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
   },
   {
@@ -397,7 +497,12 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%89%E1%85%B5%E1%86%AB%E1%84%82%E1%85%A9%E1%86%AB%E1%84%92%E1%85%A7%E1%86%AB.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.jpeg",
-    priceInfo: { daily: 22000, monthly: 130000, threeMonths: 330000, tenSession: 170000 },
+    priceInfo: {
+      daily: 22000,
+      monthly: 130000,
+      threeMonths: 330000,
+      tenSession: 170000,
+    },
     facilities: ["SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
   },
   {
@@ -416,7 +521,12 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%92%E1%85%A1%E1%86%AB%E1%84%90%E1%85%B5.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.jpeg",
-    priceInfo: { daily: 22000, monthly: 130000, threeMonths: 330000, tenSession: 170000 },
+    priceInfo: {
+      daily: 22000,
+      monthly: 130000,
+      threeMonths: 330000,
+      tenSession: 170000,
+    },
     facilities: ["SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
   },
   {
@@ -435,7 +545,12 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%89%E1%85%A5%E1%86%BC%E1%84%89%E1%85%AE.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.jpeg",
-    priceInfo: { daily: 22000, monthly: 130000, threeMonths: 330000, tenSession: 170000 },
+    priceInfo: {
+      daily: 22000,
+      monthly: 130000,
+      threeMonths: 330000,
+      tenSession: 170000,
+    },
     facilities: ["SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
   },
   {
@@ -454,7 +569,12 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%8C%E1%85%A9%E1%86%BC%E1%84%85%E1%85%A9.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.jpeg",
-    priceInfo: { daily: 22000, monthly: 130000, threeMonths: 330000, tenSession: 170000 },
+    priceInfo: {
+      daily: 22000,
+      monthly: 130000,
+      threeMonths: 330000,
+      tenSession: 170000,
+    },
     facilities: ["SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
   },
 ];
@@ -665,6 +785,20 @@ export async function seedGyms(
 ): Promise<Record<string, Gym>> {
   const gymMap: Record<string, Gym> = {};
 
+  const THECLIMB_PRICE_IMAGE_URL =
+    "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png";
+  const SEOULFOREST_PRICE_IMAGE_URL =
+    "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png";
+  const CLIMBINGPARK_PRICE_IMAGE_URL =
+    "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.jpeg";
+
+  const priceImageUrlFromKey = (key: string) => {
+    if (key.startsWith("theclimb_")) return THECLIMB_PRICE_IMAGE_URL;
+    if (key.startsWith("seoulforest_")) return SEOULFOREST_PRICE_IMAGE_URL;
+    if (key.startsWith("climbingpark_")) return CLIMBINGPARK_PRICE_IMAGE_URL;
+    return null;
+  };
+
   for (const gymData of GYMS_DATA) {
     const { key, ...rest } = gymData;
     const gym = await prisma.gym.create({
@@ -687,6 +821,22 @@ export async function seedGyms(
         reviewCount: 0,
       },
     });
+
+    // 가격표(또는 대체 이미지) 1장 필수 생성: 화면에서 images가 빈 배열이면 안 됨
+    const imageUrl =
+      priceImageUrlFromKey(key) ??
+      rest.priceImageUrl ??
+      rest.thumbnailUrl ??
+      null;
+    if (imageUrl) {
+      await prisma.gymImage.create({
+        data: {
+          gymId: gym.id,
+          url: imageUrl,
+          order: 0,
+        },
+      });
+    }
 
     const hours = OPEN_HOURS[key];
     if (hours) {

@@ -1,21 +1,11 @@
 "use client";
 
-import { useState } from "react";
-
-import type { Region } from "@clog/utils";
-
 import AppTopBar from "#web/components/layout/AppTopBar";
-import useDebounce from "#web/hooks/useDebounce";
 
-import GymListSection from "./_source/components/GymListSection";
-import GymSearchBar from "./_source/components/GymSearchBar";
+import GymExploreBar from "./_source/components/gym-explore-bar/GymExploreBar";
+import GymListSection from "./_source/components/gym-list-section/GymListSection";
 
 const GymsPage = () => {
-  const [search, setSearch] = useState("");
-  const [region, setRegion] = useState<Region | "">("");
-
-  const debouncedSearch = useDebounce(search, 300);
-
   return (
     <>
       <AppTopBar
@@ -24,13 +14,8 @@ const GymsPage = () => {
         }
       />
       <div className="px-4 pb-8">
-        <GymSearchBar
-          search={search}
-          setSearch={setSearch}
-          region={region}
-          setRegion={setRegion}
-        />
-        <GymListSection search={debouncedSearch} region={region} />
+        <GymExploreBar />
+        <GymListSection />
       </div>
     </>
   );

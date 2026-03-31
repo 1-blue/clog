@@ -6,12 +6,12 @@ import { useCallback, useEffect, useId, useState } from "react";
 
 import { Button } from "#web/components/ui/button";
 import {
-  type CarouselApi,
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
+  type CarouselApi,
 } from "#web/components/ui/carousel";
 import { Dialog, DialogPortal } from "#web/components/ui/dialog";
 import { cn } from "#web/libs/utils";
@@ -24,6 +24,8 @@ interface IProps {
   /** 썸네일·큰 이미지 alt 접두사 */
   altPrefix?: string;
   className?: string;
+  /** 썸네일 버튼 크기·모양 (기본: 작은 스트립) */
+  thumbClassName?: string;
 }
 
 const ImageStripLightbox: React.FC<IProps> = ({
@@ -31,6 +33,7 @@ const ImageStripLightbox: React.FC<IProps> = ({
   maxSlots = 4,
   altPrefix = "이미지",
   className,
+  thumbClassName,
 }) => {
   const titleId = useId();
   const [open, setOpen] = useState(false);
@@ -39,10 +42,13 @@ const ImageStripLightbox: React.FC<IProps> = ({
   const [current, setCurrent] = useState(1);
   const [slideCount, setSlideCount] = useState(0);
 
-  const openAt = useCallback((index: number) => {
-    setStartIndex(Math.min(Math.max(0, index), urls.length - 1));
-    setOpen(true);
-  }, [urls.length]);
+  const openAt = useCallback(
+    (index: number) => {
+      setStartIndex(Math.min(Math.max(0, index), urls.length - 1));
+      setOpen(true);
+    },
+    [urls.length],
+  );
 
   useEffect(() => {
     if (!open || !carouselApi) return;
@@ -66,36 +72,35 @@ const ImageStripLightbox: React.FC<IProps> = ({
 
   if (urls.length === 0) return null;
 
-  const overflow =
-    urls.length > maxSlots ? urls.length - (maxSlots - 1) : 0;
+  const overflow = urls.length > maxSlots ? urls.length - (maxSlots - 1) : 0;
   const thumbCount =
     overflow > 0 ? maxSlots - 1 : Math.min(urls.length, maxSlots);
 
   return (
     <>
-      <div
-        className={cn("mt-2 flex items-center gap-1.5 overflow-hidden", className)}
-      >
+      <div className={cn("flex items-center gap-2 overflow-hidden", className)}>
         {urls.slice(0, thumbCount).map((url, i) => (
           <button
             key={`thumb-${i}-${url}`}
             type="button"
             onClick={() => openAt(i)}
-            className="relative size-14 shrink-0 overflow-hidden rounded-lg bg-surface-container-high ring-1 ring-inset ring-foreground/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+            className={cn(
+              "relative shrink-0 cursor-pointer overflow-hidden rounded-lg bg-surface-container-high ring-1 ring-foreground/10 ring-inset focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:outline-none",
+              thumbClassName ?? "size-14",
+            )}
             aria-label={`${altPrefix} ${i + 1} 보기`}
           >
-            <img
-              src={url}
-              alt=""
-              className="size-full object-cover"
-            />
+            <img src={url} alt="" className="size-full object-cover" />
           </button>
         ))}
         {overflow > 0 ? (
           <button
             type="button"
             onClick={() => openAt(thumbCount)}
-            className="flex size-14 shrink-0 items-center justify-center rounded-lg bg-surface-container-high text-sm font-semibold text-on-surface ring-1 ring-inset ring-foreground/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+            className={cn(
+              "flex shrink-0 items-center justify-center rounded-lg bg-surface-container-high text-sm font-semibold text-on-surface ring-1 ring-foreground/15 ring-inset focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:outline-none",
+              thumbClassName ?? "size-14",
+            )}
             aria-label={`나머지 ${overflow}장 보기`}
           >
             +{overflow}
@@ -116,10 +121,7 @@ const ImageStripLightbox: React.FC<IProps> = ({
               "fixed inset-0 z-50 flex flex-col bg-transparent p-0 outline-none data-closed:animate-out data-closed:fade-out-0 data-open:animate-in data-open:fade-in-0",
             )}
           >
-            <DialogPrimitive.Title
-              id={titleId}
-              className="sr-only"
-            >
+            <DialogPrimitive.Title id={titleId} className="sr-only">
               {altPrefix} 전체 보기
             </DialogPrimitive.Title>
 
@@ -165,12 +167,8 @@ const ImageStripLightbox: React.FC<IProps> = ({
                 </CarouselContent>
                 {urls.length > 1 ? (
                   <>
-                    <CarouselPrevious
-                      className="top-1/2 left-2 z-20 size-10 -translate-y-1/2 border-white/30 bg-black/40 text-white hover:bg-black/55 hover:text-white disabled:opacity-30 md:left-4"
-                    />
-                    <CarouselNext
-                      className="top-1/2 right-2 z-20 size-10 -translate-y-1/2 border-white/30 bg-black/40 text-white hover:bg-black/55 hover:text-white disabled:opacity-30 md:right-4"
-                    />
+                    <CarouselPrevious className="top-1/2 left-2 z-20 size-10 -translate-y-1/2 border-white/30 bg-black/40 text-white hover:bg-black/55 hover:text-white disabled:opacity-30 md:left-4" />
+                    <CarouselNext className="top-1/2 right-2 z-20 size-10 -translate-y-1/2 border-white/30 bg-black/40 text-white hover:bg-black/55 hover:text-white disabled:opacity-30 md:right-4" />
                   </>
                 ) : null}
               </Carousel>

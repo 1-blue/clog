@@ -1,9 +1,16 @@
 import {
+  GymPerceivedDifficulty,
   GymReviewFeature,
   type Gym,
   type PrismaClient,
   type User,
 } from "@prisma/client";
+
+const PERCEIVED_ROTATION: GymPerceivedDifficulty[] = [
+  GymPerceivedDifficulty.EASY,
+  GymPerceivedDifficulty.NORMAL,
+  GymPerceivedDifficulty.HARD,
+];
 
 const FEATURE_POOL = [
   GymReviewFeature.CLEAN_FACILITY,
@@ -41,6 +48,8 @@ export async function seedReviews(
           gymId: gyms[gymIdx]!.id,
           rating: 3 + Math.floor(Math.random() * 3),
           content: reviewTexts[(i + j) % reviewTexts.length]!,
+          perceivedDifficulty:
+            PERCEIVED_ROTATION[(i * 4 + j) % PERCEIVED_ROTATION.length],
           features,
         },
       });

@@ -1,4 +1,4 @@
-import GymInfoSkeleton from "./_source/components/skeleton/GymInfoSkeleton";
+import GymInfoSkeleton from "./_source/components/gym-tabs/gym-info-tab/GymInfoSkeleton";
 
 const GymDetailLoading = () => {
   return <GymInfoSkeleton />;

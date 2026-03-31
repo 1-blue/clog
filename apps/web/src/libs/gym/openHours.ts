@@ -19,15 +19,7 @@ const isGymOpenHourRowArray = (raw: unknown): raw is TGymOpenHourRow[] => {
   );
 };
 
-const DAY_ORDER = [
-  "MON",
-  "TUE",
-  "WED",
-  "THU",
-  "FRI",
-  "SAT",
-  "SUN",
-] as const;
+const DAY_ORDER = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"] as const;
 
 const DAY_TYPE_LABEL_KO: Record<(typeof DAY_ORDER)[number], string> = {
   MON: "월",
@@ -114,10 +106,7 @@ export type TGymOpenHoursDisplay = {
 const SEOUL_TZ = "Asia/Seoul";
 
 /** en-US short weekday with Asia/Seoul zoned instant → Sun … Sat */
-const SEOUL_WEEKDAY_TO_SLOT: Record<
-  string,
-  keyof TGymOpenHours | undefined
-> = {
+const SEOUL_WEEKDAY_TO_SLOT: Record<string, keyof TGymOpenHours | undefined> = {
   Sun: "sunday",
   Mon: "weekday",
   Tue: "weekday",
@@ -182,14 +171,10 @@ const isNowWithinSlot = (
   if (openM === closeM) return false;
 
   if (closeM > openM) {
-    return (
-      minutesSinceMidnight >= openM && minutesSinceMidnight < closeM
-    );
+    return minutesSinceMidnight >= openM && minutesSinceMidnight < closeM;
   }
 
-  return (
-    minutesSinceMidnight >= openM || minutesSinceMidnight < closeM
-  );
+  return minutesSinceMidnight >= openM || minutesSinceMidnight < closeM;
 };
 
 export type TGymOpenNowStatus = "open" | "closed" | "unknown";
@@ -248,7 +233,9 @@ export const formatGymOpenHoursDisplay = (
   if (raw && typeof raw === "object") {
     const lines = (raw as { lines?: unknown }).lines;
     if (Array.isArray(lines)) {
-      const scheduleLines = lines.filter((l): l is string => typeof l === "string");
+      const scheduleLines = lines.filter(
+        (l): l is string => typeof l === "string",
+      );
       if (scheduleLines.length > 0) {
         return { scheduleLines, notice: undefined };
       }
@@ -257,7 +244,9 @@ export const formatGymOpenHoursDisplay = (
 
   if (isGymOpenHourRowArray(raw)) {
     const scheduleLines = [...raw]
-      .filter((r) => DAY_ORDER.includes(r.dayType as (typeof DAY_ORDER)[number]))
+      .filter((r) =>
+        DAY_ORDER.includes(r.dayType as (typeof DAY_ORDER)[number]),
+      )
       .sort(
         (a, b) =>
           DAY_ORDER.indexOf(a.dayType as (typeof DAY_ORDER)[number]) -
@@ -297,4 +286,168 @@ export const formatGymOpenHoursDisplay = (
     scheduleLines,
     notice: parsed.notice,
   };
+};
+
+/**
+ * 운영 시간 한 줄이 서울 기준 '오늘'에 해당하는 스케줄인지 (강조 표시용)
+ * - 요일별 행: `월: 10:00 ~ 22:00`
+ * - 레거시 묶음: `월–금: …`, `토–일: …`, `토: …`, `일: …`
+ */
+export const isOpenHoursLineHighlightedForToday = (
+  line: string,
+  at: Date = new Date(),
+): boolean => {
+  const zoned = getSeoulWeekdayKeyAndMinutes(at);
+  if (!zoned) return false;
+  const dayType = SEOUL_SHORT_TO_DAY_TYPE[zoned.weekdayKey];
+  if (!dayType) return false;
+  const dayKo = DAY_TYPE_LABEL_KO[dayType];
+
+  const trimmed = line.trim();
+
+  const singleDayMatch = /^([월화수목금토일])[:：]/.exec(trimmed);
+  if (singleDayMatch) {
+    return singleDayMatch[1] === dayKo;
+  }
+
+  if (/^월(?:\u2013|-)금[:：]/.test(trimmed)) {
+    return ["MON", "TUE", "WED", "THU", "FRI"].includes(dayType);
+  }
+
+  if (/^토(?:\u2013|-)일[:：]/.test(trimmed)) {
+    return dayType === "SAT" || dayType === "SUN";
+  }
+
+  if (/^토[:：]/.test(trimmed)) {
+    return dayType === "SAT";
+  }
+
+  if (/^일[:：]/.test(trimmed)) {
+    return dayType === "SUN";
+  }
+
+  return false;
+};
+
+type TOpenCloseSoonBadge =
+  | { type: "openSoon"; minutesLeft: number; label: string }
+  | { type: "closeSoon"; minutesLeft: number; label: string }
+  | null;
+
+const minutesUntilOpen = (
+  nowMinutes: number,
+  slot: TGymOpenHoursSlot,
+): number | null => {
+  const openM = parseHHMmToMinutes(slot.open, "open");
+  const closeM = parseHHMmToMinutes(slot.close, "close");
+  if (openM === null || closeM === null) return null;
+  if (openM === closeM) return null;
+
+  // 정상 구간 (예: 10:00~22:00)
+  if (closeM > openM) {
+    if (nowMinutes >= openM && nowMinutes < closeM) return 0; // 이미 영업 중
+    if (nowMinutes < openM) return openM - nowMinutes;
+    return null; // 오늘은 이미 종료
+  }
+
+  // 익일 마감 (예: 20:00~02:00)
+  // - now가 open~24:00 or 00:00~close 구간이면 영업 중
+  // - now가 close~open 구간이면 다음 오픈까지 (open - now)
+  const isOpenNow =
+    nowMinutes >= openM || nowMinutes < closeM;
+  if (isOpenNow) return 0;
+  return openM - nowMinutes;
+};
+
+const minutesUntilClose = (
+  nowMinutes: number,
+  slot: TGymOpenHoursSlot,
+): number | null => {
+  const openM = parseHHMmToMinutes(slot.open, "open");
+  const closeM = parseHHMmToMinutes(slot.close, "close");
+  if (openM === null || closeM === null) return null;
+  if (openM === closeM) return null;
+
+  // 정상 구간 (예: 10:00~22:00)
+  if (closeM > openM) {
+    if (nowMinutes < openM || nowMinutes >= closeM) return null;
+    return closeM - nowMinutes;
+  }
+
+  // 익일 마감 (예: 20:00~02:00)
+  // - now가 open~24:00 구간이면: (1440-now)+close
+  // - now가 00:00~close 구간이면: close-now
+  if (nowMinutes >= openM) return 24 * 60 - nowMinutes + closeM;
+  if (nowMinutes < closeM) return closeM - nowMinutes;
+  return null;
+};
+
+const formatRemainingKo = (minLeft: number): string => {
+  const clamped = Math.max(0, Math.floor(minLeft));
+  const h = Math.floor(clamped / 60);
+  const m = clamped % 60;
+  if (h <= 0) return `${m}분`;
+  if (m === 0) return `${h}시간`;
+  return `${h}시간 ${m}분`;
+};
+
+const todaySlotFromRaw = (
+  raw: unknown,
+  at: Date,
+): { nowMinutes: number; slot: TGymOpenHoursSlot } | null => {
+  const zoned = getSeoulWeekdayKeyAndMinutes(at);
+  if (!zoned) return null;
+
+  if (isGymOpenHourRowArray(raw)) {
+    const dayType = SEOUL_SHORT_TO_DAY_TYPE[zoned.weekdayKey];
+    if (!dayType) return null;
+    const row = raw.find((r) => r.dayType === dayType);
+    if (!row) return null;
+    return {
+      nowMinutes: zoned.minutes,
+      slot: { open: row.open, close: row.close },
+    };
+  }
+
+  const parsed = parseGymOpenHours(raw);
+  if (!parsed) return null;
+  const slotName = SEOUL_WEEKDAY_TO_SLOT[zoned.weekdayKey];
+  if (!slotName) return null;
+  const slot = parsed[slotName];
+  if (!isTimeSlot(slot)) return null;
+  return { nowMinutes: zoned.minutes, slot };
+};
+
+/**
+ * 오픈/마감 임박 배지
+ * - 오픈 1시간 전 이내: "곧 오픈 (n분 전)"
+ * - 마감 2시간 전 이내: "곧 마감 (n시간 n분 전)"
+ */
+export const getGymOpenCloseSoonBadge = (
+  raw: unknown,
+  options?: { at?: Date },
+): TOpenCloseSoonBadge => {
+  const at = options?.at ?? new Date();
+  const today = todaySlotFromRaw(raw, at);
+  if (!today) return null;
+
+  const untilClose = minutesUntilClose(today.nowMinutes, today.slot);
+  if (untilClose != null && untilClose > 0 && untilClose <= 120) {
+    return {
+      type: "closeSoon",
+      minutesLeft: untilClose,
+      label: `곧 마감 (${formatRemainingKo(untilClose)} 전)`,
+    };
+  }
+
+  const untilOpen = minutesUntilOpen(today.nowMinutes, today.slot);
+  if (untilOpen != null && untilOpen > 0 && untilOpen <= 60) {
+    return {
+      type: "openSoon",
+      minutesLeft: untilOpen,
+      label: `곧 오픈 (${formatRemainingKo(untilOpen)} 전)`,
+    };
+  }
+
+  return null;
 };

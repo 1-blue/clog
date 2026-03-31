@@ -21,8 +21,15 @@ export const ROUTES = {
       label: "암장 상세",
       /** 암장 > 암장 상세 > 리뷰 작성 */
       REVIEW: {
-        path: (gymId: string) => `/gyms/${gymId}/review`,
-        label: "리뷰 작성",
+        CREATE: {
+          path: (gymId: string) => `/gyms/${gymId}/review/create`,
+          label: "리뷰 작성",
+        },
+        EDIT: {
+          path: (gymId: string, reviewId: string) =>
+            `/gyms/${gymId}/review/edit/${reviewId}`,
+          label: "리뷰 수정",
+        },
       },
     },
   },
