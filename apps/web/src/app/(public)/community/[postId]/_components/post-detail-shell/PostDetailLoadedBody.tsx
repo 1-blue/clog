@@ -16,17 +16,20 @@ interface IProps {
   setReplyParentId: (id: string | null) => void;
 }
 
-const PostDetailLoadedBody = ({
+const PostDetailLoadedBody: React.FC<IProps> = ({
   post,
   postId,
   replyParentId,
   setReplyParentId,
-}: IProps) => {
+}) => {
   return (
     <>
-      <div className="mx-auto max-w-3xl px-6 pt-20 pb-4">
+      <div className="mx-auto flex max-w-3xl flex-col gap-6 px-6">
         <PostArticlePanel post={post} />
-        <section id="community-post-comments" className="mt-16 mb-6">
+
+        <hr className="border-outline-variant" />
+
+        <section id="community-post-comments" className="flex flex-col gap-4">
           <PostCommentsHeading commentCount={post.commentCount} />
           <PostCommentsList
             postId={postId}
@@ -35,6 +38,7 @@ const PostDetailLoadedBody = ({
           />
         </section>
       </div>
+
       <PostDetailDock
         post={post}
         postId={postId}

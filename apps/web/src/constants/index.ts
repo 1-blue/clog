@@ -44,9 +44,14 @@ export const ROUTES = {
       label: "게시글 상세",
     },
     /** 커뮤니티 > 게시글 작성 */
-    WRITE: {
-      path: "/community/write",
+    CREATE: {
+      path: "/community/create",
       label: "게시글 작성",
+    },
+    /** 커뮤니티 > 게시글 수정 */
+    EDIT: {
+      path: (postId: string) => `/community/edit/${postId}`,
+      label: "게시글 수정",
     },
   },
 

@@ -6,7 +6,8 @@ const AUTH_ROUTES = [
   "/my",
   "/records",
   "/notifications",
-  "/community/write",
+  "/community/create",
+  "/community/edit",
 ];
 
 /** /gyms/:gymId/review 및 하위 (작성·수정) */

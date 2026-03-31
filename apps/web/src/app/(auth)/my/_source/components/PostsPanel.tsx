@@ -5,7 +5,7 @@ import Link from "next/link";
 
 import type { CommunityCategory } from "@clog/utils";
 
-import CommunityFeedPostCard from "#web/app/(public)/community/_components/community-post-list/CommunityFeedPostCard";
+import CommunityPostCard from "#web/app/(public)/community/_components/community-post-list/CommunityPostCard";
 import EmptyState from "#web/components/shared/EmptyState";
 import InfiniteScroll from "#web/components/shared/InfiniteScroll";
 import { ROUTES } from "#web/constants";
@@ -91,7 +91,7 @@ const PostsPanel: React.FC<IProps> = ({
     >
       <div className="space-y-5">
         {posts.map((post) => (
-          <CommunityFeedPostCard
+          <CommunityPostCard
             key={post.id}
             id={post.id}
             title={post.title}

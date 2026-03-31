@@ -2,8 +2,8 @@ import { useSearchParams } from "next/navigation";
 
 import { regionEnum, regionToKoreanMap, type Region } from "@clog/utils";
 
+import FilterChip from "#web/components/shared/FilterChip";
 import useReplaceQueryParams from "#web/hooks/useReplaceQueryParams";
-import { cn } from "#web/libs/utils";
 
 const REGIONS = Object.entries(regionToKoreanMap) as [Region, string][];
 
@@ -21,31 +21,21 @@ const GymRegionFilterChipList: React.FC = () => {
   };
 
   return (
-    <div className="scrollbar-hide flex gap-2 overflow-x-auto">
-      <button
+    <div className="scrollbar-hide flex items-center gap-2 overflow-x-auto">
+      <FilterChip
+        size="xs"
+        label="전체"
+        selected={!value}
         onClick={() => onChange("")}
-        className={cn(
-          "shrink-0 cursor-pointer rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
-          !value
-            ? "bg-primary text-primary-foreground"
-            : "bg-surface-container-high text-on-surface-variant",
-        )}
-      >
-        전체
-      </button>
+      />
       {REGIONS.map(([key, label]) => (
-        <button
+        <FilterChip
           key={key}
+          size="xs"
+          label={label}
+          selected={value === key}
           onClick={() => onChange(key)}
-          className={cn(
-            "shrink-0 cursor-pointer rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
-            value === key
-              ? "bg-primary text-primary-foreground"
-              : "bg-surface-container-high text-on-surface-variant",
-          )}
-        >
-          {label}
-        </button>
+        />
       ))}
     </div>
   );

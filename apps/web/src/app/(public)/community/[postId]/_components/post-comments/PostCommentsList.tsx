@@ -13,7 +13,11 @@ interface IProps {
   onReply?: (commentId: string) => void;
 }
 
-const PostCommentsList = ({ postId, postAuthorId, onReply }: IProps) => {
+const PostCommentsList: React.FC<IProps> = ({
+  postId,
+  postAuthorId,
+  onReply,
+}) => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery({
       queryKey: ["get", "/api/v1/posts/{postId}/comments", { postId }],
@@ -41,21 +45,22 @@ const PostCommentsList = ({ postId, postAuthorId, onReply }: IProps) => {
       hasMore={!!hasNextPage}
       isLoading={isFetchingNextPage}
     >
-      <div className="space-y-10">
+      <div className="flex flex-col gap-10">
         {comments.map((c) => (
           <PostCommentBlock
             key={c.id}
+            postId={postId}
             comment={c}
             postAuthorId={postAuthorId}
             onReply={onReply}
           />
         ))}
+        {comments.length === 0 ? (
+          <p className="py-8 text-center text-sm text-on-surface-variant">
+            아직 댓글이 없어요
+          </p>
+        ) : null}
       </div>
-      {comments.length === 0 ? (
-        <p className="py-8 text-center text-sm text-on-surface-variant">
-          아직 댓글이 없어요
-        </p>
-      ) : null}
     </InfiniteScroll>
   );
 };

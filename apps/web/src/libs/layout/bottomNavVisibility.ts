@@ -16,5 +16,8 @@ export function shouldShowBottomNav(pathname: string | null): boolean {
   if (pathname.startsWith("/login")) return false;
   if (pathname.startsWith("/gyms/")) return false;
   if (isCommunityPostDetail(pathname)) return false;
+  /** 글 작성·수정 — 하단 네비·체크인 배너 숨김 (암장 리뷰 작성과 동일) */
+  if (pathname.startsWith("/community/create")) return false;
+  if (pathname.startsWith("/community/edit")) return false;
   return true;
 }
