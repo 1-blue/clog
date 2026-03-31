@@ -1,10 +1,10 @@
 import type { Gym, PrismaClient, User } from "@prisma/client";
 
 import {
+  normalizeSessionTimeRange,
   SESSION_CLOCK_HOUR_MAX,
   SESSION_CLOCK_HOUR_MIN,
   SESSION_MINUTE_OPTIONS,
-  normalizeSessionTimeRange,
 } from "@clog/utils";
 
 const PERCEIVED_DIFFICULTIES = ["EASY", "NORMAL", "HARD"] as const;
@@ -15,7 +15,6 @@ export async function seedClimbingSessions(
   gyms: Gym[],
 ): Promise<void> {
   const difficulties = [
-    "VB",
     "V0",
     "V1",
     "V2",
@@ -30,7 +29,7 @@ export async function seedClimbingSessions(
 
   for (let i = 0; i < 30; i++) {
     const userIdx = i % 5;
-    const gymIdx = i % 10;
+    const gymIdx = i % 22;
     const date = new Date();
     date.setDate(date.getDate() - Math.floor(Math.random() * 60));
     date.setHours(0, 0, 0, 0);
@@ -56,8 +55,24 @@ export async function seedClimbingSessions(
     const y = date.getFullYear();
     const mo = date.getMonth();
     const d = date.getDate();
-    const startTime = new Date(y, mo, d, Math.floor(startMinutes / 60), startMinutes % 60, 0, 0);
-    const endTime = new Date(y, mo, d, Math.floor(endMinutes / 60), endMinutes % 60, 0, 0);
+    const startTime = new Date(
+      y,
+      mo,
+      d,
+      Math.floor(startMinutes / 60),
+      startMinutes % 60,
+      0,
+      0,
+    );
+    const endTime = new Date(
+      y,
+      mo,
+      d,
+      Math.floor(endMinutes / 60),
+      endMinutes % 60,
+      0,
+      0,
+    );
 
     const routeCount = 3 + Math.floor(Math.random() * 5);
     await prisma.climbingSession.create({
@@ -78,7 +93,10 @@ export async function seedClimbingSessions(
           create: Array.from({ length: routeCount }, (_, j) => ({
             difficulty:
               difficulties[
-                Math.min(userIdx * 2 + Math.floor(Math.random() * 3), 9)
+                Math.min(
+                  userIdx * 2 + Math.floor(Math.random() * 3),
+                  difficulties.length - 1,
+                )
               ]!,
             result: results[Math.floor(Math.random() * 4)]!,
             attempts: 1 + Math.floor(Math.random() * 3),

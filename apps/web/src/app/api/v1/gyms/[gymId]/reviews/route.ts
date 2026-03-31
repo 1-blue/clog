@@ -27,7 +27,6 @@ export const GET = async (
       ...(query.cursor && { cursor: { id: query.cursor }, skip: 1 }),
       include: {
         user: { select: { id: true, nickname: true, profileImage: true } },
-        images: { orderBy: { order: "asc" } },
       },
     });
 
@@ -68,9 +67,7 @@ export const POST = async (
         content: data.content,
         perceivedDifficulty: data.perceivedDifficulty ?? null,
         features: data.features ?? [],
-        images: data.imageUrls?.length
-          ? { create: data.imageUrls.map((url, i) => ({ url, order: i })) }
-          : undefined,
+        imageUrls: data.imageUrls ?? [],
       },
     });
 

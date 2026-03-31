@@ -13,7 +13,6 @@ interface IProps {
 }
 
 const DIFFICULTY_COLORS: Record<string, string> = {
-  VB: "#E5E7EB",
   V0: "#E5E7EB",
   V1: "#F5DC4C",
   V2: "#F0A830",
@@ -25,7 +24,6 @@ const DIFFICULTY_COLORS: Record<string, string> = {
   V8: "#888888",
   V9: "#111111",
   V10: "#111111",
-  V_PLUS: "#999999",
 };
 
 const RecordDayCard: React.FC<IProps> = ({ record }) => {
@@ -48,7 +46,7 @@ const RecordDayCard: React.FC<IProps> = ({ record }) => {
   );
   const totalRoutes = record.routes.length;
 
-  const heroImage = record.images?.[0]?.url;
+  const heroImage = record.imageUrls[0];
 
   return (
     <Link

@@ -1,4 +1,56 @@
 /**
+ * Prisma `GymOpenHour` 행 (API에서 openHours 관계 배열)
+ */
+export type TGymOpenHourRow = {
+  dayType: string;
+  open: string;
+  close: string;
+};
+
+const isGymOpenHourRowArray = (raw: unknown): raw is TGymOpenHourRow[] => {
+  if (!Array.isArray(raw) || raw.length === 0) return false;
+  return raw.every(
+    (r) =>
+      r !== null &&
+      typeof r === "object" &&
+      typeof (r as { dayType?: unknown }).dayType === "string" &&
+      typeof (r as { open?: unknown }).open === "string" &&
+      typeof (r as { close?: unknown }).close === "string",
+  );
+};
+
+const DAY_ORDER = [
+  "MON",
+  "TUE",
+  "WED",
+  "THU",
+  "FRI",
+  "SAT",
+  "SUN",
+] as const;
+
+const DAY_TYPE_LABEL_KO: Record<(typeof DAY_ORDER)[number], string> = {
+  MON: "월",
+  TUE: "화",
+  WED: "수",
+  THU: "목",
+  FRI: "금",
+  SAT: "토",
+  SUN: "일",
+};
+
+/** en-US short weekday (Asia/Seoul) → Prisma DayType */
+const SEOUL_SHORT_TO_DAY_TYPE: Record<string, (typeof DAY_ORDER)[number]> = {
+  Mon: "MON",
+  Tue: "TUE",
+  Wed: "WED",
+  Thu: "THU",
+  Fri: "FRI",
+  Sat: "SAT",
+  Sun: "SUN",
+};
+
+/**
  * Gym.openHours JSON (Prisma `Json`)
  */
 export type TGymOpenHoursSlot = {
@@ -160,6 +212,19 @@ export const getGymOpenNowStatus = (
     }
   }
 
+  if (isGymOpenHourRowArray(raw)) {
+    const zoned = getSeoulWeekdayKeyAndMinutes(options?.at ?? new Date());
+    if (!zoned) return "unknown";
+    const dayType = SEOUL_SHORT_TO_DAY_TYPE[zoned.weekdayKey];
+    if (!dayType) return "unknown";
+    const row = raw.find((r) => r.dayType === dayType);
+    if (!row) return "unknown";
+    const slot: TGymOpenHoursSlot = { open: row.open, close: row.close };
+    const within = isNowWithinSlot(zoned.minutes, slot);
+    if (within === null) return "unknown";
+    return within ? "open" : "closed";
+  }
+
   const parsed = parseGymOpenHours(raw);
   if (!parsed) return "unknown";
 
@@ -188,6 +253,22 @@ export const formatGymOpenHoursDisplay = (
         return { scheduleLines, notice: undefined };
       }
     }
+  }
+
+  if (isGymOpenHourRowArray(raw)) {
+    const scheduleLines = [...raw]
+      .filter((r) => DAY_ORDER.includes(r.dayType as (typeof DAY_ORDER)[number]))
+      .sort(
+        (a, b) =>
+          DAY_ORDER.indexOf(a.dayType as (typeof DAY_ORDER)[number]) -
+          DAY_ORDER.indexOf(b.dayType as (typeof DAY_ORDER)[number]),
+      )
+      .map((r) => {
+        const dt = r.dayType as (typeof DAY_ORDER)[number];
+        const label = DAY_TYPE_LABEL_KO[dt] ?? r.dayType;
+        return `${label}: ${formatRange({ open: r.open, close: r.close })}`;
+      });
+    return { scheduleLines };
   }
 
   const parsed = parseGymOpenHours(raw);

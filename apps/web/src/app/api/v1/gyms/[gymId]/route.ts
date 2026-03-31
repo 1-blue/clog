@@ -14,8 +14,8 @@ export const GET = async (
     const gym = await prisma.gym.findUnique({
       where: { id: gymId },
       include: {
-        facilities: true,
         images: { orderBy: { order: "asc" } },
+        openHours: { orderBy: { dayType: "asc" } },
       },
     });
 

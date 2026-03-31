@@ -124,32 +124,6 @@ paths:
                   payload:
                     $ref: "#/components/schemas/CheckOutResult"
 
-  /api/v1/gyms/{gymId}/congestion:
-    get:
-      operationId: getGymCongestion
-      summary: 시간대별 혼잡도
-      tags: [Gyms]
-      parameters:
-        - {
-            name: gymId,
-            in: path,
-            required: true,
-            schema: { type: string, format: uuid },
-          }
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                required: [payload]
-                properties:
-                  payload:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/CongestionLog"
-
   /api/v1/gyms/{gymId}/reviews:
     get:
       operationId: getGymReviews
@@ -989,8 +963,13 @@ paths:
 
 components:
   schemas:
-    # ── Enums ──
+    # ── Enums (Prisma schema.prisma와 동기화) ──
     Region:
+      description: |
+        지역 (17개 시도)
+        SEOUL 서울, GYEONGGI 경기, INCHEON 인천, BUSAN 부산, DAEGU 대구, DAEJEON 대전,
+        GWANGJU 광주, ULSAN 울산, SEJONG 세종, GANGWON 강원, CHUNGBUK 충북, CHUNGNAM 충남,
+        JEONBUK 전북, JEONNAM 전남, GYEONGBUK 경북, GYEONGNAM 경남, JEJU 제주
       type: string
       enum:
         [
@@ -1013,24 +992,44 @@ components:
           JEJU,
         ]
     Difficulty:
+      description: |
+        난이도 (V0~V10)
       type: string
-      enum: [VB, V0, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V_PLUS]
+      enum: [V0, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10]
+    DayType:
+      description: |
+        영업시간 요일 타입 (MON 월요일 ~ SUN 일요일)
+      type: string
+      enum: [MON, TUE, WED, THU, FRI, SAT, SUN]
     GymPerceivedDifficulty:
+      description: 체감 난이도 (EASY 쉬움, NORMAL 보통, HARD 어려움)
       type: string
       enum: [EASY, NORMAL, HARD]
     CommunityCategory:
+      description: |
+        게시글 카테고리 (FREE 자유, TIPS 팁/노하우, REVIEW 후기, MEETUP 모임, GEAR 장비)
       type: string
       enum: [FREE, TIPS, REVIEW, MEETUP, GEAR]
     NotificationType:
+      description: |
+        알림 타입 (COMMENT 댓글, LIKE 좋아요, FOLLOW 팔로우, SYSTEM 시스템, GYM_UPDATE 암장 업데이트)
       type: string
       enum: [COMMENT, LIKE, FOLLOW, SYSTEM, GYM_UPDATE]
     FacilityType:
+      description: |
+        암장 시설 타입 (PARKING 주차장, SHOWER 샤워실, LOCKER 락커, REST_AREA 휴식 공간, TRAINING 트레이닝 시설)
       type: string
-      enum: [PARKING, SHOWER, LOCKER, RENTAL, CAFE, WIFI, REST_AREA, TRAINING]
+      enum: [PARKING, SHOWER, LOCKER, REST_AREA, TRAINING]
     AttemptResult:
+      description: |
+        시도 결과 (SEND 완등, ATTEMPT 시도, FLASH 플래시, ONSIGHT 온사이트)
       type: string
       enum: [SEND, ATTEMPT, FLASH, ONSIGHT]
     GymReviewFeature:
+      description: |
+        암장 리뷰 특징 (COOL_AIR 쾌적한 냉방, WIDE_STRETCH 넓은 스트레칭존, VARIOUS_LEVEL 다양한 난이도,
+        KIND_STAFF 친절한 스태프, EASY_PARKING 주차 편리, SHOWER_ROOM 샤워실 완비,
+        CLEAN_FACILITY 깨끗한 시설, GOOD_VENT 환기 좋음)
       type: string
       enum:
         - COOL_AIR
@@ -1042,6 +1041,7 @@ components:
         - CLEAN_FACILITY
         - GOOD_VENT
     Role:
+      description: 유저 권한 (ADMIN 관리자, MANAGER 매니저, GUEST 일반)
       type: string
       enum: [ADMIN, MANAGER, GUEST]
 
@@ -1056,40 +1056,30 @@ components:
 
     # ── Gym ──
     GymImage:
+      description: 암장 이미지
       type: object
       required: [id, gymId, url, order, createdAt]
       properties:
-        id: { type: string, format: uuid }
-        gymId: { type: string, format: uuid }
-        url: { type: string }
-        order: { type: integer }
-        createdAt: { type: string, format: date-time }
+        id: { type: string, format: uuid, description: 이미지 고유 ID }
+        gymId: { type: string, format: uuid, description: 암장 ID }
+        url: { type: string, description: 이미지 URL }
+        order: { type: integer, description: 순서 }
+        createdAt: { type: string, format: date-time, description: 생성일 }
 
-    GymFacility:
+    GymOpenHour:
+      description: 암장 영업시간 (요일별 한 슬롯, gym_open_hours)
       type: object
-      required: [id, gymId, type]
+      required: [id, gymId, dayType, open, close]
       properties:
-        id: { type: string, format: uuid }
-        gymId: { type: string, format: uuid }
-        type: { $ref: "#/components/schemas/FacilityType" }
-
-    GymOpenHoursTimeSlot:
-      type: object
-      required: [open, close]
-      properties:
-        open: { type: string, description: "HH:mm" }
-        close: { type: string, description: "HH:mm" }
-
-    GymOpenHours:
-      type: object
-      properties:
-        weekday: { $ref: "#/components/schemas/GymOpenHoursTimeSlot" }
-        saturday: { $ref: "#/components/schemas/GymOpenHoursTimeSlot" }
-        sunday: { $ref: "#/components/schemas/GymOpenHoursTimeSlot" }
-        holiday: { $ref: "#/components/schemas/GymOpenHoursTimeSlot" }
-        notice: { type: string, description: "비정기 휴무·안내 문구" }
+        id: { type: string, format: uuid, description: 고유 ID }
+        gymId: { type: string, format: uuid, description: 암장 ID }
+        dayType:
+          $ref: "#/components/schemas/DayType"
+        open: { type: string, description: '오픈 시간 "HH:mm"' }
+        close: { type: string, description: '마감 시간 "HH:mm"' }
 
     GymListItem:
+      description: 암장 (목록/상세 공통 필드; API는 Prisma Gym + 실시간 visitorCount 등)
       type: object
       required:
         [
@@ -1113,44 +1103,55 @@ components:
           images,
         ]
       properties:
-        id: { type: string, format: uuid }
-        name: { type: string }
-        address: { type: string }
+        id: { type: string, format: uuid, description: 암장 고유 ID }
+        name: { type: string, description: 암장 이름 }
+        address: { type: string, description: 주소 }
         region: { $ref: "#/components/schemas/Region" }
-        phone: { type: string, nullable: true }
+        phone: { type: string, description: 전화번호 }
+        notice:
+          type: string
+          nullable: true
+          description: '영업시간 공지 (예: "명절 당일 휴무")'
         openHours:
-          oneOf:
-            - type: "null"
-            - $ref: "#/components/schemas/GymOpenHours"
-        congestion: { type: integer }
+          type: array
+          description: 요일별 영업시간 (GymOpenHour 관계)
+          items: { $ref: "#/components/schemas/GymOpenHour" }
+        congestion:
+          type: integer
+          description: 현재 혼잡도 (0~100)
         visitorCount:
-          { type: integer, description: "현재 체크인 기준 이용 인원" }
+          type: integer
+          description: 현재 추정 이용 인원 (실시간 체크인 집계로 덮어쓸 수 있음)
         monthlyCheckInCount:
           type: integer
           nullable: true
-          description: "이번 달 체크인 횟수"
-        visitorCapacity: { type: integer, description: "수용 인원(표시 상한)" }
-        latitude: { type: number, nullable: true }
-        longitude: { type: number, nullable: true }
-        description: { type: string, nullable: true }
-        avgRating: { type: number }
-        reviewCount: { type: integer }
-        website: { type: string, nullable: true, description: "웹사이트 URL" }
+          description: 이번 달 체크인 횟수 (정렬·목록 전용)
+        visitorCapacity:
+          type: integer
+          description: 수용 인원 (혼잡도 카드 분모)
+        latitude: { type: number, description: 위도 }
+        longitude: { type: number, description: 경도 }
+        description: { type: string, description: 설명 }
+        avgRating: { type: number, description: 평균 평점 }
+        reviewCount: { type: integer, description: 리뷰 수 }
+        website: { type: string, nullable: true, description: 웹사이트 URL }
         thumbnailUrl:
-          { type: string, nullable: true, description: "목록/카드용 썸네일" }
-        instagramId: { type: string, nullable: true }
+          { type: string, nullable: true, description: 목록/카드용 썸네일 }
+        instagramId: { type: string, nullable: true, description: 인스타그램 아이디 }
         priceInfo:
-          description: "가격 정보 (암장별 JSON 구조)"
+          description: 가격 정보 (암장별 JSON 구조)
           nullable: true
           type: object
           additionalProperties: true
-        createdAt: { type: string, format: date-time }
-        updatedAt: { type: string, format: date-time }
+        createdAt: { type: string, format: date-time, description: 생성일 }
+        updatedAt: { type: string, format: date-time, description: 수정일 }
         facilities:
           type: array
-          items: { $ref: "#/components/schemas/GymFacility" }
+          description: 시설 목록 (스칼라 enum 배열)
+          items: { $ref: "#/components/schemas/FacilityType" }
         images:
           type: array
+          description: 이미지 목록 (목록 API는 take 1 등으로 제한될 수 있음)
           items: { $ref: "#/components/schemas/GymImage" }
 
     GymDetail:
@@ -1177,17 +1178,6 @@ components:
       properties:
         ok: { type: boolean }
 
-    CongestionLog:
-      type: object
-      required: [id, gymId, dayOfWeek, hour, congestion, createdAt]
-      properties:
-        id: { type: string, format: uuid }
-        gymId: { type: string, format: uuid }
-        dayOfWeek: { type: integer }
-        hour: { type: integer }
-        congestion: { type: integer }
-        createdAt: { type: string, format: date-time }
-
     PaginatedGymListItem:
       type: object
       required: [items, nextCursor]
@@ -1198,35 +1188,31 @@ components:
         nextCursor: { type: string, nullable: true }
 
     # ── Review ──
-    ReviewImage:
-      type: object
-      required: [id, reviewId, url, order, createdAt]
-      properties:
-        id: { type: string, format: uuid }
-        reviewId: { type: string, format: uuid }
-        url: { type: string }
-        order: { type: integer }
-        createdAt: { type: string, format: date-time }
-
     Review:
+      description: 암장 리뷰 (작성 응답 등, user 미포함일 수 있음)
       type: object
-      required: [id, userId, gymId, rating, content, createdAt, updatedAt]
+      required: [id, userId, gymId, rating, content, imageUrls, features, createdAt, updatedAt]
       properties:
         id: { type: string, format: uuid }
         userId: { type: string, format: uuid }
         gymId: { type: string, format: uuid }
-        rating: { type: integer }
-        content: { type: string }
+        rating: { type: integer, description: 평점 (1~5) }
+        content: { type: string, description: 리뷰 내용 }
         perceivedDifficulty:
           $ref: "#/components/schemas/GymPerceivedDifficulty"
           nullable: true
         features:
           type: array
           items: { $ref: "#/components/schemas/GymReviewFeature" }
+        imageUrls:
+          type: array
+          description: 이미지 URL 목록
+          items: { type: string, format: uri }
         createdAt: { type: string, format: date-time }
         updatedAt: { type: string, format: date-time }
 
     ReviewListItem:
+      description: 리뷰 목록 항목 (작성자 user 포함)
       type: object
       required:
         [
@@ -1235,11 +1221,11 @@ components:
           gymId,
           rating,
           content,
+          imageUrls,
           createdAt,
           updatedAt,
           user,
           features,
-          images,
         ]
       properties:
         id: { type: string, format: uuid }
@@ -1256,9 +1242,9 @@ components:
         features:
           type: array
           items: { $ref: "#/components/schemas/GymReviewFeature" }
-        images:
+        imageUrls:
           type: array
-          items: { $ref: "#/components/schemas/ReviewImage" }
+          items: { type: string, format: uri }
 
     PaginatedReviewListItem:
       type: object
@@ -1284,9 +1270,9 @@ components:
 
     # ── Record / Session ──
     Route:
+      description: 클라이밍 루트 기록 (routes 테이블)
       type: object
-      required:
-        [id, sessionId, difficulty, result, attempts, memo, order, createdAt]
+      required: [id, sessionId, difficulty, result, attempts, order, createdAt]
       properties:
         id: { type: string, format: uuid }
         sessionId: { type: string, format: uuid }
@@ -1300,16 +1286,6 @@ components:
         order: { type: integer }
         createdAt: { type: string, format: date-time }
 
-    SessionImage:
-      type: object
-      required: [id, sessionId, url, order, createdAt]
-      properties:
-        id: { type: string, format: uuid }
-        sessionId: { type: string, format: uuid }
-        url: { type: string }
-        order: { type: integer }
-        createdAt: { type: string, format: date-time }
-
     GymSummary:
       type: object
       required: [id, name]
@@ -1318,6 +1294,7 @@ components:
         name: { type: string }
 
     RecordListItem:
+      description: 클라이밍 세션 목록 항목 (climbing_sessions)
       type: object
       required:
         [
@@ -1333,7 +1310,7 @@ components:
           updatedAt,
           gym,
           routes,
-          images,
+          imageUrls,
         ]
       properties:
         id: { type: string, format: uuid }
@@ -1350,11 +1327,13 @@ components:
         routes:
           type: array
           items: { $ref: "#/components/schemas/Route" }
-        images:
+        imageUrls:
           type: array
-          items: { $ref: "#/components/schemas/SessionImage" }
+          description: 세션 이미지 URL 목록
+          items: { type: string, format: uri }
 
     RecordDetail:
+      description: 기록 상세 (세션 + 작성자)
       type: object
       required:
         [
@@ -1370,7 +1349,7 @@ components:
           updatedAt,
           gym,
           routes,
-          images,
+          imageUrls,
           user,
         ]
       properties:
@@ -1394,9 +1373,9 @@ components:
         routes:
           type: array
           items: { $ref: "#/components/schemas/Route" }
-        images:
+        imageUrls:
           type: array
-          items: { $ref: "#/components/schemas/SessionImage" }
+          items: { type: string, format: uri }
         user: { $ref: "#/components/schemas/AuthorSummary" }
 
     PaginatedRecordListItem:
@@ -1451,25 +1430,8 @@ components:
           items: { type: string, format: uri }
 
     # ── Post ──
-    PostTag:
-      type: object
-      required: [id, postId, name]
-      properties:
-        id: { type: string, format: uuid }
-        postId: { type: string, format: uuid }
-        name: { type: string }
-
-    PostImage:
-      type: object
-      required: [id, postId, url, order, createdAt]
-      properties:
-        id: { type: string, format: uuid }
-        postId: { type: string, format: uuid }
-        url: { type: string }
-        order: { type: integer }
-        createdAt: { type: string, format: date-time }
-
     Post:
+      description: 커뮤니티 게시글 (posts)
       type: object
       required:
         [
@@ -1481,6 +1443,8 @@ components:
           viewCount,
           likeCount,
           commentCount,
+          tags,
+          imageUrls,
           createdAt,
           updatedAt,
         ]
@@ -1493,10 +1457,19 @@ components:
         viewCount: { type: integer }
         likeCount: { type: integer }
         commentCount: { type: integer }
+        tags:
+          type: array
+          description: 태그 문자열 목록
+          items: { type: string }
+        imageUrls:
+          type: array
+          description: 이미지 URL 목록
+          items: { type: string, format: uri }
         createdAt: { type: string, format: date-time }
         updatedAt: { type: string, format: date-time }
 
     PostListItem:
+      description: 게시글 목록 항목
       type: object
       required:
         [
@@ -1512,7 +1485,7 @@ components:
           updatedAt,
           author,
           tags,
-          images,
+          imageUrls,
         ]
       properties:
         id: { type: string, format: uuid }
@@ -1528,10 +1501,10 @@ components:
         author: { $ref: "#/components/schemas/AuthorSummary" }
         tags:
           type: array
-          items: { $ref: "#/components/schemas/PostTag" }
-        images:
+          items: { type: string }
+        imageUrls:
           type: array
-          items: { $ref: "#/components/schemas/PostImage" }
+          items: { type: string, format: uri }
         likes:
           type: array
           items:
@@ -1548,6 +1521,7 @@ components:
               id: { type: string, format: uuid }
 
     PostDetail:
+      description: 게시글 상세
       type: object
       required:
         [
@@ -1563,7 +1537,7 @@ components:
           updatedAt,
           author,
           tags,
-          images,
+          imageUrls,
         ]
       properties:
         id: { type: string, format: uuid }
@@ -1579,10 +1553,10 @@ components:
         author: { $ref: "#/components/schemas/AuthorSummary" }
         tags:
           type: array
-          items: { $ref: "#/components/schemas/PostTag" }
-        images:
+          items: { type: string }
+        imageUrls:
           type: array
-          items: { $ref: "#/components/schemas/PostImage" }
+          items: { type: string, format: uri }
         likes:
           type: array
           items:

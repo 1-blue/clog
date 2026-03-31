@@ -25,9 +25,9 @@ const CommunityCard: React.FC<IProps> = ({ post }) => {
       href={ROUTES.COMMUNITY.DETAIL.path(post.id)}
     >
       <div className="relative size-20 shrink-0 overflow-hidden rounded-lg bg-surface-container-highest">
-        {post.images[0]?.url ? (
+        {post.imageUrls[0] ? (
           <img
-            src={post.images[0].url}
+            src={post.imageUrls[0]}
             alt=""
             className="size-full object-cover transition-transform duration-300 group-hover:scale-110"
           />

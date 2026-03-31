@@ -25,7 +25,7 @@ interface IProps {
     commentCount: number;
     viewCount: number;
     createdAt: string;
-    images: Array<{ url: string }>;
+    imageUrls: string[];
     likes?: Array<{ id: string }>;
     bookmarks?: Array<{ id: string }>;
   }>;
@@ -104,7 +104,7 @@ const PostsPanel: React.FC<IProps> = ({
             commentCount={post.commentCount}
             viewCount={post.viewCount}
             createdAt={post.createdAt}
-            imageUrl={post.images[0]?.url}
+            imageUrl={post.imageUrls[0]}
             isLiked={forceLiked || (post.likes?.length ?? 0) > 0}
             isBookmarked={forceBookmarked || (post.bookmarks?.length ?? 0) > 0}
           />

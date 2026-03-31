@@ -72,23 +72,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/gyms/{gymId}/congestion": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 시간대별 혼잡도 */
-        get: operations["getGymCongestion"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/gyms/{gymId}/reviews": {
         parameters: {
             query?: never;
@@ -477,23 +460,60 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        /** @enum {string} */
+        /**
+         * @description 지역 (17개 시도)
+         *     SEOUL 서울, GYEONGGI 경기, INCHEON 인천, BUSAN 부산, DAEGU 대구, DAEJEON 대전,
+         *     GWANGJU 광주, ULSAN 울산, SEJONG 세종, GANGWON 강원, CHUNGBUK 충북, CHUNGNAM 충남,
+         *     JEONBUK 전북, JEONNAM 전남, GYEONGBUK 경북, GYEONGNAM 경남, JEJU 제주
+         * @enum {string}
+         */
         Region: "SEOUL" | "GYEONGGI" | "INCHEON" | "BUSAN" | "DAEGU" | "DAEJEON" | "GWANGJU" | "ULSAN" | "SEJONG" | "GANGWON" | "CHUNGBUK" | "CHUNGNAM" | "JEONBUK" | "JEONNAM" | "GYEONGBUK" | "GYEONGNAM" | "JEJU";
-        /** @enum {string} */
-        Difficulty: "VB" | "V0" | "V1" | "V2" | "V3" | "V4" | "V5" | "V6" | "V7" | "V8" | "V9" | "V10" | "V_PLUS";
-        /** @enum {string} */
+        /**
+         * @description 난이도 (V0~V10)
+         * @enum {string}
+         */
+        Difficulty: "V0" | "V1" | "V2" | "V3" | "V4" | "V5" | "V6" | "V7" | "V8" | "V9" | "V10";
+        /**
+         * @description 영업시간 요일 타입 (MON 월요일 ~ SUN 일요일)
+         * @enum {string}
+         */
+        DayType: "MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT" | "SUN";
+        /**
+         * @description 체감 난이도 (EASY 쉬움, NORMAL 보통, HARD 어려움)
+         * @enum {string}
+         */
         GymPerceivedDifficulty: "EASY" | "NORMAL" | "HARD";
-        /** @enum {string} */
+        /**
+         * @description 게시글 카테고리 (FREE 자유, TIPS 팁/노하우, REVIEW 후기, MEETUP 모임, GEAR 장비)
+         * @enum {string}
+         */
         CommunityCategory: "FREE" | "TIPS" | "REVIEW" | "MEETUP" | "GEAR";
-        /** @enum {string} */
+        /**
+         * @description 알림 타입 (COMMENT 댓글, LIKE 좋아요, FOLLOW 팔로우, SYSTEM 시스템, GYM_UPDATE 암장 업데이트)
+         * @enum {string}
+         */
         NotificationType: "COMMENT" | "LIKE" | "FOLLOW" | "SYSTEM" | "GYM_UPDATE";
-        /** @enum {string} */
-        FacilityType: "PARKING" | "SHOWER" | "LOCKER" | "RENTAL" | "CAFE" | "WIFI" | "REST_AREA" | "TRAINING";
-        /** @enum {string} */
+        /**
+         * @description 암장 시설 타입 (PARKING 주차장, SHOWER 샤워실, LOCKER 락커, REST_AREA 휴식 공간, TRAINING 트레이닝 시설)
+         * @enum {string}
+         */
+        FacilityType: "PARKING" | "SHOWER" | "LOCKER" | "REST_AREA" | "TRAINING";
+        /**
+         * @description 시도 결과 (SEND 완등, ATTEMPT 시도, FLASH 플래시, ONSIGHT 온사이트)
+         * @enum {string}
+         */
         AttemptResult: "SEND" | "ATTEMPT" | "FLASH" | "ONSIGHT";
-        /** @enum {string} */
+        /**
+         * @description 암장 리뷰 특징 (COOL_AIR 쾌적한 냉방, WIDE_STRETCH 넓은 스트레칭존, VARIOUS_LEVEL 다양한 난이도,
+         *     KIND_STAFF 친절한 스태프, EASY_PARKING 주차 편리, SHOWER_ROOM 샤워실 완비,
+         *     CLEAN_FACILITY 깨끗한 시설, GOOD_VENT 환기 좋음)
+         * @enum {string}
+         */
         GymReviewFeature: "COOL_AIR" | "WIDE_STRETCH" | "VARIOUS_LEVEL" | "KIND_STAFF" | "EASY_PARKING" | "SHOWER_ROOM" | "CLEAN_FACILITY" | "GOOD_VENT";
-        /** @enum {string} */
+        /**
+         * @description 유저 권한 (ADMIN 관리자, MANAGER 매니저, GUEST 일반)
+         * @enum {string}
+         */
         Role: "ADMIN" | "MANAGER" | "GUEST";
         AuthorSummary: {
             /** Format: uuid */
@@ -501,71 +521,105 @@ export interface components {
             nickname: string;
             profileImage: string | null;
         };
+        /** @description 암장 이미지 */
         GymImage: {
-            /** Format: uuid */
+            /**
+             * Format: uuid
+             * @description 이미지 고유 ID
+             */
             id: string;
-            /** Format: uuid */
+            /**
+             * Format: uuid
+             * @description 암장 ID
+             */
             gymId: string;
+            /** @description 이미지 URL */
             url: string;
+            /** @description 순서 */
             order: number;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description 생성일
+             */
             createdAt: string;
         };
-        GymFacility: {
-            /** Format: uuid */
+        /** @description 암장 영업시간 (요일별 한 슬롯, gym_open_hours) */
+        GymOpenHour: {
+            /**
+             * Format: uuid
+             * @description 고유 ID
+             */
             id: string;
-            /** Format: uuid */
+            /**
+             * Format: uuid
+             * @description 암장 ID
+             */
             gymId: string;
-            type: components["schemas"]["FacilityType"];
-        };
-        GymOpenHoursTimeSlot: {
-            /** @description HH:mm */
+            dayType: components["schemas"]["DayType"];
+            /** @description 오픈 시간 "HH:mm" */
             open: string;
-            /** @description HH:mm */
+            /** @description 마감 시간 "HH:mm" */
             close: string;
         };
-        GymOpenHours: {
-            weekday?: components["schemas"]["GymOpenHoursTimeSlot"];
-            saturday?: components["schemas"]["GymOpenHoursTimeSlot"];
-            sunday?: components["schemas"]["GymOpenHoursTimeSlot"];
-            holiday?: components["schemas"]["GymOpenHoursTimeSlot"];
-            /** @description 비정기 휴무·안내 문구 */
-            notice?: string;
-        };
+        /** @description 암장 (목록/상세 공통 필드; API는 Prisma Gym + 실시간 visitorCount 등) */
         GymListItem: {
-            /** Format: uuid */
+            /**
+             * Format: uuid
+             * @description 암장 고유 ID
+             */
             id: string;
+            /** @description 암장 이름 */
             name: string;
+            /** @description 주소 */
             address: string;
             region: components["schemas"]["Region"];
-            phone: string | null;
-            openHours: null | components["schemas"]["GymOpenHours"];
+            /** @description 전화번호 */
+            phone: string;
+            /** @description 영업시간 공지 (예: "명절 당일 휴무") */
+            notice?: string | null;
+            /** @description 요일별 영업시간 (GymOpenHour 관계) */
+            openHours: components["schemas"]["GymOpenHour"][];
+            /** @description 현재 혼잡도 (0~100) */
             congestion: number;
-            /** @description 현재 체크인 기준 이용 인원 */
+            /** @description 현재 추정 이용 인원 (실시간 체크인 집계로 덮어쓸 수 있음) */
             visitorCount: number;
-            /** @description 이번 달 체크인 횟수 */
+            /** @description 이번 달 체크인 횟수 (정렬·목록 전용) */
             monthlyCheckInCount?: number | null;
-            /** @description 수용 인원(표시 상한) */
+            /** @description 수용 인원 (혼잡도 카드 분모) */
             visitorCapacity: number;
-            latitude: number | null;
-            longitude: number | null;
-            description: string | null;
+            /** @description 위도 */
+            latitude: number;
+            /** @description 경도 */
+            longitude: number;
+            /** @description 설명 */
+            description: string;
+            /** @description 평균 평점 */
             avgRating: number;
+            /** @description 리뷰 수 */
             reviewCount: number;
             /** @description 웹사이트 URL */
             website?: string | null;
             /** @description 목록/카드용 썸네일 */
             thumbnailUrl?: string | null;
+            /** @description 인스타그램 아이디 */
             instagramId?: string | null;
             /** @description 가격 정보 (암장별 JSON 구조) */
             priceInfo?: {
                 [key: string]: unknown;
             } | null;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description 생성일
+             */
             createdAt: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description 수정일
+             */
             updatedAt: string;
-            facilities: components["schemas"]["GymFacility"][];
+            /** @description 시설 목록 (스칼라 enum 배열) */
+            facilities: components["schemas"]["FacilityType"][];
+            /** @description 이미지 목록 (목록 API는 take 1 등으로 제한될 수 있음) */
             images: components["schemas"]["GymImage"][];
         };
         GymDetail: components["schemas"]["GymListItem"] & {
@@ -581,31 +635,11 @@ export interface components {
         CheckOutResult: {
             ok: boolean;
         };
-        CongestionLog: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            gymId: string;
-            dayOfWeek: number;
-            hour: number;
-            congestion: number;
-            /** Format: date-time */
-            createdAt: string;
-        };
         PaginatedGymListItem: {
             items: components["schemas"]["GymListItem"][];
             nextCursor: string | null;
         };
-        ReviewImage: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            reviewId: string;
-            url: string;
-            order: number;
-            /** Format: date-time */
-            createdAt: string;
-        };
+        /** @description 암장 리뷰 (작성 응답 등, user 미포함일 수 있음) */
         Review: {
             /** Format: uuid */
             id: string;
@@ -613,15 +647,20 @@ export interface components {
             userId: string;
             /** Format: uuid */
             gymId: string;
+            /** @description 평점 (1~5) */
             rating: number;
+            /** @description 리뷰 내용 */
             content: string;
             perceivedDifficulty?: components["schemas"]["GymPerceivedDifficulty"];
-            features?: components["schemas"]["GymReviewFeature"][];
+            features: components["schemas"]["GymReviewFeature"][];
+            /** @description 이미지 URL 목록 */
+            imageUrls: string[];
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
         };
+        /** @description 리뷰 목록 항목 (작성자 user 포함) */
         ReviewListItem: {
             /** Format: uuid */
             id: string;
@@ -638,7 +677,7 @@ export interface components {
             updatedAt: string;
             user: components["schemas"]["AuthorSummary"];
             features: components["schemas"]["GymReviewFeature"][];
-            images: components["schemas"]["ReviewImage"][];
+            imageUrls: string[];
         };
         PaginatedReviewListItem: {
             items: components["schemas"]["ReviewListItem"][];
@@ -650,6 +689,7 @@ export interface components {
             features?: components["schemas"]["GymReviewFeature"][];
             imageUrls?: string[];
         };
+        /** @description 클라이밍 루트 기록 (routes 테이블) */
         Route: {
             /** Format: uuid */
             id: string;
@@ -659,17 +699,7 @@ export interface components {
             result: components["schemas"]["AttemptResult"];
             attempts: number;
             perceivedDifficulty?: components["schemas"]["GymPerceivedDifficulty"];
-            memo: string | null;
-            order: number;
-            /** Format: date-time */
-            createdAt: string;
-        };
-        SessionImage: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            sessionId: string;
-            url: string;
+            memo?: string | null;
             order: number;
             /** Format: date-time */
             createdAt: string;
@@ -679,6 +709,7 @@ export interface components {
             id: string;
             name: string;
         };
+        /** @description 클라이밍 세션 목록 항목 (climbing_sessions) */
         RecordListItem: {
             /** Format: uuid */
             id: string;
@@ -700,8 +731,10 @@ export interface components {
             updatedAt: string;
             gym: components["schemas"]["GymSummary"];
             routes: components["schemas"]["Route"][];
-            images: components["schemas"]["SessionImage"][];
+            /** @description 세션 이미지 URL 목록 */
+            imageUrls: string[];
         };
+        /** @description 기록 상세 (세션 + 작성자) */
         RecordDetail: {
             /** Format: uuid */
             id: string;
@@ -728,7 +761,7 @@ export interface components {
                 address: string;
             };
             routes: components["schemas"]["Route"][];
-            images: components["schemas"]["SessionImage"][];
+            imageUrls: string[];
             user: components["schemas"]["AuthorSummary"];
         };
         PaginatedRecordListItem: {
@@ -769,23 +802,7 @@ export interface components {
             routes?: components["schemas"]["CreateRouteBody"][];
             imageUrls?: string[];
         };
-        PostTag: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            postId: string;
-            name: string;
-        };
-        PostImage: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            postId: string;
-            url: string;
-            order: number;
-            /** Format: date-time */
-            createdAt: string;
-        };
+        /** @description 커뮤니티 게시글 (posts) */
         Post: {
             /** Format: uuid */
             id: string;
@@ -797,11 +814,16 @@ export interface components {
             viewCount: number;
             likeCount: number;
             commentCount: number;
+            /** @description 태그 문자열 목록 */
+            tags: string[];
+            /** @description 이미지 URL 목록 */
+            imageUrls: string[];
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
         };
+        /** @description 게시글 목록 항목 */
         PostListItem: {
             /** Format: uuid */
             id: string;
@@ -818,8 +840,8 @@ export interface components {
             /** Format: date-time */
             updatedAt: string;
             author: components["schemas"]["AuthorSummary"];
-            tags: components["schemas"]["PostTag"][];
-            images: components["schemas"]["PostImage"][];
+            tags: string[];
+            imageUrls: string[];
             likes?: {
                 /** Format: uuid */
                 id: string;
@@ -829,6 +851,7 @@ export interface components {
                 id: string;
             }[];
         };
+        /** @description 게시글 상세 */
         PostDetail: {
             /** Format: uuid */
             id: string;
@@ -845,8 +868,8 @@ export interface components {
             /** Format: date-time */
             updatedAt: string;
             author: components["schemas"]["AuthorSummary"];
-            tags: components["schemas"]["PostTag"][];
-            images: components["schemas"]["PostImage"][];
+            tags: string[];
+            imageUrls: string[];
             likes?: {
                 /** Format: uuid */
                 id: string;
@@ -1150,30 +1173,6 @@ export interface operations {
                     "application/json": {
                         toast: string;
                         payload: components["schemas"]["CheckOutResult"];
-                    };
-                };
-            };
-        };
-    };
-    getGymCongestion: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                gymId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: components["schemas"]["CongestionLog"][];
                     };
                 };
             };

@@ -40,7 +40,7 @@ const RecordDetailMain = ({ recordId }: IProps) => {
   return (
     <div className="pb-10">
       <RecordDetailTopBar />
-      <RecordDetailHeroCarousel images={record.images} />
+      <RecordDetailHeroCarousel imageUrls={record.imageUrls} />
       <div className="relative z-10 -mt-10 px-4">
         <RecordDetailEditEntry
           recordUserId={record.user.id}

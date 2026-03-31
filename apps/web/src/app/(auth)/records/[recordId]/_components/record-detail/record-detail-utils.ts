@@ -17,7 +17,6 @@ const DIFF_ORDER: Difficulty[] = [
   "V8",
   "V9",
   "V10",
-  "V_PLUS",
 ];
 
 const diffIdx = (d: Difficulty) => DIFF_ORDER.indexOf(d);

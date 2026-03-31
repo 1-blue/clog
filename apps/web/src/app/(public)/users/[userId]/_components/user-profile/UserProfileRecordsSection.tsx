@@ -58,7 +58,7 @@ const UserProfileRecordsSection = ({ userId, selectedYmd }: IProps) => {
       >
         <div className="grid grid-cols-3 gap-0.5">
           {records.map((rec) => {
-            const thumb = rec.images[0]?.url;
+            const thumb = rec.imageUrls[0];
             const topRoute = rec.routes[0];
             return (
               <Link

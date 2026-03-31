@@ -20,13 +20,7 @@ interface IProps {
 
 const ReviewListItem: React.FC<IProps> = ({ review }) => {
   const [contentExpanded, setContentExpanded] = useState(false);
-  const reviewImageUrls = useMemo(
-    () =>
-      [...review.images]
-        .sort((a, b) => a.order - b.order)
-        .map((img) => img.url),
-    [review.images],
-  );
+  const reviewImageUrls = useMemo(() => review.imageUrls, [review.imageUrls]);
 
   return (
     <div className="rounded-2xl bg-surface-container-low p-3">

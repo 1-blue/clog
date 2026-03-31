@@ -37,7 +37,7 @@ const GymInfoTabContent: React.FC<IProps> = ({ gym }) => {
           <h5 className={sectionTitleClass}>시설</h5>
           <div className="flex flex-wrap gap-2.5 rounded-2xl border border-white/5 bg-surface-container-low p-4">
             {gym.facilities.map((f) => (
-              <FacilityChip key={f.id} type={f.type as FacilityType} />
+              <FacilityChip key={f} type={f as FacilityType} />
             ))}
           </div>
         </div>

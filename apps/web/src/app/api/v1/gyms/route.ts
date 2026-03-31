@@ -111,7 +111,6 @@ export const GET = async (request: Request) => {
       const gyms = await prisma.gym.findMany({
         where: { id: { in: pageIds } },
         include: {
-          facilities: true,
           images: { take: 1, orderBy: { order: "asc" } },
         },
       });
@@ -174,7 +173,6 @@ export const GET = async (request: Request) => {
       const gyms = await prisma.gym.findMany({
         where: { id: { in: pageIds } },
         include: {
-          facilities: true,
           images: { take: 1, orderBy: { order: "asc" } },
         },
       });
@@ -219,7 +217,6 @@ export const GET = async (request: Request) => {
         skip: 1,
       }),
       include: {
-        facilities: true,
         images: { take: 1, orderBy: { order: "asc" } },
       },
     });

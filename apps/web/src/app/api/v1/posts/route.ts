@@ -34,8 +34,6 @@ export const GET = async (request: Request) => {
       ...(query.cursor && { cursor: { id: query.cursor }, skip: 1 }),
       include: {
         author: { select: { id: true, nickname: true, profileImage: true } },
-        tags: true,
-        images: { take: 1, orderBy: { order: "asc" } },
         ...(userId && {
           likes: { where: { userId }, select: { id: true } },
           bookmarks: { where: { userId }, select: { id: true } },
@@ -70,12 +68,8 @@ export const POST = async (request: Request) => {
         category: data.category,
         title: data.title,
         content: data.content,
-        tags: data.tags?.length
-          ? { create: data.tags.map((name) => ({ name })) }
-          : undefined,
-        images: data.imageUrls?.length
-          ? { create: data.imageUrls.map((url, i) => ({ url, order: i })) }
-          : undefined,
+        tags: data.tags ?? [],
+        imageUrls: data.imageUrls ?? [],
       },
     });
 

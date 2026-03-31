@@ -2,32 +2,29 @@
 
 import { Mountain } from "lucide-react";
 
-import type { components } from "#web/@types/openapi";
 import { cn } from "#web/libs/utils";
 
-type SessionImage = components["schemas"]["SessionImage"];
-
 interface IProps {
-  images: SessionImage[];
+  imageUrls: string[];
   className?: string;
 }
 
-const RecordDetailHeroCarousel = ({ images, className }: IProps) => (
+const RecordDetailHeroCarousel = ({ imageUrls, className }: IProps) => (
   <div
     className={cn(
       "relative w-full overflow-hidden bg-surface-container-high",
       className,
     )}
   >
-    {images.length > 0 ? (
+    {imageUrls.length > 0 ? (
       <div className="scrollbar-hide flex aspect-3/4 max-h-screen w-full snap-x snap-mandatory overflow-x-auto md:aspect-video">
-        {images.map((img) => (
+        {imageUrls.map((url, i) => (
           <div
-            key={img.id}
+            key={`${url}-${i}`}
             className="relative w-full shrink-0 snap-center"
           >
             <img
-              src={img.url}
+              src={url}
               alt=""
               className="size-full object-cover"
             />

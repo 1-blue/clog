@@ -18,7 +18,6 @@ export const GET = async (
       include: {
         gym: { select: { id: true, name: true, address: true } },
         routes: { orderBy: { order: "asc" } },
-        images: { orderBy: { order: "asc" } },
         user: { select: { id: true, nickname: true, profileImage: true } },
       },
     });
@@ -58,11 +57,6 @@ export const PATCH = async (
     if (data.routes) {
       await prisma.climbingRoute.deleteMany({ where: { sessionId: recordId } });
     }
-    if (data.imageUrls) {
-      await prisma.climbingSessionImage.deleteMany({
-        where: { sessionId: recordId },
-      });
-    }
 
     const session = await prisma.climbingSession.update({
       where: { id: recordId },
@@ -83,13 +77,9 @@ export const PATCH = async (
             })),
           },
         }),
-        ...(data.imageUrls && {
-          images: {
-            create: data.imageUrls.map((url, i) => ({ url, order: i })),
-          },
-        }),
+        ...(data.imageUrls && { imageUrls: data.imageUrls }),
       },
-      include: { routes: true, images: true },
+      include: { routes: true },
     });
 
     return jsonWithToast(session, "기록이 수정되었습니다.");

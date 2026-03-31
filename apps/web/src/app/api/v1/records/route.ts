@@ -40,7 +40,6 @@ export const GET = async (request: Request) => {
       include: {
         gym: { select: { id: true, name: true } },
         routes: { orderBy: { order: "asc" } },
-        images: { orderBy: { order: "asc" }, take: 1 },
       },
     });
 
@@ -81,13 +80,10 @@ export const POST = async (request: Request) => {
             order: i,
           })),
         },
-        images: data.imageUrls?.length
-          ? { create: data.imageUrls.map((url, i) => ({ url, order: i })) }
-          : undefined,
+        imageUrls: data.imageUrls ?? [],
       },
       include: {
         routes: true,
-        images: true,
       },
     });
 

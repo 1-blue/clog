@@ -59,7 +59,7 @@ const RecordDetailRouteRow = ({ route, className }: IProps) => {
         </div>
         <div className="min-w-0">
           <p className="truncate font-bold text-on-surface">
-            {routeRowTitle(d, route.memo)}
+            {routeRowTitle(d, route.memo ?? null)}
           </p>
           <p className="text-sm text-on-surface-variant">
             {routeRowSubtitle(route.attempts, result)}

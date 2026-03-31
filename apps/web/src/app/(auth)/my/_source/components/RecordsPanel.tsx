@@ -13,7 +13,7 @@ interface IProps {
     date: string;
     gym: { name: string };
     routes: Array<{ difficulty: string; result: string }>;
-    images?: Array<{ url: string }>;
+    imageUrls: string[];
   }>;
   isLoading: boolean;
   fetchNextPage: () => void;
@@ -73,9 +73,9 @@ const RecordsPanel: React.FC<IProps> = ({
             className="block overflow-hidden rounded-2xl bg-surface-container-low ring-1 ring-outline-variant/10 transition-transform active:scale-95"
           >
             <div className="relative aspect-square bg-surface-container-high">
-              {record.images?.[0]?.url ? (
+              {record.imageUrls[0] ? (
                 <img
-                  src={record.images[0].url}
+                  src={record.imageUrls[0]}
                   alt=""
                   className="size-full object-cover"
                 />

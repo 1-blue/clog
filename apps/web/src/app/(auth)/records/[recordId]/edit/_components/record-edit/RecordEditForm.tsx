@@ -50,7 +50,7 @@ const RecordEditForm: React.FC<IProps> = ({ recordId, record }) => {
         result,
         attempts,
       })),
-      imageUrls: record.images.map((img) => img.url),
+      imageUrls: record.imageUrls,
     },
   });
 

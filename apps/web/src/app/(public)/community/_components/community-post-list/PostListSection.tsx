@@ -66,7 +66,7 @@ const PostListSection = ({ category }: IProps) => {
             commentCount={post.commentCount}
             viewCount={post.viewCount}
             createdAt={post.createdAt}
-            imageUrl={post.images?.[0]?.url}
+            imageUrl={post.imageUrls[0]}
             isLiked={(post.likes?.length ?? 0) > 0}
             isBookmarked={(post.bookmarks?.length ?? 0) > 0}
           />

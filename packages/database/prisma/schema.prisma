@@ -46,7 +46,6 @@ enum Region {
 
 /// 난이도
 enum Difficulty {
-  VB     /// V-Beginner (입문)
   V0     /// V0
   V1     /// V1
   V2     /// V2
@@ -58,21 +57,28 @@ enum Difficulty {
   V8     /// V8
   V9     /// V9
   V10    /// V10
-  V_PLUS /// V+ (최상급)
 }
 
 // ============================================
 // 암장 Enums
 // ============================================
 
+/// 영업시간 요일 타입
+enum DayType {
+  MON     /// 월요일
+  TUE     /// 화요일
+  WED     /// 수요일
+  THU     /// 목요일
+  FRI     /// 금요일
+  SAT     /// 토요일
+  SUN     /// 일요일
+}
+
 /// 암장 시설 타입
 enum GymFacilityType {
   PARKING   /// 주차장
   SHOWER    /// 샤워실
   LOCKER    /// 락커
-  RENTAL    /// 장비 대여
-  CAFE      /// 카페
-  WIFI      /// 와이파이
   REST_AREA /// 휴식 공간
   TRAINING  /// 트레이닝 시설
 }
@@ -256,9 +262,10 @@ model Gym {
   /// 지역
   region          Region
   /// 전화번호
-  phone           String?
-  /// 영업시간 JSON: { weekday|saturday|sunday|holiday: { open, close } "HH:mm", notice?: string }
-  openHours       Json?    @map("open_hours")
+  phone           String
+  /// 영업시간 공지 (예: "명절 당일 휴무")
+  notice          String?
+
   /// 현재 혼잡도 (0~100)
   congestion      Int      @default(0)
   /// 현재 추정 이용 인원 (실시간 표시용)
@@ -266,11 +273,11 @@ model Gym {
   /// 수용 인원 (혼잡도 카드 분모)
   visitorCapacity Int      @default(60) @map("visitor_capacity")
   /// 위도
-  latitude        Float?
+  latitude        Float
   /// 경도
-  longitude       Float?
+  longitude       Float
   /// 설명
-  description     String?
+  description     String
   /// 웹사이트 URL
   website         String?
   /// 썸네일 이미지 URL
@@ -291,11 +298,11 @@ model Gym {
   /// 홈짐으로 등록한 유저 목록
   homeGymUsers     User[]               @relation("homeGym")
   /// 시설 목록
-  facilities       GymFacility[]
+  facilities       GymFacilityType[]  @default([])
+  /// 영업시간 목록
+  openHours        GymOpenHour[]
   /// 이미지 목록
   images           GymImage[]
-  /// 혼잡도 로그
-  congestionLogs   GymCongestionLog[]
   /// 난이도 색상 매핑
   difficultyColors GymDifficultyColor[]
   /// 암장 북마크 목록
@@ -337,22 +344,6 @@ model GymCheckIn {
   @@map("gym_check_ins")
 }
 
-/// 암장 시설
-model GymFacility {
-  /// 시설 고유 ID
-  id    String          @id @default(uuid()) @db.Uuid
-  /// 암장 ID
-  gymId String          @map("gym_id") @db.Uuid
-  /// 시설 타입
-  type  GymFacilityType
-
-  /// 암장
-  gym Gym @relation(fields: [gymId], references: [id], onDelete: Cascade)
-
-  @@unique([gymId, type])
-  @@map("gym_facilities")
-}
-
 /// 암장 이미지
 model GymImage {
   /// 이미지 고유 ID
@@ -372,26 +363,24 @@ model GymImage {
   @@map("gym_images")
 }
 
-/// 시간대별 혼잡도 로그
-model GymCongestionLog {
-  /// 로그 고유 ID
-  id         String   @id @default(uuid()) @db.Uuid
+/// 암장 영업시간
+model GymOpenHour {
+  /// 고유 ID
+  id      String  @id @default(uuid()) @db.Uuid
   /// 암장 ID
-  gymId      String   @map("gym_id") @db.Uuid
-  /// 요일 (0=일, 6=토)
-  dayOfWeek  Int      @map("day_of_week")
-  /// 시간 (0~23)
-  hour       Int
-  /// 혼잡도 (0~100)
-  congestion Int
-  /// 생성일
-  createdAt  DateTime @default(now()) @map("created_at")
+  gymId   String  @map("gym_id") @db.Uuid
+  /// 요일
+  dayType DayType @map("day_type")
+  /// 오픈 시간 "HH:mm"
+  open    String
+  /// 마감 시간 "HH:mm"
+  close   String
 
   /// 암장
   gym Gym @relation(fields: [gymId], references: [id], onDelete: Cascade)
 
-  @@unique([gymId, dayOfWeek, hour])
-  @@map("congestion_logs")
+  @@unique([gymId, dayType])
+  @@map("gym_open_hours")
 }
 
 /// 암장별 난이도 색상 매핑
@@ -402,10 +391,10 @@ model GymDifficultyColor {
   gymId      String     @map("gym_id") @db.Uuid
   /// 난이도
   difficulty Difficulty
-  /// HEX 색상 코드 (예: "#E05555", null이면 암장 커스텀 미지정)
-  color      String?
+  /// HEX 색상 코드 (예: "#E05555")
+  color      String
   /// 암장 자체 명칭 (예: "빨강", "레드")
-  label      String?
+  label      String
   /// 표시 순서
   order      Int        @default(0)
 
@@ -486,30 +475,11 @@ model GymReview {
   user   User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   /// 암장
   gym    Gym              @relation(fields: [gymId], references: [id], onDelete: Cascade)
-  /// 이미지 목록
-  images GymReviewImage[]
+  /// 이미지 URL 목록
+  imageUrls           String[]              @default([]) @map("image_urls")
 
   @@unique([userId, gymId])
   @@map("reviews")
-}
-
-/// 암장 리뷰 이미지
-model GymReviewImage {
-  /// 이미지 고유 ID
-  id        String   @id @default(uuid()) @db.Uuid
-  /// 리뷰 ID
-  reviewId  String   @map("review_id") @db.Uuid
-  /// 이미지 URL
-  url       String
-  /// 순서
-  order     Int      @default(0)
-  /// 생성일
-  createdAt DateTime @default(now()) @map("created_at")
-
-  /// 리뷰
-  review GymReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
-
-  @@map("review_images")
 }
 
 // ============================================
@@ -544,9 +514,9 @@ model ClimbingSession {
   /// 암장
   gym    Gym                   @relation(fields: [gymId], references: [id], onDelete: Cascade)
   /// 루트 목록
-  routes ClimbingRoute[]
-  /// 세션 이미지 목록
-  images ClimbingSessionImage[]
+  routes    ClimbingRoute[]
+  /// 세션 이미지 URL 목록
+  imageUrls String[]            @default([]) @map("image_urls")
 
   @@map("climbing_sessions")
 }
@@ -578,25 +548,6 @@ model ClimbingRoute {
   @@map("routes")
 }
 
-/// 클라이밍 세션 이미지
-model ClimbingSessionImage {
-  /// 이미지 고유 ID
-  id        String   @id @default(uuid()) @db.Uuid
-  /// 세션 ID
-  sessionId String   @map("session_id") @db.Uuid
-  /// 이미지 URL
-  url       String
-  /// 순서
-  order     Int      @default(0)
-  /// 생성일
-  createdAt DateTime @default(now()) @map("created_at")
-
-  /// 세션
-  session ClimbingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-
-  @@map("session_images")
-}
-
 // ============================================
 // 커뮤니티
 // ============================================
@@ -624,12 +575,13 @@ model Post {
   /// 수정일
   updatedAt    DateTime     @updatedAt @map("updated_at")
 
+  /// 이미지 URL 목록
+  imageUrls    String[]     @default([]) @map("image_urls")
+  /// 태그 목록
+  tags         String[]     @default([])
+
   /// 작성자
   author    User           @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  /// 이미지 목록
-  images    PostImage[]
-  /// 태그 목록
-  tags      PostTag[]
   /// 좋아요 목록
   likes     PostLike[]
   /// 북마크 목록
@@ -638,40 +590,6 @@ model Post {
   comments  PostComment[]
 
   @@map("posts")
-}
-
-/// 게시글 이미지
-model PostImage {
-  /// 이미지 고유 ID
-  id        String   @id @default(uuid()) @db.Uuid
-  /// 게시글 ID
-  postId    String   @map("post_id") @db.Uuid
-  /// 이미지 URL
-  url       String
-  /// 순서
-  order     Int      @default(0)
-  /// 생성일
-  createdAt DateTime @default(now()) @map("created_at")
-
-  /// 게시글
-  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
-
-  @@map("post_images")
-}
-
-/// 게시글 태그
-model PostTag {
-  /// 태그 고유 ID
-  id     String @id @default(uuid()) @db.Uuid
-  /// 게시글 ID
-  postId String @map("post_id") @db.Uuid
-  /// 태그명
-  name   String
-
-  /// 게시글
-  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
-
-  @@map("post_tags")
 }
 
 /// 게시글 좋아요

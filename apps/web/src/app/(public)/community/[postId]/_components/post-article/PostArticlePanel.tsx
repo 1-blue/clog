@@ -17,7 +17,7 @@ interface IProps {
 }
 
 const PostArticlePanel = ({ post }: IProps) => {
-  const cover = post.images[0];
+  const cover = post.imageUrls[0];
   const timeRel = formatDistanceToNow(new Date(post.createdAt), {
     addSuffix: true,
     locale: ko,
@@ -27,7 +27,7 @@ const PostArticlePanel = ({ post }: IProps) => {
     <>
       {cover ? (
         <div className="relative -mx-6 aspect-4/5 w-screen max-w-none overflow-hidden bg-surface-container-low shadow-2xl sm:mx-0 sm:w-full sm:rounded-2xl">
-          <img src={cover.url} alt="" className="size-full object-cover" />
+          <img src={cover} alt="" className="size-full object-cover" />
         </div>
       ) : null}
 
@@ -87,10 +87,10 @@ const PostArticlePanel = ({ post }: IProps) => {
           <div className="flex flex-wrap gap-2 pt-6">
             {post.tags.map((tag) => (
               <span
-                key={tag.id}
+                key={tag}
                 className="cursor-default rounded-full bg-surface-container-highest/60 px-3.5 py-1.5 text-xs text-on-surface-variant"
               >
-                #{tag.name}
+                #{tag}
               </span>
             ))}
           </div>

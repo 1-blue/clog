@@ -16,7 +16,6 @@ import {
 import GymHeroSection from "./gym-hero/GymHeroSection";
 import GymBasicInfoSection from "./GymBasicInfoSection";
 import GymCheckInBar from "./GymCheckInBar";
-import GymCongestionSection from "./GymCongestionSection";
 import GymInfoTabContent from "./GymInfoTabContent";
 import GymPhotosTabContent from "./GymPhotosTabContent";
 import ReviewListSection from "./review-list/ReviewListSection";
@@ -39,7 +38,7 @@ const GymDetailMain: React.FC<IProps> = ({ gymId }) => {
     { select: (d) => d.payload },
   );
 
-  const { data: liveVisitor, refetch: refetchGym } = openapi.useQuery(
+  const { data: liveVisitor } = openapi.useQuery(
     "get",
     "/api/v1/gyms/{gymId}",
     { params: { path: { gymId } } },
@@ -52,16 +51,7 @@ const GymDetailMain: React.FC<IProps> = ({ gymId }) => {
     },
   );
 
-  const { data: congestionLogs, refetch: refetchCongestion } = openapi.useQuery(
-    "get",
-    "/api/v1/gyms/{gymId}/congestion",
-    { params: { path: { gymId } } },
-    { select: (d) => d.payload },
-  );
-
-  const visitorCount = liveVisitor?.visitorCount ?? gym.visitorCount;
   const myCheckIn = liveVisitor?.myCheckIn ?? gym.myCheckIn ?? null;
-  const capacity = gym.visitorCapacity;
 
   const shareGym = async () => {
     try {
@@ -97,15 +87,6 @@ const GymDetailMain: React.FC<IProps> = ({ gymId }) => {
       />
 
       <GymHeroSection gym={gym} />
-
-      <GymCongestionSection
-        visitorCount={visitorCount}
-        capacity={capacity}
-        congestionLogs={congestionLogs ?? []}
-        onRefresh={async () => {
-          await Promise.all([refetchGym(), refetchCongestion()]);
-        }}
-      />
 
       <GymBasicInfoSection gym={gym} />
 

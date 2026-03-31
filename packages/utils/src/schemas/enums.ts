@@ -28,7 +28,6 @@ export const regionEnum = z.enum([
 export type Region = z.infer<typeof regionEnum>;
 
 export const difficultyEnum = z.enum([
-  "VB",
   "V0",
   "V1",
   "V2",
@@ -40,7 +39,6 @@ export const difficultyEnum = z.enum([
   "V8",
   "V9",
   "V10",
-  "V_PLUS",
 ]);
 export type Difficulty = z.infer<typeof difficultyEnum>;
 
@@ -66,9 +64,6 @@ export const facilityTypeEnum = z.enum([
   "PARKING",
   "SHOWER",
   "LOCKER",
-  "RENTAL",
-  "CAFE",
-  "WIFI",
   "REST_AREA",
   "TRAINING",
 ]);
