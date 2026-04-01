@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import type { Metadata } from "next";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
@@ -7,7 +6,6 @@ import { getQueryClient } from "#web/libs/getQueryClient";
 import { getSharedMetadata } from "#web/libs/sharedMetadata";
 
 import ProfileEditMain from "./_components/profile-edit/ProfileEditMain";
-import ProfileEditMainSkeleton from "./_components/profile-edit/ProfileEditMainSkeleton";
 
 export const revalidate = 0;
 
@@ -24,9 +22,7 @@ const ProfileEditPage = async () => {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <Suspense fallback={<ProfileEditMainSkeleton />}>
-        <ProfileEditMain />
-      </Suspense>
+      <ProfileEditMain />
     </HydrationBoundary>
   );
 };

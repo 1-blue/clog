@@ -1,39 +1,50 @@
 "use client";
 
-import { toast } from "sonner";
+import { ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 
-import { openapi } from "#web/apis/openapi";
+import AppTopBar from "#web/components/layout/AppTopBar";
+import useMe from "#web/hooks/useMe";
 
+import SettingLogoutSection from "./SettingLogoutSection";
 import SettingsAccountSection from "./SettingsAccountSection";
 import SettingsAppSection from "./SettingsAppSection";
 import SettingsInfoSection from "./SettingsInfoSection";
-import SettingsLogoutSection from "./SettingsLogoutSection";
+import SettingsMainSkeleton from "./SettingsMainSkeleton";
 import SettingsProfileSummaryCard from "./SettingsProfileSummaryCard";
-import SettingsTopBar from "./SettingsTopBar";
 
 const SettingsMain = () => {
-  const { data: me } = openapi.useSuspenseQuery(
-    "get",
-    "/api/v1/users/me",
-    undefined,
-    { select: (d) => d.payload },
-  );
+  const router = useRouter();
+  const { me } = useMe();
+
+  if (!me) {
+    return <SettingsMainSkeleton />;
+  }
 
   return (
     <div className="pb-12">
-      <SettingsTopBar />
-      <div className="mx-auto max-w-lg space-y-1 px-4 pt-2">
+      <AppTopBar
+        showNotification={false}
+        left={
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => router.back()}
+              className="flex size-10 items-center justify-center rounded-full text-on-surface hover:bg-surface-container-high"
+              aria-label="뒤로"
+            >
+              <ArrowLeft className="size-5" strokeWidth={2} />
+            </button>
+            <h1 className="text-lg font-semibold text-on-surface">설정</h1>
+          </div>
+        }
+      />
+      <div className="mx-auto flex max-w-lg flex-col gap-8 px-4 pt-8">
         <SettingsProfileSummaryCard me={me} />
-        <SettingsAccountSection
-          onSecurityClick={() =>
-            toast.message(
-              "비밀번호 및 보안은 카카오·구글 등 로그인 수단에서 관리할 수 있어요.",
-            )
-          }
-        />
+        <SettingsAccountSection />
         <SettingsAppSection me={me} />
         <SettingsInfoSection />
-        <SettingsLogoutSection />
+        <SettingLogoutSection />
       </div>
     </div>
   );

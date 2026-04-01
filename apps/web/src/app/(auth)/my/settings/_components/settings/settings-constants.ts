@@ -1,6 +1,6 @@
 /** 앱 표시용 (배포 시 env로 덮어쓸 수 있음) */
-export const SETTINGS_APP_NAME = "Clog";
-export const SETTINGS_APP_VERSION = "0.1.0";
+export const SETTINGS_APP_NAME = "클로그";
+export const SETTINGS_APP_VERSION = "1.0.0";
 
 export const SETTINGS_CHECKOUT_DURATION_OPTIONS = [
   { minutes: 60, label: "1시간" },

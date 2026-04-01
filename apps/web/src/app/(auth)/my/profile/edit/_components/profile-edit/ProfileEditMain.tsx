@@ -1,48 +1,53 @@
 "use client";
 
-import { FormProvider } from "react-hook-form";
+import { ArrowLeft } from "lucide-react";
+import { FormProvider, useFormState, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
-import { openapi } from "#web/apis/openapi";
+import { fetchClient, openapi } from "#web/apis/openapi";
+import AppTopBar from "#web/components/layout/AppTopBar";
+import { Button } from "#web/components/ui/button";
 import useUserMutations from "#web/hooks/mutations/users/useUserMutations";
+import useMe from "#web/hooks/useMe";
 
-import ProfileEditAccountSection from "./ProfileEditAccountSection";
-import ProfileEditAvatarSection from "./ProfileEditAvatarSection";
-import ProfileEditBasicSection from "./ProfileEditBasicSection";
-import ProfileEditCoverSection from "./ProfileEditCoverSection";
-import ProfileEditDangerSection from "./ProfileEditDangerSection";
-import ProfileEditTopBar from "./ProfileEditTopBar";
-import useProfileEditForm from "./useProfileEditForm";
+import ProfileEditAvatarSection from "./hero/ProfileEditAvatarSection";
+import ProfileEditCoverSection from "./hero/ProfileEditCoverSection";
+import ProfileEditMainSkeleton from "./ProfileEditMainSkeleton";
+import ProfileEditAccountSection from "./sections/ProfileEditAccountSection";
+import ProfileEditBasicSection from "./sections/ProfileEditBasicSection";
+import useProfileEditForm, {
+  type TProfileEditFormData,
+} from "./useProfileEditForm";
 
 const ProfileEditMain = () => {
-  const { data: me } = openapi.useSuspenseQuery(
-    "get",
-    "/api/v1/users/me",
-    undefined,
-    { select: (d) => d.payload },
-  );
+  const router = useRouter();
+  const { me } = useMe();
 
   const form = useProfileEditForm({
     defaultValues: {
-      nickname: me.nickname,
-      bio: me.bio ?? "",
-      instagramId: me.instagramId ?? "",
-      youtubeUrl: me.youtubeUrl ?? "",
+      nickname: "",
+      bio: "",
+      instagramId: "",
+      youtubeUrl: "",
     },
   });
 
   useEffect(() => {
+    if (!me) return;
     form.reset({
       nickname: me.nickname,
       bio: me.bio ?? "",
       instagramId: me.instagramId ?? "",
       youtubeUrl: me.youtubeUrl ?? "",
     });
-  }, [me.nickname, me.bio, me.instagramId, me.youtubeUrl]);
+  }, [me, form]);
 
-  const nickname = form.watch("nickname");
-  const [debouncedNick, setDebouncedNick] = useState(me.nickname);
+  const nickname = useWatch({ control: form.control, name: "nickname" }) ?? "";
+  const { isSubmitting } = useFormState({ control: form.control });
+
+  const [debouncedNick, setDebouncedNick] = useState("");
 
   useEffect(() => {
     const id = window.setTimeout(() => setDebouncedNick(nickname.trim()), 450);
@@ -50,6 +55,7 @@ const ProfileEditMain = () => {
   }, [nickname]);
 
   const shouldCheckNick =
+    !!me &&
     debouncedNick.length >= 1 &&
     debouncedNick.length <= 20 &&
     debouncedNick !== me.nickname;
@@ -72,24 +78,30 @@ const ProfileEditMain = () => {
 
   const { updateMeMutation } = useUserMutations();
 
-  const { isDirty, isValid } = form.formState;
+  const onSubmit = async (data: TProfileEditFormData) => {
+    if (!me) return;
+    form.clearErrors("nickname");
 
-  const trimmedNick = nickname.trim();
-  const nickDirty = trimmedNick !== me.nickname;
-  const nickOk =
-    !nickDirty ||
-    (debouncedNick === trimmedNick &&
-      nicknameAvailable === true &&
-      !nicknameError);
-
-  const saveDisabled =
-    !isDirty || !isValid || !nickOk || trimmedNick.length < 1;
-
-  const save = form.handleSubmit((data) => {
-    if (!nickOk) {
-      toast.error("닉네임 중복 여부를 확인해 주세요.");
-      return;
+    const trimmedNick = data.nickname.trim();
+    if (trimmedNick !== me.nickname) {
+      const { data: availRes, error } = await fetchClient.GET(
+        "/api/v1/users/me/nickname-availability",
+        { params: { query: { nickname: trimmedNick } } },
+      );
+      if (error) {
+        form.setError("nickname", {
+          message: "닉네임 확인에 실패했습니다.",
+        });
+        return;
+      }
+      if (!availRes?.payload?.available) {
+        form.setError("nickname", {
+          message: "이미 사용 중인 닉네임입니다.",
+        });
+        return;
+      }
     }
+
     const bio = me.bio ?? "";
     const instagramId = me.instagramId ?? "";
     const youtubeUrl = me.youtubeUrl ?? "";
@@ -97,9 +109,7 @@ const ProfileEditMain = () => {
     updateMeMutation.mutate(
       {
         body: {
-          ...(data.nickname.trim() !== me.nickname
-            ? { nickname: data.nickname.trim() }
-            : {}),
+          ...(trimmedNick !== me.nickname ? { nickname: trimmedNick } : {}),
           ...(data.bio !== bio ? { bio: data.bio.trim() } : {}),
           ...(data.instagramId !== instagramId
             ? { instagramId: data.instagramId.trim() }
@@ -110,19 +120,45 @@ const ProfileEditMain = () => {
         },
       },
       {
-        onSuccess: () => toast.success("저장했습니다."),
-        onError: () => toast.error("저장에 실패했습니다."),
+        onSuccess: () => {
+          toast.success("프로필이 변경되었습니다.");
+          router.back();
+        },
+        onError: () => toast.error("프로필 변경에 실패했습니다."),
       },
     );
-  });
+  };
+
+  if (!me) {
+    return <ProfileEditMainSkeleton />;
+  }
 
   return (
     <FormProvider {...form}>
-      <div className="pb-28">
-        <ProfileEditTopBar
-          onSave={() => void save()}
-          saveDisabled={saveDisabled}
-          savePending={updateMeMutation.isPending}
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          void form.handleSubmit(onSubmit)(e);
+        }}
+        className="pb-28"
+      >
+        <AppTopBar
+          showNotification={false}
+          left={
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => router.back()}
+                className="flex size-10 items-center justify-center rounded-full text-on-surface hover:bg-surface-container-high"
+                aria-label="뒤로"
+              >
+                <ArrowLeft className="size-5" strokeWidth={2} />
+              </button>
+              <h1 className="text-lg font-semibold text-on-surface">
+                프로필 수정
+              </h1>
+            </div>
+          }
         />
         <div className="relative">
           <ProfileEditCoverSection coverImage={me.coverImage} />
@@ -131,6 +167,7 @@ const ProfileEditMain = () => {
             profileImage={me.profileImage}
           />
         </div>
+
         <div className="mx-auto mt-10 max-w-lg space-y-5 px-4 pb-8">
           <ProfileEditBasicSection
             baselineNickname={me.nickname}
@@ -144,9 +181,15 @@ const ProfileEditMain = () => {
             email={me.email}
             linkedProviders={me.linkedProviders}
           />
-          <ProfileEditDangerSection />
+          <Button
+            type="submit"
+            className="h-11 w-full rounded-xl font-semibold"
+            disabled={updateMeMutation.isPending || isSubmitting}
+          >
+            {updateMeMutation.isPending || isSubmitting ? "저장 중…" : "저장"}
+          </Button>
         </div>
-      </div>
+      </form>
     </FormProvider>
   );
 };

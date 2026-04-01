@@ -43,7 +43,7 @@ const ProfileEditAvatarSection = ({ nickname, profileImage }: IProps) => {
 
   return (
     <label
-      className="group relative -mt-12 ml-6 block w-fit cursor-pointer"
+      className="group relative z-10 -mt-10 ml-6 block w-fit cursor-pointer"
       aria-label="프로필 이미지 변경"
     >
       <Avatar

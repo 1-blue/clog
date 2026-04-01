@@ -8,6 +8,7 @@ import { difficultyToKoreanMap, type Difficulty } from "@clog/utils";
 
 import { openapi } from "#web/apis/openapi";
 import AppTopBar from "#web/components/layout/AppTopBar";
+import ImageLightboxDialog from "#web/components/shared/image-carousel-lightbox/ImageLightboxDialog";
 import { ROUTES } from "#web/constants";
 import { formatProfileCount } from "#web/libs/format/formatProfileCount";
 
@@ -24,6 +25,7 @@ const ProfileSummarySection = () => {
   const [followSheet, setFollowSheet] = useState<
     "followers" | "following" | null
   >(null);
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
 
   const follower = me._count?.followers ?? 0;
   const following = me._count?.following ?? 0;
@@ -55,36 +57,53 @@ const ProfileSummarySection = () => {
         }
       />
 
-      {/* 커버 이미지 */}
-      <section className="relative h-56 w-full overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-container/50 via-primary/35 to-secondary-container/45 opacity-90" />
+      {/* 커버 이미지 (프로필과 겹치는 영역은 아래 프로필 섹션 z-20이 클릭을 가져감) */}
+      <section className="relative z-0 h-56 w-full overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-primary-container/50 via-primary/35 to-secondary-container/45 opacity-90" />
         {me.coverImage ? (
-          <img
-            src={me.coverImage}
-            alt=""
-            className="absolute inset-0 size-full object-cover mix-blend-overlay"
-          />
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={me.coverImage}
+              alt=""
+              className="absolute inset-0 size-full object-cover mix-blend-overlay"
+            />
+            <button
+              type="button"
+              aria-label="커버 이미지 크게 보기"
+              className="absolute inset-0 z-10 cursor-zoom-in"
+              onClick={() => setLightboxUrl(me.coverImage)}
+            />
+          </>
         ) : null}
       </section>
 
       {/* 프로필 영역 */}
-      <section className="relative -mt-16 flex flex-col items-center px-6">
+      <section className="relative z-20 -mt-16 flex flex-col items-center px-6">
         {/* 아바타 */}
         <div className="relative">
-          <div className="size-32 overflow-hidden rounded-full border-4 border-background bg-surface-container-highest shadow-xl ring-1 ring-outline-variant/20">
-            {me.profileImage ? (
+          {me.profileImage ? (
+            <button
+              type="button"
+              aria-label="프로필 이미지 크게 보기"
+              className="size-32 cursor-zoom-in overflow-hidden rounded-full border-4 border-background bg-surface-container-highest shadow-xl ring-1 ring-outline-variant/20"
+              onClick={() => setLightboxUrl(me.profileImage)}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={me.profileImage}
                 alt=""
                 className="size-full object-cover"
               />
-            ) : (
+            </button>
+          ) : (
+            <div className="size-32 overflow-hidden rounded-full border-4 border-background bg-surface-container-highest shadow-xl ring-1 ring-outline-variant/20">
               <div className="flex size-full items-center justify-center">
                 <User className="size-12 text-on-surface-variant" />
               </div>
-            )}
-          </div>
-          <div className="absolute right-1 bottom-1 flex size-8 items-center justify-center rounded-full border-4 border-background bg-secondary">
+            </div>
+          )}
+          <div className="pointer-events-none absolute right-1 bottom-1 flex size-8 items-center justify-center rounded-full border-4 border-background bg-secondary">
             <Check className="text-on-secondary size-4" strokeWidth={3} />
           </div>
         </div>
@@ -197,6 +216,15 @@ const ProfileSummarySection = () => {
         userId={me.id}
         type={followSheet}
         onClose={() => setFollowSheet(null)}
+      />
+
+      <ImageLightboxDialog
+        url={lightboxUrl}
+        open={lightboxUrl !== null}
+        onOpenChange={(o) => {
+          if (!o) setLightboxUrl(null);
+        }}
+        altPrefix="프로필"
       />
     </div>
   );

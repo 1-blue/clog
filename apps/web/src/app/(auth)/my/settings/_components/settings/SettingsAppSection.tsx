@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Bell, Moon } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useSyncExternalStore } from "react";
 
 import type { components } from "#web/@types/openapi";
 import { Label } from "#web/components/ui/label";
@@ -13,7 +13,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "#web/components/ui/select";
-
 import useUserMutations from "#web/hooks/mutations/users/useUserMutations";
 
 import {
@@ -26,6 +25,33 @@ import SettingsSwitchRow from "./SettingsSwitchRow";
 
 type UserMe = components["schemas"]["UserMe"];
 
+const PUSH_PREF_EVENT = "clog:settings-push-pref";
+
+const getPushPreferenceSnapshot = (): boolean => {
+  try {
+    const raw = localStorage.getItem(SETTINGS_PUSH_STORAGE_KEY);
+    if (raw === null) return true;
+    return raw === "true";
+  } catch {
+    return true;
+  }
+};
+
+const subscribePushPreference = (onStoreChange: () => void) => {
+  const onCustom = () => onStoreChange();
+  window.addEventListener(PUSH_PREF_EVENT, onCustom);
+  window.addEventListener("storage", onCustom);
+  return () => {
+    window.removeEventListener(PUSH_PREF_EVENT, onCustom);
+    window.removeEventListener("storage", onCustom);
+  };
+};
+
+/** SSR false / 클라 true — next-themes와 동일한 마운트 가드 */
+const subscribeMounted = () => () => {};
+const getMountedSnapshot = () => true;
+const getMountedServerSnapshot = () => false;
+
 interface IProps {
   me: UserMe;
 }
@@ -33,29 +59,26 @@ interface IProps {
 const SettingsAppSection = ({ me }: IProps) => {
   const { theme, setTheme, resolvedTheme } = useTheme();
   const { updateMeMutation } = useUserMutations();
-  const [mounted, setMounted] = useState(false);
-  const [pushOn, setPushOn] = useState(true);
+  const mounted = useSyncExternalStore(
+    subscribeMounted,
+    getMountedSnapshot,
+    getMountedServerSnapshot,
+  );
+  const pushOn = useSyncExternalStore(
+    subscribePushPreference,
+    getPushPreferenceSnapshot,
+    () => true,
+  );
 
-  useEffect(() => {
-    setMounted(true);
-    try {
-      const raw = localStorage.getItem(SETTINGS_PUSH_STORAGE_KEY);
-      if (raw !== null) setPushOn(raw === "true");
-    } catch {
-      /* ignore */
-    }
-  }, []);
-
-  const darkOn =
-    mounted && (resolvedTheme === "dark" || theme === "dark");
+  const darkOn = mounted && (resolvedTheme === "dark" || theme === "dark");
 
   const onPushChange = (v: boolean) => {
-    setPushOn(v);
     try {
       localStorage.setItem(SETTINGS_PUSH_STORAGE_KEY, String(v));
     } catch {
       /* ignore */
     }
+    window.dispatchEvent(new Event(PUSH_PREF_EVENT));
   };
 
   const onDarkChange = (v: boolean) => {
@@ -63,14 +86,14 @@ const SettingsAppSection = ({ me }: IProps) => {
   };
 
   return (
-    <div>
+    <div className="flex flex-col gap-3">
       <SettingsSectionLabel>앱 설정</SettingsSectionLabel>
       <SettingsListGroup>
         <SettingsSwitchRow
           id="settings-push"
           icon={Bell}
           label="푸시 알림"
-          description="댓글, 좋아요, 팔로우 알림 (앱에서 연동 예정)"
+          description="댓글, 좋아요, 팔로우 알림"
           checked={pushOn}
           onCheckedChange={onPushChange}
         />

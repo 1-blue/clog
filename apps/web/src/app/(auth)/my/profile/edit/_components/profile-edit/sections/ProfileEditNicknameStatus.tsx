@@ -28,12 +28,16 @@ const ProfileEditNicknameStatus = ({
   }
   if (trimmed.length === 0) {
     return (
-      <p className="mt-1.5 text-xs text-on-surface-variant">닉네임을 입력해 주세요.</p>
+      <p className="mt-1.5 text-xs text-on-surface-variant">
+        닉네임을 입력해 주세요.
+      </p>
     );
   }
   if (trimmed.length > 20) {
     return (
-      <p className="mt-1.5 text-xs text-destructive">닉네임은 20자 이하여야 합니다.</p>
+      <p className="mt-1.5 text-xs text-destructive">
+        닉네임은 20자 이하여야 합니다.
+      </p>
     );
   }
   if (!shouldCheck) return null;
@@ -41,7 +45,9 @@ const ProfileEditNicknameStatus = ({
     return <p className="mt-1.5 text-xs text-on-surface-variant">확인 중…</p>;
   }
   if (isError) {
-    return <p className="mt-1.5 text-xs text-destructive">확인에 실패했습니다.</p>;
+    return (
+      <p className="mt-1.5 text-xs text-destructive">확인에 실패했습니다.</p>
+    );
   }
   if (available === true) {
     return (
