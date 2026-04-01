@@ -614,6 +614,26 @@ export interface components {
             /** @description 마감 시간 "HH:mm" */
             close: string;
         };
+        /** @description 암장별 난이도 색상·표시명 (gym_difficulty_colors) */
+        GymDifficultyColor: {
+            /**
+             * Format: uuid
+             * @description 고유 ID
+             */
+            id: string;
+            /**
+             * Format: uuid
+             * @description 암장 ID
+             */
+            gymId: string;
+            difficulty: components["schemas"]["Difficulty"];
+            /** @description HEX 색상 (예: #E05555) */
+            color: string;
+            /** @description 암장 자체 난이도 명칭 */
+            label: string;
+            /** @description 표시 순서 */
+            order: number;
+        };
         /** @description 암장 (목록/상세 공통 필드; API는 Prisma Gym + 실시간 visitorCount 등) */
         GymListItem: {
             /**
@@ -674,6 +694,8 @@ export interface components {
             facilities: components["schemas"]["FacilityType"][];
             /** @description 이미지 목록 (목록 API는 take 1 등으로 제한될 수 있음) */
             images: components["schemas"]["GymImage"][];
+            /** @description 암장별 난이도표 (상세 GET 등에서 포함; 목록은 빈 배열 또는 생략) */
+            difficultyColors?: components["schemas"]["GymDifficultyColor"][];
         };
         GymDetail: components["schemas"]["GymListItem"] & {
             myCheckIn?: {
@@ -763,6 +785,8 @@ export interface components {
             /** Format: uuid */
             id: string;
             name: string;
+            /** @description 암장별 난이도 색상 (기록 목록 GET에서 포함) */
+            difficultyColors?: components["schemas"]["GymDifficultyColor"][];
         };
         /** @description 클라이밍 세션 목록 항목 (climbing_sessions) */
         RecordListItem: {

@@ -4,8 +4,8 @@ import type { Metadata } from "next";
 import AppTopBar from "#web/components/layout/AppTopBar";
 import { getSharedMetadata } from "#web/libs/sharedMetadata";
 
-import RecordsListSection from "./_source/components/RecordsListSection";
-import RecordsListSkeleton from "./_source/components/RecordsListSkeleton";
+import RecordsList from "./_source/components/records-list/RecordsList";
+import RecordsListSkeleton from "./_source/components/records-list/RecordsListSkeleton";
 
 export const revalidate = 0;
 
@@ -16,13 +16,13 @@ export const generateMetadata = async (): Promise<Metadata> =>
   });
 
 const RecordsPage = () => (
-  <div className="pb-24">
+  <div>
     <AppTopBar
       left={<span className="text-lg font-bold text-on-surface">기록</span>}
     />
 
     <Suspense fallback={<RecordsListSkeleton />}>
-      <RecordsListSection />
+      <RecordsList />
     </Suspense>
   </div>
 );

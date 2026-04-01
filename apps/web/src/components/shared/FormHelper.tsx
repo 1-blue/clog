@@ -31,6 +31,8 @@ const mergeDescribedBy = (
 
 interface IProps {
   label?: string;
+  /** FieldLabel / FieldTitle에 추가 클래스 (기록 폼 등에서 통일용) */
+  labelClassName?: string;
   /** 라벨 옆(예: 글자 수) */
   labelSuffix?: React.ReactNode;
   /** 없으면 내부 useId — cloneChild true일 때 컨트롤 id로 사용 */
@@ -50,6 +52,7 @@ interface IProps {
 
 const FormHelper: React.FC<IProps> = ({
   label,
+  labelClassName,
   labelSuffix,
   htmlFor,
   description,
@@ -127,9 +130,11 @@ const FormHelper: React.FC<IProps> = ({
       return null;
     }
     const labelNode = cloneChild ? (
-      <FieldLabel htmlFor={id}>{label}</FieldLabel>
+      <FieldLabel htmlFor={id} className={labelClassName}>
+        {label}
+      </FieldLabel>
     ) : (
-      <FieldTitle>{label}</FieldTitle>
+      <FieldTitle className={labelClassName}>{label}</FieldTitle>
     );
     if (labelSuffix) {
       return (

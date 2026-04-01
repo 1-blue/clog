@@ -19,6 +19,7 @@ export const GET = async (
       include: {
         images: { orderBy: { order: "asc" } },
         openHours: { orderBy: { dayType: "asc" } },
+        difficultyColors: { orderBy: { order: "asc" } },
       },
     });
 

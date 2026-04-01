@@ -13,7 +13,7 @@ const Calendar = ({
 }: React.ComponentProps<typeof DayPicker>) => (
   <DayPicker
     locale={ko}
-    className={cn("", className)}
+    className={cn("relative", className)}
     classNames={{
       months: "flex flex-col",
       month: "space-y-1",

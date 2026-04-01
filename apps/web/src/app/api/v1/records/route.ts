@@ -36,9 +36,16 @@ export const GET = async (request: Request) => {
       },
       orderBy: { date: "desc" },
       take: dateFilter ? MONTH_LIMIT : query.limit + 1,
-      ...(query.cursor && !dateFilter && { cursor: { id: query.cursor }, skip: 1 }),
+      ...(query.cursor &&
+        !dateFilter && { cursor: { id: query.cursor }, skip: 1 }),
       include: {
-        gym: { select: { id: true, name: true } },
+        gym: {
+          select: {
+            id: true,
+            name: true,
+            difficultyColors: { orderBy: { order: "asc" } },
+          },
+        },
         routes: { orderBy: { order: "asc" } },
       },
     });
