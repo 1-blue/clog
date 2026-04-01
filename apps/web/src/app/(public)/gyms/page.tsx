@@ -1,5 +1,7 @@
 "use client";
 
+import { Suspense } from "react";
+
 import AppTopBar from "#web/components/layout/AppTopBar";
 
 import GymExploreBar from "./_source/components/gym-explore-bar/GymExploreBar";
@@ -13,10 +15,12 @@ const GymsPage = () => {
           <span className="text-lg font-bold text-on-surface">암장 찾기</span>
         }
       />
-      <div className="px-4 pb-8">
-        <GymExploreBar />
-        <GymListSection />
-      </div>
+      <Suspense>
+        <div className="px-4 pb-8">
+          <GymExploreBar />
+          <GymListSection />
+        </div>
+      </Suspense>
     </>
   );
 };
