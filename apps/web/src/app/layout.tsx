@@ -4,6 +4,7 @@ import "./globals.css";
 
 import { Toaster } from "sonner";
 
+import { getSharedMetadata } from "#web/libs/sharedMetadata";
 import QueryProvider from "#web/providers/QueryProvider";
 import ThemeProvider from "#web/providers/ThemeProvider";
 
@@ -13,11 +14,7 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export const metadata: Metadata = {
-  title: "Clog - 클라이밍 커뮤니티",
-  description: `클라이머를 위한 커뮤니티 & 기록 앱. 암장 검색, 기록 관리, 커뮤니티까지.`,
-  metadataBase: new URL("https://clog.story-dict.com"),
-};
+export const metadata: Metadata = getSharedMetadata();
 
 const RootLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
   return (

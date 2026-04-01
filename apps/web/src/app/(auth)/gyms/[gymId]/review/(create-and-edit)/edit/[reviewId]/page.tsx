@@ -1,14 +1,14 @@
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { cache, Suspense } from "react";
 import type { Metadata, NextPage } from "next";
 import { notFound } from "next/navigation";
-import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
 import { fetchClient, openapi } from "#web/apis/openapi";
 import { getQueryClient } from "#web/libs/getQueryClient";
 import { getSharedMetadata } from "#web/libs/sharedMetadata";
 
-import GymReviewEditMain from "./_source/components/GymReviewEditMain";
 import GymReviewSkeleton from "../../_source/components/gym-review/skeleton/GymReviewSkeleton";
+import GymReviewEditMain from "./_source/components/GymReviewEditMain";
 
 export const revalidate = 0;
 
@@ -34,7 +34,7 @@ export const generateMetadata = async ({
     return getSharedMetadata({ title: "리뷰 수정" });
   }
   return getSharedMetadata({
-    title: `리뷰 수정 · ${payload.name}`,
+    title: `${payload.name} · 리뷰 수정`,
     keywords: [payload.name, "암장 리뷰"],
   });
 };

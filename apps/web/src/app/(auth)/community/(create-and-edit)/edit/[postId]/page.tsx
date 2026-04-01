@@ -1,7 +1,7 @@
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { cache, Suspense } from "react";
 import type { Metadata, NextPage } from "next";
 import { notFound } from "next/navigation";
-import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
 import { fetchClient, openapi } from "#web/apis/openapi";
 import { getQueryClient } from "#web/libs/getQueryClient";
@@ -33,7 +33,7 @@ export const generateMetadata = async ({
     return getSharedMetadata({ title: "게시글 수정" });
   }
   return getSharedMetadata({
-    title: `게시글 수정 · ${post.title.slice(0, 40)}`,
+    title: `${post.title.slice(0, 40)} · 게시글 수정`,
     keywords: [post.title],
   });
 };

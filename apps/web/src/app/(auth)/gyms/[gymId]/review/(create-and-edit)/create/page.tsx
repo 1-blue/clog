@@ -34,7 +34,7 @@ export const generateMetadata = async ({
   if (!payload) return getSharedMetadata({ title: "리뷰 작성" });
 
   return getSharedMetadata({
-    title: `리뷰 작성 · ${payload.name}`,
+    title: `${payload.name} · 리뷰 작성`,
     keywords: [payload.name, "암장 리뷰"],
   });
 };

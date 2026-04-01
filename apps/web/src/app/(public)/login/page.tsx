@@ -1,11 +1,17 @@
 "use client";
 
 import { Mountain } from "lucide-react";
+import { Metadata } from "next";
 import Link from "next/link";
 
 import { Button } from "#web/components/ui/button";
 import { ROUTES } from "#web/constants";
+import { getSharedMetadata } from "#web/libs/sharedMetadata";
 import { createClient } from "#web/libs/supabase/client";
+
+export const metadata: Metadata = getSharedMetadata({
+  title: "로그인",
+});
 
 const LoginPage = () => {
   const supabase = createClient();

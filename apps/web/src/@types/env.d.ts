@@ -2,6 +2,8 @@ declare namespace NodeJS {
   interface ProcessEnv {
     /** API URL */
     NEXT_PUBLIC_API_URL: string;
+    /** Client URL */
+    NEXT_PUBLIC_CLIENT_URL: string;
 
     /** Supabase URL */
     NEXT_PUBLIC_SUPABASE_URL: string;

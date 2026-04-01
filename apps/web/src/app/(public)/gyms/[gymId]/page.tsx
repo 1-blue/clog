@@ -31,6 +31,7 @@ export const generateMetadata = async ({
     if (!payload?.name) {
       return getSharedMetadata({ title: "암장 상세" });
     }
+
     return getSharedMetadata({
       title: payload.name,
       description: payload.description ?? payload.address,

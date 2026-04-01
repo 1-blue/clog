@@ -3,6 +3,8 @@
 import { ExternalLink, FileText, Gavel, Info } from "lucide-react";
 import Link from "next/link";
 
+import { ROUTES } from "#web/constants";
+
 import { SETTINGS_APP_NAME, SETTINGS_APP_VERSION } from "./settings-constants";
 import SettingsListGroup from "./SettingsListGroup";
 import SettingsSectionLabel from "./SettingsSectionLabel";
@@ -27,7 +29,7 @@ const SettingsInfoSection = () => {
           </span>
         </div>
         <Link
-          href="#"
+          href={ROUTES.EXTERNAL_LINKS.PRIVACY_POLICY.path}
           target="_blank"
           rel="noopener noreferrer"
           className="flex min-h-14 w-full cursor-pointer items-center gap-3 px-4 py-3.5 text-left transition-colors hover:bg-surface-container-high/80"
@@ -45,7 +47,7 @@ const SettingsInfoSection = () => {
           />
         </Link>
         <Link
-          href="#"
+          href={ROUTES.EXTERNAL_LINKS.TERMS_OF_SERVICE.path}
           target="_blank"
           rel="noopener noreferrer"
           className="flex min-h-14 w-full cursor-pointer items-center gap-3 px-4 py-3.5 text-left transition-colors hover:bg-surface-container-high/80"
