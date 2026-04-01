@@ -1,21 +1,24 @@
 "use client";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { useSearchParams } from "next/navigation";
 
-import type { CommunityCategory } from "@clog/utils";
+import { communityCategoryEnum, type CommunityCategory } from "@clog/utils";
 
 import { fetchClient } from "#web/apis/openapi";
 import InfiniteScroll from "#web/components/shared/InfiniteScroll";
 
-import CommunityFeedPostCard from "./CommunityFeedPostCard";
+import CommunityPostCard from "./CommunityPostCard";
 import CommunityPostListEmpty from "./CommunityPostListEmpty";
 import PostListSkeleton from "./PostListSkeleton";
 
-interface IProps {
-  category: CommunityCategory | "";
-}
+const PostListSection = () => {
+  const searchParams = useSearchParams();
+  const categoryRaw = searchParams.get("category") ?? "";
+  const category = communityCategoryEnum.safeParse(categoryRaw).success
+    ? (categoryRaw as CommunityCategory)
+    : "";
 
-const PostListSection = ({ category }: IProps) => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useInfiniteQuery({
       queryKey: ["get", "/api/v1/posts", { category }],
@@ -53,22 +56,7 @@ const PostListSection = ({ category }: IProps) => {
     >
       <div className="space-y-5">
         {posts.map((post) => (
-          <CommunityFeedPostCard
-            key={post.id}
-            id={post.id}
-            title={post.title}
-            content={post.content}
-            category={post.category}
-            authorId={post.author.id}
-            authorNickname={post.author.nickname}
-            authorImage={post.author.profileImage}
-            likeCount={post.likeCount}
-            commentCount={post.commentCount}
-            viewCount={post.viewCount}
-            createdAt={post.createdAt}
-            imageUrl={post.images?.[0]?.url}
-            isLiked={(post.likes?.length ?? 0) > 0}
-          />
+          <CommunityPostCard key={post.id} post={post} />
         ))}
       </div>
     </InfiniteScroll>

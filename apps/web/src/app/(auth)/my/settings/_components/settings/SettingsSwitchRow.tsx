@@ -2,8 +2,8 @@
 
 import type { LucideIcon } from "lucide-react";
 
-import { Switch } from "#web/components/ui/switch";
 import { Label } from "#web/components/ui/label";
+import { Switch } from "#web/components/ui/switch";
 import { cn } from "#web/libs/utils";
 
 interface IProps {
@@ -16,7 +16,7 @@ interface IProps {
   disabled?: boolean;
 }
 
-const SettingsSwitchRow = ({
+const SettingsSwitchRow: React.FC<IProps> = ({
   id,
   icon: Icon,
   label,
@@ -24,11 +24,11 @@ const SettingsSwitchRow = ({
   checked,
   onCheckedChange,
   disabled,
-}: IProps) => {
+}) => {
   return (
     <div
       className={cn(
-        "flex items-center gap-3 px-4 py-3.5",
+        "flex cursor-pointer items-center gap-3 px-4 py-3.5 transition-colors hover:bg-surface-container-high/80",
         disabled && "opacity-60",
       )}
     >

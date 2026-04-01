@@ -1,12 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import {
-  Bookmark,
-  Heart,
-  MessageCircle,
-  Send,
-} from "lucide-react";
+import { Bookmark, Heart, MessageCircle, Send } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 
 import type { components } from "#web/@types/openapi";
@@ -58,11 +53,7 @@ const PostDetailDock = ({
 
   const submitComment = () => {
     const content = draft.trim();
-    if (
-      !content ||
-      createCommentMutation.isPending ||
-      submitLockRef.current
-    ) {
+    if (!content || createCommentMutation.isPending || submitLockRef.current) {
       return;
     }
     submitLockRef.current = true;
@@ -86,9 +77,7 @@ const PostDetailDock = ({
     );
   };
 
-  const onCommentKeyDown = (
-    e: React.KeyboardEvent<HTMLInputElement>,
-  ) => {
+  const onCommentKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key !== "Enter") return;
     if (e.repeat) return;
     if (e.nativeEvent.isComposing) return;
@@ -100,7 +89,7 @@ const PostDetailDock = ({
     <footer className="fixed right-0 bottom-0 left-0 z-50 border-t border-white/10 bg-background/95 backdrop-blur-2xl">
       <div className="mx-auto flex max-w-3xl flex-col gap-3 px-6 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-4">
             <button
               type="button"
               onClick={() =>
@@ -108,7 +97,9 @@ const PostDetailDock = ({
               }
               className={cn(
                 "flex items-center gap-2 transition-transform active:scale-95",
-                liked ? "text-primary" : "text-on-surface-variant hover:text-primary",
+                liked
+                  ? "text-primary"
+                  : "text-on-surface-variant hover:text-primary",
               )}
             >
               <Heart

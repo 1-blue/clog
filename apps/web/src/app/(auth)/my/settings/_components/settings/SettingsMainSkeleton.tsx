@@ -3,7 +3,7 @@ import { Skeleton } from "#web/components/ui/skeleton";
 const SettingsMainSkeleton = () => {
   return (
     <div className="pb-12">
-      <div className="flex h-14 items-center gap-2 border-b border-outline-variant px-4">
+      <div className="flex h-14 items-center gap-2 border-b border-outline-variant bg-surface-container/80 px-4 backdrop-blur-xl">
         <Skeleton className="size-10 rounded-full" />
         <Skeleton className="h-6 w-20 rounded-md" />
       </div>

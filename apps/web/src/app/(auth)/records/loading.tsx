@@ -1,4 +1,4 @@
-import RecordsListSkeleton from "./_source/components/RecordsListSkeleton";
+import RecordsListSkeleton from "./_source/components/records-list/RecordsListSkeleton";
 
 const RecordsLoading = () => (
   <div className="pb-24">

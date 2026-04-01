@@ -8,6 +8,9 @@ import {
   paginatedJson,
   requireAuth,
 } from "#web/libs/api";
+import { normalizeReviewJsonBody } from "#web/libs/reviewBody";
+
+import { gymReviewListInclude } from "./_reviewInclude";
 
 /** 리뷰 목록 (무한스크롤) */
 export const GET = async (
@@ -25,10 +28,7 @@ export const GET = async (
       orderBy: { createdAt: "desc" },
       take: query.limit + 1,
       ...(query.cursor && { cursor: { id: query.cursor }, skip: 1 }),
-      include: {
-        user: { select: { id: true, nickname: true, profileImage: true } },
-        images: { orderBy: { order: "asc" } },
-      },
+      include: gymReviewListInclude,
     });
 
     const hasMore = reviews.length > query.limit;
@@ -51,7 +51,8 @@ export const POST = async (
   if (error) return error;
 
   try {
-    const body = await request.json();
+    const raw = await request.json();
+    const body = normalizeReviewJsonBody(raw);
     const data = createReviewSchema.parse(body);
 
     // 중복 리뷰 체크
@@ -68,9 +69,7 @@ export const POST = async (
         content: data.content,
         perceivedDifficulty: data.perceivedDifficulty ?? null,
         features: data.features ?? [],
-        images: data.imageUrls?.length
-          ? { create: data.imageUrls.map((url, i) => ({ url, order: i })) }
-          : undefined,
+        imageUrls: data.imageUrls ?? [],
       },
     });
 

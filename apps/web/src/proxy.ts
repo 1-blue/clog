@@ -6,11 +6,16 @@ const AUTH_ROUTES = [
   "/my",
   "/records",
   "/notifications",
-  "/community/write",
-  "/gyms/*/review",
+  "/community/create",
+  "/community/edit",
 ];
 
+/** /gyms/:gymId/review 및 하위 (작성·수정) */
+const isGymReviewAuthRoute = (pathname: string) =>
+  /^\/gyms\/[^/]+\/review(\/.*)?$/.test(pathname);
+
 const isAuthRoute = (pathname: string) => {
+  if (isGymReviewAuthRoute(pathname)) return true;
   return AUTH_ROUTES.some((route) => {
     if (route.includes("*")) {
       const regex = new RegExp(`^${route.replace(/\*/g, "[^/]+")}$`);

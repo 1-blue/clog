@@ -2,9 +2,7 @@ import "./load-env";
 
 import { prisma } from "../../src/index";
 import { seedComments } from "./comments";
-import { seedCongestionLogs } from "./congestion";
 import { seedDifficultyColors } from "./difficulty-colors";
-import { seedFacilities } from "./facilities";
 import { seedFollows } from "./follows";
 import { seedGymBookmarks } from "./gym-bookmarks";
 import { seedGyms } from "./gyms";
@@ -21,12 +19,11 @@ async function main() {
 
   const { users, admin, manager, user1, user2, user3 } =
     await seedUsers(prisma);
-  const gyms = await seedGyms(prisma);
+  const gymMap = await seedGyms(prisma);
+  const gyms = Object.values(gymMap);
 
-  await seedFacilities(prisma, gyms);
-  await seedCongestionLogs(prisma, gyms);
-  await seedDifficultyColors(prisma, gyms);
-  await seedSettingSchedules(prisma, gyms);
+  await seedDifficultyColors(prisma, gymMap);
+  await seedSettingSchedules(prisma, gymMap);
   await seedClimbingSessions(prisma, users, gyms);
   await seedReviews(prisma, users, gyms);
   await seedGymBookmarks(prisma, users, gyms);
@@ -46,23 +43,23 @@ async function main() {
   // 유저 홈짐 설정
   await prisma.user.update({
     where: { id: admin.id },
-    data: { homeGymId: gyms[0]!.id },
+    data: { homeGymId: gymMap["theclimb_yeonnam"]!.id },
   });
   await prisma.user.update({
     where: { id: manager.id },
-    data: { homeGymId: gyms[1]!.id },
+    data: { homeGymId: gymMap["theclimb_b_hongdae"]!.id },
   });
   await prisma.user.update({
     where: { id: user1.id },
-    data: { homeGymId: gyms[2]!.id },
+    data: { homeGymId: gymMap["seoulforest_jongno"]!.id },
   });
   await prisma.user.update({
     where: { id: user2.id },
-    data: { homeGymId: gyms[5]!.id },
+    data: { homeGymId: gymMap["climbingpark_gangnam"]!.id },
   });
   await prisma.user.update({
     where: { id: user3.id },
-    data: { homeGymId: gyms[0]!.id },
+    data: { homeGymId: gymMap["theclimb_seongsu"]!.id },
   });
   console.log("  ✅ 유저 홈짐 설정 완료");
 

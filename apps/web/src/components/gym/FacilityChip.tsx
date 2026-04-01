@@ -1,12 +1,9 @@
 import {
   Car,
-  Coffee,
   Dumbbell,
-  HandHelping,
   Lock,
   ShowerHead,
   Sofa,
-  Wifi,
   type LucideIcon,
 } from "lucide-react";
 import React from "react";
@@ -18,9 +15,6 @@ const FACILITY_INFO: Record<FacilityType, { icon: LucideIcon; label: string }> =
     PARKING: { icon: Car, label: "주차" },
     SHOWER: { icon: ShowerHead, label: "샤워" },
     LOCKER: { icon: Lock, label: "락커" },
-    RENTAL: { icon: HandHelping, label: "대여" },
-    CAFE: { icon: Coffee, label: "카페" },
-    WIFI: { icon: Wifi, label: "와이파이" },
     REST_AREA: { icon: Sofa, label: "휴게" },
     TRAINING: { icon: Dumbbell, label: "트레이닝" },
   };

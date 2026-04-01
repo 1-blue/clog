@@ -48,8 +48,11 @@ export const GET = async (
       userId,
       scope,
     );
-    const { levels: activityHeatmap, dayKeys: activityHeatmapDays } =
-      await getUserActivityHeatmap(userId, 20);
+    const {
+      levels: activityHeatmap,
+      dayKeys: activityHeatmapDays,
+      publicSessionCountInRange: activityHeatmapSessionCount,
+    } = await getUserActivityHeatmap(userId);
 
     return json({
       ...user,
@@ -57,6 +60,7 @@ export const GET = async (
       sendCount,
       activityHeatmap,
       activityHeatmapDays,
+      activityHeatmapSessionCount,
     });
   } catch {
     return errorResponse("유저 정보를 불러올 수 없습니다.");

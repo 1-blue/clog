@@ -13,23 +13,24 @@ import {
   TabsTrigger,
 } from "#web/components/ui/tabs";
 
-import GymHeroSection from "./gym-hero/GymHeroSection";
-import GymBasicInfoSection from "./GymBasicInfoSection";
-import GymCheckInBar from "./GymCheckInBar";
-import GymCongestionSection from "./GymCongestionSection";
-import GymInfoTabContent from "./GymInfoTabContent";
-import GymPhotosTabContent from "./GymPhotosTabContent";
-import ReviewListSection from "./review-list/ReviewListSection";
-import ReviewListSkeleton from "./skeleton/ReviewListSkeleton";
+import GymBasicInfoSection from "./gym-basic-info-section/GymBasicInfoSection";
+import GymCheckInBar from "./gym-check-in-bar/GymCheckInBar";
+import GymCheckInStatusBanner from "./gym-check-in-status-banner/GymCheckInStatusBanner";
+import GymHeroSection from "./gym-hero-section/GymHeroSection";
+import GymLiveStatsStrip from "./gym-live-stats-strip/GymLiveStatsStrip";
+import GymInfoTab from "./gym-tabs/gym-info-tab/GymInfoTab";
+import GymPhotoTab from "./gym-tabs/gym-photo-tab/GymPhotoTab";
+import GymReviewSkeleton from "./gym-tabs/gym-review-tab/gym-review-list/GymReviewSkeleton";
+import GymReviewTab from "./gym-tabs/gym-review-tab/GymReviewTab";
+
+/** line 탭: 기본 하단 라인 + 활성 라인 강조 */
+const tabTriggerClass =
+  "after:hidden relative shrink-0 rounded-none border-0 border-b-2 border-outline-variant/30 px-1 py-3 text-base font-medium text-muted-foreground transition-colors hover:text-foreground cursor-pointer " +
+  "data-active:border-primary data-active:font-bold data-active:text-primary!";
 
 interface IProps {
   gymId: string;
 }
-
-/** line 탭: 기본 하단 라인 + 활성 라인 강조 */
-const tabTriggerClass =
-  "after:hidden relative shrink-0 rounded-none border-0 border-b-2 border-outline-variant/30 px-1 py-3 text-base font-medium text-muted-foreground transition-colors hover:text-foreground " +
-  "data-active:border-primary data-active:font-bold data-active:text-primary";
 
 const GymDetailMain: React.FC<IProps> = ({ gymId }) => {
   const { data: gym } = openapi.useSuspenseQuery(
@@ -39,7 +40,7 @@ const GymDetailMain: React.FC<IProps> = ({ gymId }) => {
     { select: (d) => d.payload },
   );
 
-  const { data: liveVisitor, refetch: refetchGym } = openapi.useQuery(
+  const { data: liveVisitor } = openapi.useQuery(
     "get",
     "/api/v1/gyms/{gymId}",
     { params: { path: { gymId } } },
@@ -47,21 +48,21 @@ const GymDetailMain: React.FC<IProps> = ({ gymId }) => {
       select: (d) => ({
         visitorCount: d.payload?.visitorCount ?? 0,
         myCheckIn: d.payload?.myCheckIn ?? null,
+        congestion: d.payload?.congestion ?? 0,
+        visitorCapacity: d.payload?.visitorCapacity ?? 0,
+        monthlyCheckInCount: d.payload?.monthlyCheckInCount ?? null,
       }),
       refetchInterval: 30_000,
     },
   );
 
-  const { data: congestionLogs, refetch: refetchCongestion } = openapi.useQuery(
-    "get",
-    "/api/v1/gyms/{gymId}/congestion",
-    { params: { path: { gymId } } },
-    { select: (d) => d.payload },
-  );
-
-  const visitorCount = liveVisitor?.visitorCount ?? gym.visitorCount;
   const myCheckIn = liveVisitor?.myCheckIn ?? gym.myCheckIn ?? null;
-  const capacity = gym.visitorCapacity;
+
+  const congestion = liveVisitor?.congestion ?? gym.congestion;
+  const visitorCount = liveVisitor?.visitorCount ?? gym.visitorCount;
+  const visitorCapacity = liveVisitor?.visitorCapacity ?? gym.visitorCapacity;
+  const monthlyCheckInCount =
+    liveVisitor?.monthlyCheckInCount ?? gym.monthlyCheckInCount;
 
   const shareGym = async () => {
     try {
@@ -98,16 +99,18 @@ const GymDetailMain: React.FC<IProps> = ({ gymId }) => {
 
       <GymHeroSection gym={gym} />
 
-      <GymCongestionSection
-        visitorCount={visitorCount}
-        capacity={capacity}
-        congestionLogs={congestionLogs ?? []}
-        onRefresh={async () => {
-          await Promise.all([refetchGym(), refetchCongestion()]);
-        }}
-      />
+      <div className="flex flex-col gap-6 px-6 pt-6 pb-4">
+        {myCheckIn && <GymCheckInStatusBanner endsAt={myCheckIn.endsAt} />}
 
-      <GymBasicInfoSection gym={gym} />
+        <GymLiveStatsStrip
+          congestion={congestion}
+          visitorCount={visitorCount}
+          visitorCapacity={visitorCapacity}
+          monthlyCheckInCount={monthlyCheckInCount}
+        />
+
+        <GymBasicInfoSection gym={gym} />
+      </div>
 
       <Tabs defaultValue="info" className="flex w-full flex-col">
         <div className="sticky top-14 z-20 border-b border-outline-variant/10 bg-background/90 backdrop-blur-lg">
@@ -128,15 +131,14 @@ const GymDetailMain: React.FC<IProps> = ({ gymId }) => {
         </div>
 
         <TabsContent value="info" className="mt-0 flex-none p-0 text-base">
-          <GymInfoTabContent gym={gym} />
+          <GymInfoTab gym={gym} />
         </TabsContent>
 
         <TabsContent value="reviews" className="mt-0 flex-none p-0 text-base">
-          <div className="px-6 py-6">
-            <Suspense fallback={<ReviewListSkeleton />}>
-              <ReviewListSection
+          <div className="px-6 py-4">
+            <Suspense fallback={<GymReviewSkeleton />}>
+              <GymReviewTab
                 gymId={gymId}
-                variant="embedded"
                 avgRating={gym.avgRating}
                 reviewCount={gym.reviewCount}
               />
@@ -145,11 +147,11 @@ const GymDetailMain: React.FC<IProps> = ({ gymId }) => {
         </TabsContent>
 
         <TabsContent value="photos" className="mt-0 flex-none p-0 text-base">
-          <GymPhotosTabContent images={gym.images} gymName={gym.name} />
+          <GymPhotoTab images={gym.images} gymName={gym.name} />
         </TabsContent>
       </Tabs>
 
-      <GymCheckInBar gymId={gymId} hasActiveCheckIn={myCheckIn != null} />
+      <GymCheckInBar gymId={gymId} hasActiveCheckIn={myCheckIn !== null} />
     </div>
   );
 };

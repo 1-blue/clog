@@ -1,7 +1,7 @@
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { cache } from "react";
 import type { Metadata, NextPage } from "next";
 import { notFound } from "next/navigation";
-import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
 import { openapi } from "#web/apis/openapi";
 import { getQueryClient } from "#web/libs/getQueryClient";

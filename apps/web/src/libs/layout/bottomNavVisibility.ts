@@ -11,10 +11,23 @@ function isCommunityPostDetail(pathname: string): boolean {
   );
 }
 
+/** 기록 추가·수정 — 하단 고정 저장만 두고 탭 네비 숨김 (커뮤니티 글쓰기와 동일) */
+function isRecordCreateOrEditPath(pathname: string): boolean {
+  if (pathname === "/records/new" || pathname.startsWith("/records/new?")) {
+    return true;
+  }
+  /** `/records/:recordId/edit` — ID가 UUID가 아니어도 매칭 (환경·데이터에 따라 ID 포맷 상이) */
+  return /^\/records\/[^/]+\/edit$/.test(pathname);
+}
+
 export function shouldShowBottomNav(pathname: string | null): boolean {
   if (!pathname) return true;
   if (pathname.startsWith("/login")) return false;
   if (pathname.startsWith("/gyms/")) return false;
   if (isCommunityPostDetail(pathname)) return false;
+  /** 글 작성·수정 — 하단 네비·체크인 배너 숨김 (암장 리뷰 작성과 동일) */
+  if (pathname.startsWith("/community/create")) return false;
+  if (pathname.startsWith("/community/edit")) return false;
+  if (isRecordCreateOrEditPath(pathname)) return false;
   return true;
 }

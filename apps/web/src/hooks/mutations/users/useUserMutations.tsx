@@ -20,6 +20,42 @@ const useUserMutations = () => {
     "post",
     "/api/v1/users/{userId}/follow",
     {
+      onMutate: async (variables) => {
+        const uid = variables.params.path.userId;
+        const userQueryOptions = openapi.queryOptions(
+          "get",
+          "/api/v1/users/{userId}",
+          { params: { path: { userId: uid } } },
+        );
+
+        await queryClient.cancelQueries(userQueryOptions);
+        const prev = queryClient.getQueryData(userQueryOptions.queryKey);
+
+        queryClient.setQueryData(userQueryOptions.queryKey, (old: any) => {
+          if (!old) return old;
+          const isFollowing = (old.payload.followers?.length ?? 0) > 0;
+          return {
+            ...old,
+            payload: {
+              ...old.payload,
+              followers: isFollowing ? [] : [{ id: "optimistic" }],
+              _count: {
+                ...old.payload._count,
+                followers: isFollowing
+                  ? Math.max(0, (old.payload._count?.followers ?? 0) - 1)
+                  : (old.payload._count?.followers ?? 0) + 1,
+              },
+            },
+          };
+        });
+
+        return { prev, queryKey: userQueryOptions.queryKey };
+      },
+      onError: (_err, _vars, ctx) => {
+        if (ctx?.prev) {
+          queryClient.setQueryData(ctx.queryKey, ctx.prev);
+        }
+      },
       onSuccess: (_data, variables) => {
         const uid = variables.params.path.userId;
         queryClient.invalidateQueries(

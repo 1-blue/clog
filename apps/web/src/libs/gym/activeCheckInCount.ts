@@ -33,3 +33,53 @@ export async function activeCheckInCountsForGymIds(
   });
   return new Map(rows.map((r) => [r.gymId, r._count._all]));
 }
+
+const SEOUL_OFFSET_MS = 9 * 60 * 60 * 1000;
+
+const getSeoulMonthBounds = (
+  at: Date,
+): { monthStart: Date; nextMonthStart: Date } => {
+  const fmt = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+  });
+  const parts = fmt.formatToParts(at);
+  const year = Number(parts.find((p) => p.type === "year")?.value);
+  const month = Number(parts.find((p) => p.type === "month")?.value);
+  const monthIndex = month - 1;
+
+  const monthStartUtc = Date.UTC(year, monthIndex, 1, 0, 0, 0) - SEOUL_OFFSET_MS;
+  const nextMonthStartUtc =
+    Date.UTC(year, monthIndex + 1, 1, 0, 0, 0) - SEOUL_OFFSET_MS;
+
+  return {
+    monthStart: new Date(monthStartUtc),
+    nextMonthStart: new Date(nextMonthStartUtc),
+  };
+};
+
+/**
+ * 이번 달(서울) 체크인 횟수 — `GET /api/v1/gyms?sort=monthlyCheckInCount` 집계 규칙과 동일
+ * (30분 이상 체크인만, 월 경계는 Asia/Seoul)
+ */
+export async function monthlyQualifiedCheckInCountForGym(
+  gymId: string,
+): Promise<number> {
+  const { monthStart, nextMonthStart } = getSeoulMonthBounds(new Date());
+  const minDurationStart = new Date(Date.now() - 30 * 60 * 1000);
+
+  const rows = await prisma.$queryRaw<Array<{ c: number }>>`
+    SELECT COUNT(*)::int AS c
+    FROM "gym_check_ins"
+    WHERE "gym_id" = ${gymId}::uuid
+      AND "started_at" >= ${monthStart}
+      AND "started_at" < ${nextMonthStart}
+      AND (
+        ("ended_at" IS NOT NULL AND "ended_at" - "started_at" >= interval '30 minutes')
+        OR ("ended_at" IS NULL AND "started_at" <= ${minDurationStart})
+      )
+  `;
+
+  return rows[0]?.c ?? 0;
+}

@@ -1,13 +1,18 @@
 "use client";
 
 import { Bell, Check, Instagram, Settings, User, Youtube } from "lucide-react";
+import { useState } from "react";
 import Link from "next/link";
 
 import { difficultyToKoreanMap, type Difficulty } from "@clog/utils";
 
 import { openapi } from "#web/apis/openapi";
+import AppTopBar from "#web/components/layout/AppTopBar";
+import ImageLightboxDialog from "#web/components/shared/image-carousel-lightbox/ImageLightboxDialog";
 import { ROUTES } from "#web/constants";
 import { formatProfileCount } from "#web/libs/format/formatProfileCount";
+
+import FollowListSheet from "./FollowListSheet";
 
 const ProfileSummarySection = () => {
   const { data: me } = openapi.useSuspenseQuery(
@@ -17,64 +22,88 @@ const ProfileSummarySection = () => {
     { select: (d) => d.payload },
   );
 
-  const fans = me._count?.followers ?? 0;
-  const crew = me._count?.following ?? 0;
+  const [followSheet, setFollowSheet] = useState<
+    "followers" | "following" | null
+  >(null);
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
+
+  const follower = me._count?.followers ?? 0;
+  const following = me._count?.following ?? 0;
 
   return (
     <div className="w-full">
       {/* 헤더 */}
-      <header className="sticky top-0 z-40 flex w-full items-center justify-between bg-background/80 px-6 py-4 backdrop-blur-md">
-        <span className="text-2xl font-extrabold tracking-tighter text-primary uppercase">
-          Clog
-        </span>
-        <div className="flex items-center gap-4">
-          <Link
-            href={ROUTES.MY.SETTINGS.path}
-            className="text-primary transition-opacity hover:opacity-80 active:scale-95"
-            aria-label="설정"
-          >
-            <Settings className="size-6" strokeWidth={1.75} />
-          </Link>
-          <Link
-            href={ROUTES.NOTIFICATIONS.path}
-            className="text-primary transition-opacity hover:opacity-80 active:scale-95"
-            aria-label="알림"
-          >
-            <Bell className="size-6" strokeWidth={1.75} />
-          </Link>
-        </div>
-      </header>
+      <AppTopBar
+        left={
+          <span className="text-lg font-bold text-on-surface">내 정보</span>
+        }
+        right={
+          <div className="flex items-center gap-4">
+            <Link
+              href={ROUTES.MY.SETTINGS.path}
+              className="text-primary transition-opacity hover:opacity-80 active:scale-95"
+              aria-label="설정"
+            >
+              <Settings className="size-6" strokeWidth={1.75} />
+            </Link>
+            <Link
+              href={ROUTES.NOTIFICATIONS.path}
+              className="text-primary transition-opacity hover:opacity-80 active:scale-95"
+              aria-label="알림"
+            >
+              <Bell className="size-6" strokeWidth={1.75} />
+            </Link>
+          </div>
+        }
+      />
 
-      {/* 커버 이미지 */}
-      <section className="relative h-56 w-full overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-container/50 via-primary/35 to-secondary-container/45 opacity-90" />
+      {/* 커버 이미지 (프로필과 겹치는 영역은 아래 프로필 섹션 z-20이 클릭을 가져감) */}
+      <section className="relative z-0 h-56 w-full overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-primary-container/50 via-primary/35 to-secondary-container/45 opacity-90" />
         {me.coverImage ? (
-          <img
-            src={me.coverImage}
-            alt=""
-            className="absolute inset-0 size-full object-cover mix-blend-overlay"
-          />
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={me.coverImage}
+              alt=""
+              className="absolute inset-0 size-full object-cover mix-blend-overlay"
+            />
+            <button
+              type="button"
+              aria-label="커버 이미지 크게 보기"
+              className="absolute inset-0 z-10 cursor-zoom-in"
+              onClick={() => setLightboxUrl(me.coverImage)}
+            />
+          </>
         ) : null}
       </section>
 
       {/* 프로필 영역 */}
-      <section className="relative -mt-16 flex flex-col items-center px-6">
+      <section className="relative z-20 -mt-16 flex flex-col items-center px-6">
         {/* 아바타 */}
         <div className="relative">
-          <div className="size-32 overflow-hidden rounded-full border-4 border-background bg-surface-container-highest shadow-xl ring-1 ring-outline-variant/20">
-            {me.profileImage ? (
+          {me.profileImage ? (
+            <button
+              type="button"
+              aria-label="프로필 이미지 크게 보기"
+              className="size-32 cursor-zoom-in overflow-hidden rounded-full border-4 border-background bg-surface-container-highest shadow-xl ring-1 ring-outline-variant/20"
+              onClick={() => setLightboxUrl(me.profileImage)}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={me.profileImage}
                 alt=""
                 className="size-full object-cover"
               />
-            ) : (
+            </button>
+          ) : (
+            <div className="size-32 overflow-hidden rounded-full border-4 border-background bg-surface-container-highest shadow-xl ring-1 ring-outline-variant/20">
               <div className="flex size-full items-center justify-center">
                 <User className="size-12 text-on-surface-variant" />
               </div>
-            )}
-          </div>
-          <div className="absolute right-1 bottom-1 flex size-8 items-center justify-center rounded-full border-4 border-background bg-secondary">
+            </div>
+          )}
+          <div className="pointer-events-none absolute right-1 bottom-1 flex size-8 items-center justify-center rounded-full border-4 border-background bg-secondary">
             <Check className="text-on-secondary size-4" strokeWidth={3} />
           </div>
         </div>
@@ -148,32 +177,55 @@ const ProfileSummarySection = () => {
               완등
             </span>
           </div>
-          <div className="flex flex-col items-center rounded-2xl border border-outline-variant/10 bg-surface-container-low py-3">
+          <button
+            type="button"
+            onClick={() => setFollowSheet("followers")}
+            className="flex flex-col items-center rounded-2xl border border-outline-variant/10 bg-surface-container-low py-3 transition-colors hover:bg-surface-container active:scale-95"
+          >
             <span className="text-xl leading-none font-bold text-on-surface">
-              {formatProfileCount(fans)}
+              {formatProfileCount(follower)}
             </span>
             <span className="mt-1.5 text-xs font-bold tracking-wider text-outline uppercase">
-              팬
+              팔로워
             </span>
-          </div>
-          <div className="flex flex-col items-center rounded-2xl border border-outline-variant/10 bg-surface-container-low py-3">
+          </button>
+          <button
+            type="button"
+            onClick={() => setFollowSheet("following")}
+            className="flex flex-col items-center rounded-2xl border border-outline-variant/10 bg-surface-container-low py-3 transition-colors hover:bg-surface-container active:scale-95"
+          >
             <span className="text-xl leading-none font-bold text-on-surface">
-              {formatProfileCount(crew)}
+              {formatProfileCount(following)}
             </span>
             <span className="mt-1.5 text-xs font-bold tracking-wider text-outline uppercase">
-              크루
+              팔로잉
             </span>
-          </div>
+          </button>
         </div>
 
-        {/* 프로필 편집 버튼 - ROUTES.MY.PROFILE_EDIT.path로 수정 */}
+        {/* 프로필 편집 버튼 */}
         <Link
           href={ROUTES.MY.PROFILE_EDIT.path}
-          className="mt-8 flex w-full max-w-sm items-center justify-center rounded-xl bg-gradient-to-b from-primary to-primary-container py-3.5 text-base font-bold text-on-primary-container shadow-lg transition-all hover:opacity-90 active:scale-95"
+          className="mt-8 flex w-full max-w-sm items-center justify-center rounded-xl border border-outline-variant/40 bg-surface-container-low py-3.5 text-base font-semibold text-on-surface transition-all hover:bg-surface-container active:scale-95"
         >
           프로필 편집
         </Link>
       </section>
+
+      <FollowListSheet
+        userId={me.id}
+        type={followSheet}
+        onClose={() => setFollowSheet(null)}
+      />
+
+      <ImageLightboxDialog
+        url={lightboxUrl}
+        open={lightboxUrl !== null}
+        onOpenChange={(o) => {
+          if (!o) setLightboxUrl(null);
+        }}
+        altPrefix="프로필"
+      />
     </div>
   );
 };

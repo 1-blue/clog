@@ -23,8 +23,6 @@ export const GET = async (
       where: { id: postId },
       include: {
         author: { select: { id: true, nickname: true, profileImage: true } },
-        tags: true,
-        images: { orderBy: { order: "asc" } },
         ...(userId && {
           likes: { where: { userId }, select: { id: true } },
           bookmarks: { where: { userId }, select: { id: true } },
@@ -56,27 +54,14 @@ export const PATCH = async (
     const body = await request.json();
     const data = updatePostSchema.parse(body);
 
-    if (data.tags) {
-      await prisma.postTag.deleteMany({ where: { postId } });
-    }
-    if (data.imageUrls) {
-      await prisma.postImage.deleteMany({ where: { postId } });
-    }
-
     const post = await prisma.post.update({
       where: { id: postId },
       data: {
         ...(data.title && { title: data.title }),
         ...(data.content && { content: data.content }),
         ...(data.category && { category: data.category }),
-        ...(data.tags && {
-          tags: { create: data.tags.map((name) => ({ name })) },
-        }),
-        ...(data.imageUrls && {
-          images: {
-            create: data.imageUrls.map((url, i) => ({ url, order: i })),
-          },
-        }),
+        ...(data.tags && { tags: data.tags }),
+        ...(data.imageUrls && { imageUrls: data.imageUrls }),
       },
     });
 

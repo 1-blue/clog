@@ -25,11 +25,11 @@ const FollowButton: React.FC<IProps> = ({
         "rounded-full px-5 py-2 text-sm font-medium transition-colors",
         isFollowing
           ? "bg-surface-container-high text-on-surface hover:bg-surface-container-highest"
-          : "bg-primary text-primary-foreground hover:bg-primary/90",
+          : "border-2 border-primary bg-primary/30 text-primary hover:bg-primary/40",
         className,
       )}
     >
-      {isFollowing ? "팔로잉" : "팔로우"}
+      {isFollowing ? "언팔로우" : "팔로우"}
     </button>
   );
 };

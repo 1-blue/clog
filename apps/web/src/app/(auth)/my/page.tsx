@@ -1,8 +1,8 @@
 import { Suspense } from "react";
 
-import MyActivitySection from "./_source/components/MyActivitySection";
+import MyActivitySection from "./_source/components/activity/MyActivitySection";
+import MyActivitySectionSkeleton from "./_source/components/activity/MyActivitySectionSkeleton";
 import ProfileSummarySection from "./_source/components/ProfileSummarySection";
-import MyActivitySkeleton from "./_source/components/skeleton/MyActivitySkeleton";
 import ProfileSummarySkeleton from "./_source/components/skeleton/ProfileSummarySkeleton";
 
 const MyPage = () => {
@@ -11,7 +11,8 @@ const MyPage = () => {
       <Suspense fallback={<ProfileSummarySkeleton />}>
         <ProfileSummarySection />
       </Suspense>
-      <Suspense fallback={<MyActivitySkeleton />}>
+
+      <Suspense fallback={<MyActivitySectionSkeleton />}>
         <MyActivitySection />
       </Suspense>
     </div>

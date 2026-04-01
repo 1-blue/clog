@@ -1,8 +1,8 @@
 import { Info } from "lucide-react";
 
-const CommunityGuestNotice = () => {
+const CommunityGuestNotice: React.FC = () => {
   return (
-    <div className="mb-6 flex items-center gap-3 rounded-xl border border-outline-variant/30 bg-surface-container-high p-4">
+    <div className="flex items-center gap-3 rounded-xl border border-outline-variant/30 bg-surface-container-high p-4">
       <Info
         className="size-5 shrink-0 text-secondary"
         strokeWidth={2}

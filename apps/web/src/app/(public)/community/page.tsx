@@ -1,6 +1,6 @@
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { cache } from "react";
 import type { Metadata } from "next";
-import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
 import type { components } from "#web/@types/openapi";
 import { fetchClient } from "#web/apis/openapi";

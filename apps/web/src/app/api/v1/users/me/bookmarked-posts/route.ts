@@ -15,8 +15,6 @@ const querySchema = z.object({
 
 const postInclude = {
   author: { select: { id: true, nickname: true, profileImage: true } },
-  tags: true,
-  images: { take: 1, orderBy: { order: "asc" as const } },
 } as const;
 
 /** 내가 북마크한 게시글 (최근 저장 순) */

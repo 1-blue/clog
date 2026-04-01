@@ -55,10 +55,35 @@ const usePostDetailMutations = () => {
     },
   );
 
+  const invalidatePostAndComments = () => {
+    queryClient.invalidateQueries({ queryKey });
+    queryClient.invalidateQueries({
+      queryKey: ["get", "/api/v1/posts/{postId}/comments"],
+    });
+  };
+
+  const updateCommentMutation = openapi.useMutation(
+    "patch",
+    "/api/v1/posts/{postId}/comments/{commentId}",
+    {
+      onSuccess: invalidatePostAndComments,
+    },
+  );
+
+  const deleteCommentMutation = openapi.useMutation(
+    "delete",
+    "/api/v1/posts/{postId}/comments/{commentId}",
+    {
+      onSuccess: invalidatePostAndComments,
+    },
+  );
+
   return {
     toggleLikeMutation,
     toggleBookmarkMutation,
     createCommentMutation,
+    updateCommentMutation,
+    deleteCommentMutation,
   };
 };
 

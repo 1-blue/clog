@@ -32,7 +32,6 @@ export const GET = async (
       include: {
         gym: { select: { id: true, name: true } },
         routes: { orderBy: { order: "asc" } },
-        images: { orderBy: { order: "asc" } },
       },
     });
 

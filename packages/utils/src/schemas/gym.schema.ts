@@ -10,7 +10,14 @@ export const gymQuerySchema = z.object({
   region: regionEnum.optional(),
   search: z.string().optional(),
   sort: z
-    .enum(["name", "rating", "congestion", "reviewCount"])
+    .enum([
+      "name",
+      "rating",
+      "congestion",
+      "reviewCount",
+      "visitorCount",
+      "monthlyCheckInCount",
+    ])
     .optional()
     .default("name"),
 });

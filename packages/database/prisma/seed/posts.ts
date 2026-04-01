@@ -103,12 +103,7 @@ export async function seedPosts(
       data: {
         authorId: users[i % 5]!.id,
         ...postData[i]!,
-        tags: {
-          create:
-            i % 2 === 0
-              ? [{ name: "볼더링" }, { name: "클라이밍" }]
-              : [{ name: "초보" }],
-        },
+        tags: i % 2 === 0 ? ["볼더링", "클라이밍"] : ["초보"],
       },
     });
     posts.push(post);

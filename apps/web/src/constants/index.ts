@@ -21,8 +21,15 @@ export const ROUTES = {
       label: "암장 상세",
       /** 암장 > 암장 상세 > 리뷰 작성 */
       REVIEW: {
-        path: (gymId: string) => `/gyms/${gymId}/review`,
-        label: "리뷰 작성",
+        CREATE: {
+          path: (gymId: string) => `/gyms/${gymId}/review/create`,
+          label: "리뷰 작성",
+        },
+        EDIT: {
+          path: (gymId: string, reviewId: string) =>
+            `/gyms/${gymId}/review/edit/${reviewId}`,
+          label: "리뷰 수정",
+        },
       },
     },
   },
@@ -37,9 +44,14 @@ export const ROUTES = {
       label: "게시글 상세",
     },
     /** 커뮤니티 > 게시글 작성 */
-    WRITE: {
-      path: "/community/write",
+    CREATE: {
+      path: "/community/create",
       label: "게시글 작성",
+    },
+    /** 커뮤니티 > 게시글 수정 */
+    EDIT: {
+      path: (postId: string) => `/community/edit/${postId}`,
+      label: "게시글 수정",
     },
   },
 

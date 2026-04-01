@@ -8,6 +8,7 @@ import {
   paginatedJson,
   requireAuth,
 } from "#web/libs/api";
+import { bumpUserMaxDifficultyFromRoutes } from "#web/libs/user/updateUserMaxDifficulty";
 
 /** 기록 목록 (무한스크롤) */
 export const GET = async (request: Request) => {
@@ -36,11 +37,17 @@ export const GET = async (request: Request) => {
       },
       orderBy: { date: "desc" },
       take: dateFilter ? MONTH_LIMIT : query.limit + 1,
-      ...(query.cursor && !dateFilter && { cursor: { id: query.cursor }, skip: 1 }),
+      ...(query.cursor &&
+        !dateFilter && { cursor: { id: query.cursor }, skip: 1 }),
       include: {
-        gym: { select: { id: true, name: true } },
+        gym: {
+          select: {
+            id: true,
+            name: true,
+            difficultyColors: { orderBy: { order: "asc" } },
+          },
+        },
         routes: { orderBy: { order: "asc" } },
-        images: { orderBy: { order: "asc" }, take: 1 },
       },
     });
 
@@ -81,15 +88,14 @@ export const POST = async (request: Request) => {
             order: i,
           })),
         },
-        images: data.imageUrls?.length
-          ? { create: data.imageUrls.map((url, i) => ({ url, order: i })) }
-          : undefined,
+        imageUrls: data.imageUrls ?? [],
       },
       include: {
         routes: true,
-        images: true,
       },
     });
+
+    await bumpUserMaxDifficultyFromRoutes(userId!, session.routes);
 
     return jsonWithToast(session, "기록이 저장되었습니다.", 201);
   } catch {

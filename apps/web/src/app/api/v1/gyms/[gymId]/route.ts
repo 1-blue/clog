@@ -1,7 +1,10 @@
 import { prisma } from "@clog/db";
 
 import { errorResponse, getAuthUserId, json } from "#web/libs/api";
-import { countActiveCheckInsForGym } from "#web/libs/gym/activeCheckInCount";
+import {
+  countActiveCheckInsForGym,
+  monthlyQualifiedCheckInCountForGym,
+} from "#web/libs/gym/activeCheckInCount";
 
 /** 암장 상세 (체크인 기준 실시간 인원, 로그인 시 내 체크인 상태 포함) */
 export const GET = async (
@@ -14,8 +17,9 @@ export const GET = async (
     const gym = await prisma.gym.findUnique({
       where: { id: gymId },
       include: {
-        facilities: true,
         images: { orderBy: { order: "asc" } },
+        openHours: { orderBy: { dayType: "asc" } },
+        difficultyColors: { orderBy: { order: "asc" } },
       },
     });
 
@@ -23,6 +27,7 @@ export const GET = async (
 
     const now = new Date();
     const liveVisitorCount = await countActiveCheckInsForGym(gymId);
+    const monthlyCheckInCount = await monthlyQualifiedCheckInCountForGym(gymId);
 
     const userId = await getAuthUserId();
     let myCheckIn: { endsAt: string } | null = null;
@@ -42,6 +47,7 @@ export const GET = async (
     return json({
       ...gym,
       visitorCount: liveVisitorCount,
+      monthlyCheckInCount,
       myCheckIn,
     });
   } catch {

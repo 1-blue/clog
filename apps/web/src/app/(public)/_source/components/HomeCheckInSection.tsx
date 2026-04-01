@@ -1,31 +1,28 @@
 "use client";
 
-import { MapPin, LogIn } from "lucide-react";
-import { useRouter } from "next/navigation";
-import React, { useState } from "react";
-import { toast } from "sonner";
+import { LogIn, MapPin } from "lucide-react";
+import { useState } from "react";
 
-import { fetchClient, openapi } from "#web/apis/openapi";
+import { openapi } from "#web/apis/openapi";
 import { Button } from "#web/components/ui/button";
+import { Input } from "#web/components/ui/input";
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
 } from "#web/components/ui/sheet";
-import { Input } from "#web/components/ui/input";
-import { ROUTES } from "#web/constants";
+import useGymCheckInMutations from "#web/hooks/mutations/gyms/useGymCheckInMutations";
+import useMe from "#web/hooks/useMe";
 
 /** 홈 상단 — 로그인 유저 전용 빠른 체크인 섹션 */
 const HomeCheckInSection = () => {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const [busy, setBusy] = useState(false);
 
-  const { data: meData } = openapi.useQuery("get", "/api/v1/users/me", undefined, {
-    retry: false,
-    staleTime: 30_000,
+  const { me } = useMe();
+  const { checkInMutation } = useGymCheckInMutations({
+    onCheckInSuccess: () => setOpen(false),
   });
 
   const { data: gymData } = openapi.useQuery(
@@ -35,33 +32,14 @@ const HomeCheckInSection = () => {
     { enabled: open },
   );
 
-  const me = meData?.payload;
   if (!me) return null;
-
-  const activeCheckIn = me.activeCheckIn;
-  if (activeCheckIn) return null;
+  if (me.activeCheckIn) return null;
 
   const gymPayload = gymData?.payload;
   const gyms = gymPayload && "items" in gymPayload ? gymPayload.items : [];
 
-  const handleCheckIn = async (gymId: string) => {
-    setBusy(true);
-    try {
-      const { error } = await fetchClient.POST("/api/v1/gyms/{gymId}/check-in", {
-        params: { path: { gymId } },
-      });
-      if (error) {
-        toast.error("체크인에 실패했습니다.");
-        return;
-      }
-      toast.success("체크인했어요!");
-      setOpen(false);
-      router.refresh();
-    } catch {
-      toast.error("체크인에 실패했습니다.");
-    } finally {
-      setBusy(false);
-    }
+  const handleCheckIn = (gymId: string) => {
+    checkInMutation.mutate({ params: { path: { gymId } } });
   };
 
   return (
@@ -95,15 +73,17 @@ const HomeCheckInSection = () => {
             <div className="max-h-80 space-y-1 overflow-y-auto">
               {gyms.length === 0 && (
                 <p className="py-8 text-center text-sm text-on-surface-variant">
-                  {search ? "검색 결과가 없습니다." : "암장 목록을 불러오는 중…"}
+                  {search
+                    ? "검색 결과가 없습니다."
+                    : "암장 목록을 불러오는 중…"}
                 </p>
               )}
               {gyms.map((gym) => (
                 <button
                   key={gym.id}
                   type="button"
-                  disabled={busy}
-                  onClick={() => void handleCheckIn(gym.id)}
+                  disabled={checkInMutation.isPending}
+                  onClick={() => handleCheckIn(gym.id)}
                   className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition-colors hover:bg-surface-container-high disabled:opacity-50"
                 >
                   <MapPin className="size-4 shrink-0 text-primary" />

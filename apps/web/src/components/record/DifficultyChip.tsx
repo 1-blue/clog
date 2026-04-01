@@ -5,7 +5,6 @@ import { difficultyToKoreanMap, type Difficulty } from "@clog/utils";
 import { cn } from "#web/libs/utils";
 
 const DIFFICULTY_COLORS: Record<Difficulty, string> = {
-  VB: "bg-sky-900/30 text-sky-400",
   V0: "bg-red-900/30 text-red-400",
   V1: "bg-orange-900/30 text-orange-400",
   V2: "bg-yellow-900/30 text-yellow-400",
@@ -17,7 +16,6 @@ const DIFFICULTY_COLORS: Record<Difficulty, string> = {
   V8: "bg-pink-900/30 text-pink-400",
   V9: "bg-neutral-300/20 text-neutral-200",
   V10: "bg-neutral-900/50 text-neutral-100",
-  V_PLUS: "bg-neutral-700/30 text-neutral-500",
 };
 
 interface IProps {
