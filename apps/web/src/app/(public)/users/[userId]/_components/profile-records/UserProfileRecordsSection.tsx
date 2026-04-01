@@ -51,7 +51,7 @@ const UserProfileRecordsSection = ({ userId, selectedYmd }: IProps) => {
     records.length === 0 && !recordsQuery.isPending && !recordsQuery.isFetching;
 
   return (
-    <section className="mt-4 px-4">
+    <section className="mt-4">
       <InfiniteScroll
         onLoadMore={() => recordsQuery.fetchNextPage()}
         hasMore={!!recordsQuery.hasNextPage}
@@ -109,7 +109,7 @@ const UserProfileRecordsSection = ({ userId, selectedYmd }: IProps) => {
       </InfiniteScroll>
 
       {showEmpty ? (
-        <p className="px-6 py-8 text-center text-sm text-on-surface-variant">
+        <p className="py-8 text-center text-sm text-on-surface-variant">
           {selectedYmd
             ? "이 날짜에 공개된 기록이 없습니다."
             : "공개된 기록이 없습니다."}

@@ -83,11 +83,11 @@ const RecordsCalendarBottomSheet: React.FC<IProps> = ({
       <SheetContent
         side="bottom"
         showCloseButton={false}
-        className="rounded-t-3xl border-t border-outline-variant bg-surface-container px-0 pb-[max(1.5rem,env(safe-area-inset-bottom))]"
+        className="rounded-t-3xl border-t border-outline-variant bg-surface-container px-0"
       >
         <div className="mx-auto mt-3 mb-4 h-1 w-10 rounded-full bg-outline-variant" />
 
-        <div className="flex items-center justify-between px-6 pb-4">
+        <div className="flex items-center justify-between px-2.5 pb-4">
           <button
             type="button"
             onClick={handlePickerYearPrev}
@@ -109,7 +109,7 @@ const RecordsCalendarBottomSheet: React.FC<IProps> = ({
           </button>
         </div>
 
-        <div className="grid grid-cols-4 gap-2 px-4">
+        <div className="grid grid-cols-4 gap-2 px-2.5">
           {MONTH_LABELS.map((label, idx) => {
             const now = new Date();
             const isFuture =

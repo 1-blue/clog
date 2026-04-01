@@ -1,7 +1,6 @@
-import { format } from "date-fns";
-import { ko } from "date-fns/locale";
 import { LogIn } from "lucide-react";
 
+import { formatKoreaMonthDayTimeHm } from "#web/libs/date/korea";
 import { cn } from "#web/libs/utils";
 
 interface IProps {
@@ -12,7 +11,7 @@ interface IProps {
 /** 체크인 유지 중일 때 퇴장 예정 시각 안내 */
 const GymCheckInStatusBanner: React.FC<IProps> = ({ endsAt, className }) => {
   const end = new Date(endsAt);
-  const label = format(end, "M월 d일 HH:mm", { locale: ko });
+  const label = formatKoreaMonthDayTimeHm(end);
 
   return (
     <div

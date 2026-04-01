@@ -31,12 +31,12 @@ const PostArticleMedia: React.FC<IProps> = ({ imageUrls }) => {
 
   return (
     <>
-      <div className="-mx-6 w-screen max-w-none sm:mx-0 sm:w-full">
+      <div className="-mx-2.5 w-screen max-w-none sm:mx-0 sm:w-full">
         <button
           type="button"
           onClick={() => openAt(0)}
           className={cn(
-            "group relative block w-full overflow-hidden rounded-2xl bg-surface-container-high text-left",
+            "group relative block w-full overflow-hidden bg-surface-container-high text-left",
             "ring-1 ring-foreground/10 ring-inset",
             "transition-shadow focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none",
             "hover:shadow-lg hover:shadow-black/20",
@@ -51,7 +51,7 @@ const PostArticleMedia: React.FC<IProps> = ({ imageUrls }) => {
             <img
               src={heroUrl}
               alt=""
-              className="size-full object-cover transition-transform duration-300 ease-out group-active:scale-[0.99] group-hover:scale-[1.02]"
+              className="size-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.02] group-active:scale-[0.99]"
             />
             <div
               className="pointer-events-none absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/15"
@@ -63,13 +63,13 @@ const PostArticleMedia: React.FC<IProps> = ({ imageUrls }) => {
                   className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/60 via-black/10 to-transparent"
                   aria-hidden
                 />
-                <div className="pointer-events-none absolute right-3 bottom-3 flex items-center gap-1.5 rounded-full bg-black/55 px-3 py-1.5 text-xs font-semibold text-white shadow-lg backdrop-blur-sm ring-1 ring-white/25">
+                <div className="pointer-events-none absolute right-3 bottom-3 flex items-center gap-1.5 rounded-full bg-black/55 px-3 py-1.5 text-xs font-semibold text-white shadow-lg ring-1 ring-white/25 backdrop-blur-sm">
                   <Images className="size-4 shrink-0 opacity-95" aria-hidden />
                   <span className="tabular-nums">+{extraCount}</span>
                 </div>
               </>
             ) : (
-              <span className="pointer-events-none absolute bottom-3 right-3 rounded-md bg-black/35 px-2 py-1 text-[11px] font-medium text-white/90 opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100">
+              <span className="pointer-events-none absolute right-3 bottom-3 rounded-md bg-black/35 px-2 py-1 text-[11px] font-medium text-white/90 opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100">
                 탭하여 크게 보기
               </span>
             )}

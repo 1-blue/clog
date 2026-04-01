@@ -31,7 +31,7 @@ const GymInfoTab: React.FC<IProps> = ({ gym }) => {
   });
 
   return (
-    <section className="flex flex-col gap-6 px-6 py-4">
+    <section className="flex flex-col gap-6 py-4">
       {gym.facilities.length > 0 ? (
         <div>
           <h5 className={sectionTitleClass}>시설</h5>

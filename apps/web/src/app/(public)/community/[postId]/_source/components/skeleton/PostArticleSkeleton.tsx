@@ -1,7 +1,7 @@
 const PostArticleSkeleton = () => {
   return (
     <div className="animate-pulse">
-      <div className="relative -mx-6 aspect-4/5 w-screen max-w-none bg-surface-container-low sm:mx-0 sm:w-full sm:rounded-2xl" />
+      <div className="relative -mx-2.5 aspect-4/5 w-[calc(100%+1.25rem)] max-w-none bg-surface-container-low sm:mx-0 sm:w-full sm:rounded-2xl" />
 
       <div className="mt-8 space-y-3">
         <div className="h-6 w-20 rounded-full bg-surface-container-low" />

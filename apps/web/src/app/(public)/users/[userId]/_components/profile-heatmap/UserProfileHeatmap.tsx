@@ -1,6 +1,6 @@
 "use client";
 
-import { format, parseISO, startOfDay } from "date-fns";
+import { parseISO, startOfDay } from "date-fns";
 import { useLayoutEffect, useMemo, useRef } from "react";
 
 import {
@@ -9,6 +9,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "#web/components/ui/tooltip";
+import { getKoreaTodayYmd } from "#web/libs/date/korea";
 import { cn } from "#web/libs/utils";
 
 import { formatYmdLongKorean } from "./heatmap-utils";
@@ -47,7 +48,7 @@ const UserProfileHeatmap: React.FC<IProps> = ({
   sessionCountInRange,
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const todayYmd = useMemo(() => format(new Date(), "yyyy-MM-dd"), []);
+  const todayYmd = useMemo(() => getKoreaTodayYmd(), []);
 
   const weeks = Math.max(0, Math.floor(dayKeys.length / 7));
   const n = Math.min(dayKeys.length, levels.length);

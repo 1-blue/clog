@@ -17,7 +17,7 @@ const CheckInStatusBanner = () => {
 
   return (
     <div className="fixed right-0 bottom-16 left-0 z-40 border-t border-outline-variant bg-primary/10 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-lg items-center justify-between px-4 py-2">
+      <div className="mx-auto flex max-w-lg items-center justify-between px-2.5 py-2">
         <div className="flex items-center gap-2 text-sm">
           <MapPin className="size-4 text-primary" />
           <span className="font-medium text-on-surface">

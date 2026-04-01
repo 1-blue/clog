@@ -2,7 +2,7 @@ import PostArticleSkeleton from "../../_source/components/skeleton/PostArticleSk
 
 const PostDetailLoadingBody = () => {
   return (
-    <div className="mx-auto max-w-3xl px-6 pt-20">
+    <div className="mx-auto max-w-3xl pt-20">
       <PostArticleSkeleton />
     </div>
   );

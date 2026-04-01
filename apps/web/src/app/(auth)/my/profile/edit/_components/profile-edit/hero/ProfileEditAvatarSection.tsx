@@ -43,13 +43,10 @@ const ProfileEditAvatarSection = ({ nickname, profileImage }: IProps) => {
 
   return (
     <label
-      className="group relative z-10 -mt-10 ml-6 block w-fit cursor-pointer"
+      className="group relative z-10 -mt-12 ml-6 block w-fit cursor-pointer"
       aria-label="프로필 이미지 변경"
     >
-      <Avatar
-        size="lg"
-        className="size-24 rounded-2xl border-4 border-surface shadow-xl"
-      >
+      <Avatar className="size-24 rounded-full border-4 border-surface shadow-xl">
         {profileImage ? <AvatarImage src={profileImage} alt="" /> : null}
         <AvatarFallback className="rounded-2xl text-2xl font-bold">
           {nickname.slice(0, 1)}

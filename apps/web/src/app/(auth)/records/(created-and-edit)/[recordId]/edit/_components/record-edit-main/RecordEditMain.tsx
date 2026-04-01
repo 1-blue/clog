@@ -19,7 +19,7 @@ const RecordEditMain: React.FC<IProps> = ({ recordId }) => {
 
   if (!record) {
     return (
-      <div className="flex h-60 items-center justify-center px-4">
+      <div className="flex h-60 items-center justify-center">
         <p className="text-sm text-on-surface-variant">
           기록을 찾을 수 없습니다
         </p>

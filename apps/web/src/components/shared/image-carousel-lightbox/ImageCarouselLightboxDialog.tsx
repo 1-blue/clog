@@ -9,8 +9,6 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
   type CarouselApi,
 } from "#web/components/ui/carousel";
 import { Dialog, DialogPortal } from "#web/components/ui/dialog";
@@ -162,7 +160,7 @@ const ImageCarouselLightboxDialog: React.FC<IProps> = ({
                 opts={{ align: "center", loop: urls.length > 1 }}
                 onPointerDownCapture={onPointerDownCapture}
                 onPointerUpCapture={onPointerUpCapture}
-                className="pointer-events-auto flex min-h-0 flex-1 flex-col justify-center px-12 md:px-20"
+                className="pointer-events-auto flex min-h-0 flex-1 flex-col justify-center px-2.5"
               >
                 <CarouselContent className="-ml-0 h-full items-stretch">
                   {urls.map((url, i) => (
@@ -179,12 +177,6 @@ const ImageCarouselLightboxDialog: React.FC<IProps> = ({
                     </CarouselItem>
                   ))}
                 </CarouselContent>
-                {urls.length > 1 ? (
-                  <>
-                    <CarouselPrevious className="top-1/2 left-2 z-20 size-10 -translate-y-1/2 border-white/30 bg-black/40 text-white hover:bg-black/55 hover:text-white disabled:opacity-30 md:left-4" />
-                    <CarouselNext className="top-1/2 right-2 z-20 size-10 -translate-y-1/2 border-white/30 bg-black/40 text-white hover:bg-black/55 hover:text-white disabled:opacity-30 md:right-4" />
-                  </>
-                ) : null}
               </Carousel>
             </div>
           </div>

@@ -140,7 +140,6 @@ const ProfileEditMain = () => {
           e.preventDefault();
           void form.handleSubmit(onSubmit)(e);
         }}
-        className="pb-28"
       >
         <AppTopBar
           showNotification={false}
@@ -168,7 +167,7 @@ const ProfileEditMain = () => {
           />
         </div>
 
-        <div className="mx-auto mt-10 max-w-lg space-y-5 px-4 pb-8">
+        <div className="mx-auto mt-4 max-w-lg space-y-5 pb-8">
           <ProfileEditBasicSection
             baselineNickname={me.nickname}
             debouncedNickname={debouncedNick}

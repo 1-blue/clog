@@ -15,7 +15,7 @@ const GymPhotoTab: React.FC<IProps> = ({ images, gymName }) => {
 
   if (urls.length === 0) {
     return (
-      <section className="px-6 py-8">
+      <section>
         <p className="py-6 text-center text-sm text-on-surface-variant">
           등록된 사진이 없습니다
         </p>
@@ -24,7 +24,7 @@ const GymPhotoTab: React.FC<IProps> = ({ images, gymName }) => {
   }
 
   return (
-    <section className="px-6 py-4">
+    <section>
       <ImageStripLightbox
         urls={urls}
         altPrefix={`${gymName} 사진`}

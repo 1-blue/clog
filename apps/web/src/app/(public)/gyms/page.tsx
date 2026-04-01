@@ -16,7 +16,7 @@ const GymsPage = () => {
         }
       />
       <Suspense>
-        <div className="px-4 pb-8">
+        <div className="pb-8">
           <GymExploreBar />
           <GymListSection />
         </div>

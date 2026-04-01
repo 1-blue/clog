@@ -26,7 +26,7 @@ const HomePage: NextPage = () => {
       {/* 상단 바 */}
       <AppTopBar />
 
-      <div className="mt-4 flex flex-col gap-10 px-6">
+      <div className="mt-4 flex flex-col gap-10">
         {/* 빠른 체크인 (로그인 유저 전용) */}
         <HomeCheckInSection />
 

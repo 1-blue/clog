@@ -35,7 +35,7 @@ const RootLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
       <body className="flex min-h-full flex-col" suppressHydrationWarning>
         <ThemeProvider>
           <QueryProvider>
-            <div className="mx-auto w-full max-w-3xl">{children}</div>
+            <div className="mx-auto w-full max-w-3xl px-2.5">{children}</div>
             <Toaster
               position="top-center"
               toastOptions={{

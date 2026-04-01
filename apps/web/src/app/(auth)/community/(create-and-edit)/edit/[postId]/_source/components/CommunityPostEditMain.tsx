@@ -106,7 +106,7 @@ const CommunityPostEditMain: React.FC<IProps> = ({ postId }) => {
               </div>
             }
           />
-          <div className="mx-auto flex max-w-lg flex-col gap-6 px-4 pt-5">
+          <div className="mx-auto flex max-w-lg flex-col gap-6 pt-5">
             <div data-community-post-field="category">
               <CommunityPostCategoryField />
             </div>

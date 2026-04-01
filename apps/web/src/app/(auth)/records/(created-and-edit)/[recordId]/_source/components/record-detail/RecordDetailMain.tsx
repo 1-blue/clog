@@ -63,7 +63,7 @@ const RecordDetailLoaded = ({ recordId, record }: IContentProps) => {
 
       <RecordDetailHeroCarousel imageUrls={record.imageUrls} />
 
-      <div className="relative z-10 -mt-6 flex flex-col gap-10 px-4">
+      <div className="relative z-10 -mt-6 flex flex-col gap-10">
         <RecordDetailEditEntry
           recordUserId={record.user.id}
           recordId={recordId}
@@ -110,7 +110,7 @@ const RecordDetailMain = ({ recordId }: IProps) => {
 
   if (!record) {
     return (
-      <div className="flex h-60 items-center justify-center px-4">
+      <div className="flex h-60 items-center justify-center">
         <p className="text-sm text-on-surface-variant">
           기록을 찾을 수 없습니다
         </p>

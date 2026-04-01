@@ -20,7 +20,7 @@ const UserProfileBioLine: React.FC<IProps> = ({ user }) => {
   }
 
   return (
-    <div className="px-6">
+    <div>
       {user.bio ? (
         <p className="rounded-sm bg-primary/20 px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap text-on-surface-variant">
           {user.bio}

@@ -52,7 +52,7 @@ const RecordsSelectedDaySection: React.FC<IProps> = ({ records }) => {
   }, [selectedDate]);
 
   return (
-    <section className="flex flex-col gap-3">
+    <section className="flex flex-col gap-4">
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
           <h2 className="min-w-0 flex-1 text-base font-semibold text-on-surface">

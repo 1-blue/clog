@@ -55,7 +55,7 @@ const ImageLightboxDialog: React.FC<IProps> = ({
               onClick={() => onOpenChange(false)}
               aria-hidden
             />
-            <div className="relative z-10 flex min-h-0 flex-1 flex-col items-center justify-center px-4 pointer-events-none">
+            <div className="relative z-10 flex min-h-0 flex-1 flex-col items-center justify-center px-2.5 pointer-events-none">
               <DialogPrimitive.Close
                 render={
                   <Button

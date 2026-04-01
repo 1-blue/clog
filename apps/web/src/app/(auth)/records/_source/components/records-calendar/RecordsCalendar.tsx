@@ -163,7 +163,7 @@ const RecordsCalendar: React.FC<IProps> = ({ records }) => {
         disabled={(date) => date > today}
         startMonth={CALENDAR_START}
         endMonth={today}
-        className="relative mx-auto mt-8 w-full max-w-sm rounded-2xl bg-surface-container p-4"
+        className="relative mx-auto mt-4 w-full max-w-sm rounded-2xl bg-surface-container p-4"
         classNames={{
           month: "relative space-y-1",
           month_grid: "w-full",

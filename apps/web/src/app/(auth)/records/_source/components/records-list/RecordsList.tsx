@@ -34,7 +34,7 @@ const RecordsList: React.FC = () => {
   });
 
   return (
-    <div className="flex flex-col gap-4 px-4 pb-4">
+    <div className="flex flex-col gap-8 pb-4">
       <RecordsCalendar records={records} />
 
       <RecordsSelectedDaySection records={records} />

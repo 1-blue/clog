@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { WebView, type WebViewNavigation } from "react-native-webview";
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 import { WEB_URL } from "../constants";
 
@@ -25,16 +25,88 @@ interface WebViewScreenProps {
 export default function WebViewScreen({ path = "" }: WebViewScreenProps) {
   const webViewRef = useRef<WebView>(null);
   const canGoBackRef = useRef(false);
+  const lastHttpUrlRef = useRef(`${WEB_URL}${path}`);
 
   // 💡 마지막으로 뒤로가기를 누른 시간을 저장할 변수
   const exitAppRef = useRef(0);
 
   const handleNavigationStateChange = (navState: WebViewNavigation) => {
     canGoBackRef.current = navState.canGoBack;
+    if (
+      navState.url.startsWith("http://") ||
+      navState.url.startsWith("https://")
+    ) {
+      lastHttpUrlRef.current = navState.url;
+    }
   };
+
+  const buildWebCallbackUrlFromDeepLink = useCallback((deepLinkUrl: string) => {
+    const u = new URL(deepLinkUrl);
+    if (u.protocol !== "clog:" || u.pathname !== "/auth/callback") return null;
+
+    const code = u.searchParams.get("code");
+    if (!code) return null;
+
+    const next = u.searchParams.get("next") ?? "/";
+    const nextSafe = next.startsWith("/") && !next.startsWith("//") ? next : "/";
+
+    const webCallback = new URL(`${WEB_URL}/auth/callback`);
+    webCallback.searchParams.set("code", code);
+    webCallback.searchParams.set("next", nextSafe);
+    return webCallback.toString();
+  }, []);
+
+  useEffect(() => {
+    const sub = Linking.addEventListener("url", ({ url }) => {
+      const webCallbackUrl = buildWebCallbackUrlFromDeepLink(url);
+      if (!webCallbackUrl) return;
+
+      // WebView 도메인(웹앱)에서 PKCE code 교환 → 쿠키/세션 확정
+      webViewRef.current?.injectJavaScript(
+        `window.location.href = ${JSON.stringify(webCallbackUrl)}; true;`,
+      );
+    });
+
+    return () => sub.remove();
+  }, [buildWebCallbackUrlFromDeepLink]);
 
   const onShouldStartLoadWithRequest = (event: any) => {
     const { url } = event;
+
+    // ✅ Google OAuth는 WebView(User-Agent)에서 차단됨(403 disallowed_useragent)
+    // Supabase authorize URL로 이동하려 할 때 redirect_to를 앱 딥링크로 바꿔서 "외부 브라우저"에서 진행한다.
+    try {
+      if (url.startsWith("https://")) {
+        const u = new URL(url);
+        const isSupabaseAuthorize = u.pathname.endsWith("/auth/v1/authorize");
+        const provider = u.searchParams.get("provider");
+
+        if (isSupabaseAuthorize && provider === "google") {
+          const redirectTo = u.searchParams.get("redirect_to");
+          let next = "/";
+          if (redirectTo) {
+            try {
+              const r = new URL(redirectTo);
+              next = r.searchParams.get("next") ?? "/";
+            } catch {
+              // ignore
+            }
+          }
+          const nextSafe =
+            next.startsWith("/") && !next.startsWith("//") ? next : "/";
+
+          const deepLink = new URL("clog://auth/callback");
+          deepLink.searchParams.set("next", nextSafe);
+          u.searchParams.set("redirect_to", deepLink.toString());
+
+          // 외부 브라우저로 OAuth 진행 (Google 정책 대응)
+          Linking.openURL(u.toString());
+          return false;
+        }
+      }
+    } catch {
+      // URL 파싱 실패 시 기존 로직 진행
+    }
 
     // 1. 일반 웹페이지 (http, https)는 정상적으로 웹뷰에서 엽니다.
     if (
@@ -150,6 +222,8 @@ export default function WebViewScreen({ path = "" }: WebViewScreenProps) {
         originWhitelist={["*"]}
         javaScriptEnabled
         domStorageEnabled
+        pullToRefreshEnabled
+        refreshControlLightMode
       />
     </SafeAreaView>
   );

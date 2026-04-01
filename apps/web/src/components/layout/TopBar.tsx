@@ -28,7 +28,7 @@ const TopBar: React.FC<IProps> = ({
   return (
     <header
       className={cn(
-        "sticky top-0 z-40 flex h-14 items-center gap-2 px-4",
+        "sticky top-0 z-40 -mx-2.5 flex h-14 items-center gap-2 px-2.5",
         transparent
           ? "bg-transparent"
           : "border-b border-outline-variant bg-surface-container/80 backdrop-blur-xl",

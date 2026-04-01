@@ -6,12 +6,16 @@ import { useState } from "react";
 
 import useUserMutations from "#web/hooks/mutations/users/useUserMutations";
 import { uploadWithPresignedUrl } from "#web/libs/upload/presignedUpload";
+import { cn } from "#web/libs/utils";
 
 interface IProps {
   coverImage: string | null;
 }
 
-/** 배너 높이만큼만 보이고, 이미지는 중앙 기준으로 잘라서 표시 */
+/**
+ * 배너 높이만큼만 보이고, 이미지는 중앙 기준으로 잘라서 표시.
+ * 루트 `px-2.5` 안에서도 가로 꽉 차게: `w-screen` + `ml-[calc(50%-50vw)]` (부모 패딩·-margin에 덜 의존)
+ */
 const ProfileEditCoverSection = ({ coverImage }: IProps) => {
   const [busy, setBusy] = useState(false);
   const { updateMeMutation } = useUserMutations();
@@ -43,9 +47,13 @@ const ProfileEditCoverSection = ({ coverImage }: IProps) => {
   const isLoading = busy || updateMeMutation.isPending;
 
   return (
-    <label className="group relative block h-36 w-full cursor-pointer overflow-hidden bg-surface-container-low">
+    <label
+      className={cn(
+        "group relative block h-36 w-screen max-w-[100vw] shrink-0 cursor-pointer overflow-hidden bg-surface-container-low",
+        "ml-[calc(50%-50vw)]",
+      )}
+    >
       {coverImage ? (
-        // eslint-disable-next-line @next/next/no-img-element
         <img
           src={coverImage}
           alt=""

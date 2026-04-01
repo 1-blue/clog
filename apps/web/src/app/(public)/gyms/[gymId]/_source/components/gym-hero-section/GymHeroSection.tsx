@@ -44,7 +44,7 @@ const GymHeroSection: React.FC<IProps> = ({ gym }) => {
   const badge = getBadge(openStatus);
 
   return (
-    <section className="relative -mt-14 h-[min(440px,55vh)] w-full overflow-hidden bg-surface-container-high">
+    <section className="relative -mx-2.5 -mt-14 h-[min(440px,55vh)] w-[calc(100%+1.25rem)] overflow-hidden bg-surface-container-high">
       {thumbnailUrl ? (
         <img
           src={thumbnailUrl}

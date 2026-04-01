@@ -99,7 +99,7 @@ const GymDetailMain: React.FC<IProps> = ({ gymId }) => {
 
       <GymHeroSection gym={gym} />
 
-      <div className="flex flex-col gap-6 px-6 pt-6 pb-4">
+      <div className="flex flex-col gap-6 pt-6 pb-4">
         {myCheckIn && <GymCheckInStatusBanner endsAt={myCheckIn.endsAt} />}
 
         <GymLiveStatsStrip
@@ -116,7 +116,7 @@ const GymDetailMain: React.FC<IProps> = ({ gymId }) => {
         <div className="sticky top-14 z-20 border-b border-outline-variant/10 bg-background/90 backdrop-blur-lg">
           <TabsList
             variant="line"
-            className="scrollbar-hide mx-0 h-auto w-full min-w-0 justify-start gap-2 overflow-x-auto overflow-y-visible rounded-none border-0 bg-transparent px-4 pt-2 pb-1 shadow-none sm:gap-4 sm:px-6"
+            className="scrollbar-hide mx-0 h-auto w-full min-w-0 justify-start gap-2 overflow-x-auto overflow-y-visible rounded-none border-0 bg-transparent shadow-none sm:gap-4"
           >
             <TabsTrigger value="info" className={tabTriggerClass}>
               정보
@@ -130,12 +130,15 @@ const GymDetailMain: React.FC<IProps> = ({ gymId }) => {
           </TabsList>
         </div>
 
-        <TabsContent value="info" className="mt-0 flex-none p-0 text-base">
+        <TabsContent value="info" className="mt-0 flex-none p-0 px-2 text-base">
           <GymInfoTab gym={gym} />
         </TabsContent>
 
-        <TabsContent value="reviews" className="mt-0 flex-none p-0 text-base">
-          <div className="px-6 py-4">
+        <TabsContent
+          value="reviews"
+          className="mt-0 flex-none p-0 px-2 text-base"
+        >
+          <div className="pb-4">
             <Suspense fallback={<GymReviewSkeleton />}>
               <GymReviewTab
                 gymId={gymId}
@@ -146,7 +149,10 @@ const GymDetailMain: React.FC<IProps> = ({ gymId }) => {
           </div>
         </TabsContent>
 
-        <TabsContent value="photos" className="mt-0 flex-none p-0 text-base">
+        <TabsContent
+          value="photos"
+          className="mt-0 flex-none p-0 px-2 text-base"
+        >
           <GymPhotoTab images={gym.images} gymName={gym.name} />
         </TabsContent>
       </Tabs>

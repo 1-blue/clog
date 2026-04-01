@@ -20,7 +20,7 @@ const UserProfileStatsGrid = ({
   onFollowingClick,
 }: IProps) => {
   return (
-    <section className="px-6">
+    <section>
       <div className="rounded-xl bg-surface-container-low p-6 ring-1 ring-outline-variant/40">
         <div className="grid grid-cols-4 gap-2">
           <div className="text-center">

@@ -122,7 +122,7 @@ const UserProfileMain = ({ userId }: IProps) => {
           />
         </div>
 
-        <section className="mt-10 px-6">
+        <section className="mt-10">
           <UserProfileActivityHeading />
           <UserProfileHeatmap
             levels={user.activityHeatmap}

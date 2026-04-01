@@ -43,7 +43,7 @@ const AppTopBar: React.FC<IProps> = ({
   return (
     <header
       className={cn(
-        "sticky top-0 z-40 flex h-14 items-center justify-between border-b border-outline-variant/30 px-4 backdrop-blur-xl",
+        "sticky top-0 z-40 -mx-2.5 flex h-14 items-center justify-between border-b border-outline-variant/30 px-2.5 backdrop-blur-xl",
         className,
       )}
     >

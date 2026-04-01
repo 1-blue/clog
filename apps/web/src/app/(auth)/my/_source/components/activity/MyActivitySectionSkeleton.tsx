@@ -1,5 +1,5 @@
 const MyActivitySectionSkeleton = () => (
-  <section className="mt-12 px-6">
+  <section className="mt-12">
     <div className="mb-6 flex justify-around border-b border-outline-variant/20 pb-3">
       {Array.from({ length: 3 }).map((_, i) => (
         <div key={i} className="flex flex-col items-center gap-2">

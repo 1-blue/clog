@@ -21,7 +21,7 @@ const UserProfileActionRow = ({
 }: IProps) => {
   if (isOwnProfile) {
     return (
-      <div className="px-6">
+      <div>
         <Link
           href={ROUTES.MY.PROFILE_EDIT.path}
           className="flex h-12 w-full items-center justify-center rounded-xl border border-primary bg-primary/20 text-base font-semibold text-primary transition-transform hover:bg-primary/40 active:scale-[0.98]"
@@ -33,7 +33,7 @@ const UserProfileActionRow = ({
   }
 
   return (
-    <div className="px-6">
+    <div>
       <FollowButton
         isFollowing={isFollowing}
         isLoading={followPending}
