@@ -19,7 +19,7 @@ const RecordFormSaveBar = ({
 }: IProps) => (
   <div
     className={cn(
-      "fixed right-0 bottom-0 left-0 z-40 border-t border-white/5 bg-surface/95 px-4 pt-4 backdrop-blur-xl max-lg:max-w-none",
+      "fixed right-0 bottom-0 left-0 z-40 border-t border-white/5 bg-surface/95 px-2.5 pt-4 backdrop-blur-xl max-lg:max-w-none",
       "pb-[max(1.25rem,env(safe-area-inset-bottom))]",
       className,
     )}

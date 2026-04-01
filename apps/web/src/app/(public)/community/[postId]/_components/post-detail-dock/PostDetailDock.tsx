@@ -86,8 +86,8 @@ const PostDetailDock = ({
   };
 
   return (
-    <footer className="fixed right-0 bottom-0 left-0 z-50 border-t border-white/10 bg-background/95 backdrop-blur-2xl">
-      <div className="mx-auto flex max-w-3xl flex-col gap-3 px-6 py-4">
+    <footer className="fixed right-0 bottom-0 left-0 z-50 border-t border-white/10 bg-background/95 px-2.5 backdrop-blur-2xl">
+      <div className="mx-auto flex max-w-3xl flex-col gap-3 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button

@@ -39,7 +39,7 @@ const SettingsMain = () => {
           </div>
         }
       />
-      <div className="mx-auto flex max-w-lg flex-col gap-8 px-4 pt-8">
+      <div className="mx-auto flex max-w-lg flex-col gap-8 pt-8">
         <SettingsProfileSummaryCard me={me} />
         <SettingsAccountSection />
         <SettingsAppSection me={me} />

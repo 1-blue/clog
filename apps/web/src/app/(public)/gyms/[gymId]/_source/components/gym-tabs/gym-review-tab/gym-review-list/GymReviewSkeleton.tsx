@@ -1,6 +1,6 @@
 const GymReviewSkeleton: React.FC = () => {
   return (
-    <div className="mt-6 px-4">
+    <div className="mt-6">
       <div className="h-5 w-12 animate-pulse rounded bg-surface-container-low" />
       <div className="mt-3 space-y-3">
         {Array.from({ length: 3 }).map((_, i) => (

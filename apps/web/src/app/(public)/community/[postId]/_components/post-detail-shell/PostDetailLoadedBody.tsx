@@ -24,7 +24,7 @@ const PostDetailLoadedBody: React.FC<IProps> = ({
 }) => {
   return (
     <>
-      <div className="mx-auto flex max-w-3xl flex-col gap-6 px-6">
+      <div className="mx-auto flex max-w-3xl flex-col gap-6">
         <PostArticlePanel post={post} />
 
         <hr className="border-outline-variant" />

@@ -69,7 +69,7 @@ const GymReviewMain = ({ gymId }: IProps) => {
         <div className="min-h-svh bg-background pb-[calc(4.5rem+max(1.25rem,env(safe-area-inset-bottom)))]">
           <GymReviewTopBar title="리뷰 작성" />
 
-          <div className="mx-auto max-w-lg space-y-8 px-4 pt-5">
+          <div className="mx-auto max-w-lg space-y-8 pt-5">
             <GymReviewGymHeader gym={gym} />
             <GymReviewRatingSection />
             <GymReviewFeatureChips />

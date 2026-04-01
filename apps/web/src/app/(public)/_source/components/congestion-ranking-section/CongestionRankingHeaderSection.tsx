@@ -1,9 +1,8 @@
-import { format } from "date-fns";
-import { ko } from "date-fns/locale";
-
-const timeLabel = format(new Date(), "HH:mm", { locale: ko });
+import { formatKoreaTimeHm } from "#web/libs/date/korea";
 
 const CongestionRankingHeaderSection: React.FC = () => {
+  const timeLabel = formatKoreaTimeHm(new Date());
+
   return (
     <div className="flex items-end justify-between">
       <div>
@@ -14,7 +13,7 @@ const CongestionRankingHeaderSection: React.FC = () => {
           지금 바로 운동하기 좋은 곳은?
         </p>
       </div>
-      <span className="mb-1 text-xs text-outline">{timeLabel} 기준</span>
+      <span className="text-xs text-outline">{timeLabel} 기준</span>
     </div>
   );
 };

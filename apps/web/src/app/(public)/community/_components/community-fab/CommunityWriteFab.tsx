@@ -15,7 +15,7 @@ const CommunityWriteFab = () => {
     <Link
       href={ROUTES.COMMUNITY.CREATE.path}
       className={cn(
-        "fixed right-6 z-30 flex size-14 items-center justify-center rounded-full bg-primary/20 text-primary backdrop-blur-md transition-transform hover:scale-105 hover:bg-primary/30 active:scale-90",
+        "fixed right-2.5 z-30 flex size-14 items-center justify-center rounded-full bg-primary/20 text-primary backdrop-blur-md transition-transform hover:scale-105 hover:bg-primary/30 active:scale-90",
         hasActiveCheckIn
           ? "bottom-[calc(5rem+env(safe-area-inset-bottom)+2.5rem)]"
           : "bottom-[calc(5rem+env(safe-area-inset-bottom))]",

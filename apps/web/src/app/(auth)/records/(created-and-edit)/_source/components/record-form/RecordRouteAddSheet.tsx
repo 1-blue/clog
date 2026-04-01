@@ -63,7 +63,7 @@ const RecordRouteAddSheet: React.FC<IProps> = ({
         className="max-h-dvh overflow-y-auto rounded-t-3xl border-t border-outline-variant bg-surface-container"
         showCloseButton
       >
-        <div className="flex flex-col gap-4 px-5 pb-6">
+        <div className="flex flex-col gap-4 px-2.5 pb-6">
           <SheetHeader className="px-0 pb-0 text-left">
             <SheetTitle className="text-on-surface">난이도 추가</SheetTitle>
             <p className="text-sm font-normal text-on-surface-variant">

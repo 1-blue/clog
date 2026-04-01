@@ -1,7 +1,7 @@
 import { Skeleton } from "#web/components/ui/skeleton";
 
 const RecordsListSkeleton = () => (
-  <div className="px-4">
+  <div>
     {/* 캘린더 스켈레톤 — 실제 Calendar className과 동일하게 맞춤 */}
     <div className="mx-auto mt-8 w-full max-w-sm rounded-2xl bg-surface-container p-4">
       {/* 헤더: [<] [xxxx년 xx월] [>] */}

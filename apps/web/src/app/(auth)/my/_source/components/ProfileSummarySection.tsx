@@ -58,7 +58,7 @@ const ProfileSummarySection = () => {
       />
 
       {/* 커버 이미지 (프로필과 겹치는 영역은 아래 프로필 섹션 z-20이 클릭을 가져감) */}
-      <section className="relative z-0 h-56 w-full overflow-hidden">
+      <section className="relative z-0 -mx-2.5 h-56 w-[calc(100%+1.25rem)] overflow-hidden">
         <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-primary-container/50 via-primary/35 to-secondary-container/45 opacity-90" />
         {me.coverImage ? (
           <>
@@ -79,7 +79,7 @@ const ProfileSummarySection = () => {
       </section>
 
       {/* 프로필 영역 */}
-      <section className="relative z-20 -mt-16 flex flex-col items-center px-6">
+      <section className="relative z-20 -mt-16 flex flex-col items-center">
         {/* 아바타 */}
         <div className="relative">
           {me.profileImage ? (

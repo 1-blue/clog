@@ -86,7 +86,7 @@ const GymReviewEditMain = ({ gymId, reviewId }: IProps) => {
         <div className="min-h-svh bg-background pb-[calc(4.5rem+max(1.25rem,env(safe-area-inset-bottom)))]">
           <GymReviewTopBar title="리뷰 수정" />
 
-          <div className="mx-auto flex max-w-lg flex-col gap-6 px-4 pt-5">
+          <div className="mx-auto flex max-w-lg flex-col gap-6 pt-5">
             <GymReviewGymHeader gym={gym} />
             <GymReviewRatingSection />
             <GymReviewFeatureChips />

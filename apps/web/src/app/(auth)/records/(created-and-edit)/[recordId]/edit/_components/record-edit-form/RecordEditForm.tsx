@@ -134,7 +134,7 @@ const RecordEditForm: React.FC<IProps> = ({ recordId, record }) => {
           noValidate
           onSubmit={handleSubmit(onSubmit)}
         >
-          <div className="mx-auto flex w-full max-w-lg flex-col gap-8 px-4 pt-4 pb-[calc(6rem+max(1.25rem,env(safe-area-inset-bottom)))]">
+          <div className="mx-auto flex w-full max-w-lg flex-col gap-8 pt-4 pb-[calc(6rem+max(1.25rem,env(safe-area-inset-bottom)))]">
             <RecordGallerySection />
             <RecordVisitDateField />
             <RecordGymReadonlyCard

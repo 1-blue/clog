@@ -25,8 +25,8 @@ const MyActivitySection = () => {
   const [tab, setTab] = useState<TTabId>("records");
 
   return (
-    <section className="mt-12 px-6">
-      <div className="mb-6 flex items-center justify-around border-b border-outline-variant/20">
+    <section className="mt-6">
+      <div className="mb-4 flex items-center justify-around border-b border-outline-variant/20">
         {TABS.map((t) => {
           const Icon = t.icon;
           const isActive = tab === t.id;

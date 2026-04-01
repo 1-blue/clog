@@ -1,7 +1,7 @@
 const CongestionRankingSkeleton: React.FC = () => {
   return (
-    <section>
-      <div className="mb-6 flex justify-between">
+    <section className="flex flex-col gap-4">
+      <div className="flex justify-between">
         <div className="space-y-2">
           <div className="h-8 w-48 animate-pulse rounded bg-surface-container-high" />
           <div className="h-3 w-40 animate-pulse rounded bg-surface-container-high" />

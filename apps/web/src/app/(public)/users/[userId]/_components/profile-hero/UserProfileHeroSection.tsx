@@ -19,7 +19,7 @@ const UserProfileHeroSection: React.FC<IProps> = ({ user }) => {
 
   return (
     <section className="relative">
-      <div className="relative z-0 h-48 w-full overflow-hidden bg-surface-container-low">
+      <div className="relative z-0 -mx-2.5 h-48 w-[calc(100%+1.25rem)] overflow-hidden bg-surface-container-low">
         {user.coverImage ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -39,7 +39,7 @@ const UserProfileHeroSection: React.FC<IProps> = ({ user }) => {
         <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-primary/35 to-surface-container-low" />
       </div>
 
-      <div className="relative z-20 -mt-20 flex flex-col items-center px-6">
+      <div className="relative z-20 -mt-20 flex flex-col items-center">
         <div className="relative">
           {user.profileImage ? (
             <button
