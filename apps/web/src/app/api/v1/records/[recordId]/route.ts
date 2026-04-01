@@ -2,6 +2,7 @@ import { prisma } from "@clog/db";
 import { updateSessionSchema } from "@clog/utils";
 
 import { errorResponse, json, jsonWithToast, requireAuth } from "#web/libs/api";
+import { recomputeUserMaxDifficulty } from "#web/libs/user/updateUserMaxDifficulty";
 
 /** 기록 상세 */
 export const GET = async (
@@ -82,6 +83,10 @@ export const PATCH = async (
       include: { routes: true },
     });
 
+    if (data.routes !== undefined) {
+      await recomputeUserMaxDifficulty(userId!);
+    }
+
     return jsonWithToast(session, "기록이 수정되었습니다.");
   } catch {
     return errorResponse("기록 수정에 실패했습니다.");
@@ -106,6 +111,8 @@ export const DELETE = async (
       return errorResponse("권한이 없습니다.", 403);
 
     await prisma.climbingSession.delete({ where: { id: recordId } });
+
+    await recomputeUserMaxDifficulty(userId!);
 
     return jsonWithToast(null, "기록이 삭제되었습니다.");
   } catch {

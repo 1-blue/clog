@@ -26,6 +26,18 @@ const DIFF_ORDER: Difficulty[] = [
 
 const diffIdx = (d: Difficulty) => DIFF_ORDER.indexOf(d);
 
+/** 서버·클라이언트 공통: a가 b보다 난이도가 높은지 */
+export const isDifficultyStrictlyHigher = (
+  a: Difficulty,
+  b: Difficulty | null | undefined,
+): boolean => {
+  if (b == null) return true;
+  const ia = diffIdx(a);
+  const ib = diffIdx(b as Difficulty);
+  if (ia < 0 || ib < 0) return ia > ib;
+  return ia > ib;
+};
+
 export const maxDifficultyLabel = (
   routes: { difficulty: string }[],
 ): string => {

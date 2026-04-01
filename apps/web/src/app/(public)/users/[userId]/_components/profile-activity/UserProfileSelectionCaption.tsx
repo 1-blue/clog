@@ -1,6 +1,6 @@
 "use client";
 
-import { formatYmdLongKorean } from "./user-profile-utils";
+import { formatYmdLongKorean } from "../profile-heatmap/heatmap-utils";
 
 interface IProps {
   selectedYmd: string | null;

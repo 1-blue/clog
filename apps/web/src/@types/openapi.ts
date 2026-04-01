@@ -424,6 +424,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/users/{userId}/followers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 특정 유저 팔로워 목록 */
+        get: operations["getUserFollowers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/{userId}/following": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 특정 유저 팔로잉 목록 */
+        get: operations["getUserFollowing"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/users/{userId}/public-records": {
         parameters: {
             query?: never;
@@ -1109,10 +1143,12 @@ export interface components {
             _count: components["schemas"]["UserCounts"];
             visitCount: number;
             sendCount: number;
-            /** @description 최근 20주×7일 활동 강도 (0~4) */
+            /** @description 2026-01-01 이후 ~ 오늘, 월요일 시작 주 그리드 활동 강도 (0~4) */
             activityHeatmap: number[];
             /** @description 각 히트맵 셀 날짜 (yyyy-MM-dd), activityHeatmap과 동일 순서 */
             activityHeatmapDays: string[];
+            /** @description 2026-01-01 ~ 오늘 사이 공개 세션 개수 */
+            activityHeatmapSessionCount: number;
             followers?: {
                 /** Format: uuid */
                 id: string;
@@ -2119,6 +2155,60 @@ export interface operations {
                         payload: {
                             following: boolean;
                         };
+                    };
+                };
+            };
+        };
+    };
+    getUserFollowers: {
+        parameters: {
+            query?: {
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payload: components["schemas"]["PaginatedFollowUser"];
+                    };
+                };
+            };
+        };
+    };
+    getUserFollowing: {
+        parameters: {
+            query?: {
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payload: components["schemas"]["PaginatedFollowUser"];
                     };
                 };
             };

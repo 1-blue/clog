@@ -33,9 +33,7 @@ const ProfileSummarySection = () => {
       {/* 헤더 */}
       <AppTopBar
         left={
-          <span className="text-2xl font-extrabold tracking-tighter text-primary uppercase">
-            내 정보
-          </span>
+          <span className="text-lg font-bold text-on-surface">내 정보</span>
         }
         right={
           <div className="flex items-center gap-4">
@@ -196,6 +194,7 @@ const ProfileSummarySection = () => {
       </section>
 
       <FollowListSheet
+        userId={me.id}
         type={followSheet}
         onClose={() => setFollowSheet(null)}
       />

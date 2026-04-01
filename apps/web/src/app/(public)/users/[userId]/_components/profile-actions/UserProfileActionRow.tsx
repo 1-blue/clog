@@ -23,8 +23,8 @@ const UserProfileActionRow = ({
     return (
       <div className="px-6">
         <Link
-          href={ROUTES.MY.SETTINGS.path}
-          className="flex h-12 w-full items-center justify-center rounded-xl bg-gradient-to-b from-primary to-primary-container font-bold text-on-primary shadow-lg transition-transform active:scale-95"
+          href={ROUTES.MY.PROFILE_EDIT.path}
+          className="flex h-12 w-full items-center justify-center rounded-xl border border-primary bg-primary/20 text-base font-semibold text-primary transition-transform hover:bg-primary/40 active:scale-[0.98]"
         >
           프로필 편집
         </Link>
@@ -42,7 +42,7 @@ const UserProfileActionRow = ({
           "h-12 w-full rounded-xl font-semibold",
           isFollowing
             ? "border border-outline-variant/40 bg-surface-container-low text-on-surface-variant hover:bg-surface-container"
-            : "border-0 bg-primary text-on-primary shadow-md hover:bg-primary/90",
+            : "border-2 border-primary bg-primary/30 text-primary hover:bg-primary/40",
         )}
       />
     </div>

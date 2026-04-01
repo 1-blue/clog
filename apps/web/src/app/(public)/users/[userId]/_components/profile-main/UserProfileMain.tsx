@@ -1,21 +1,23 @@
 "use client";
 
-import { ArrowLeft, MoreVertical } from "lucide-react";
+import { ArrowLeft, Share2 } from "lucide-react";
 import { useCallback, useState } from "react";
+import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 import { openapi } from "#web/apis/openapi";
+import FollowListSheet from "#web/app/(auth)/my/_source/components/FollowListSheet";
 import AppTopBar from "#web/components/layout/AppTopBar";
 import useUserMutations from "#web/hooks/mutations/users/useUserMutations";
 
-import UserProfileActionRow from "./UserProfileActionRow";
-import UserProfileActivityHeading from "./UserProfileActivityHeading";
-import UserProfileBioLine from "./UserProfileBioLine";
-import UserProfileHeatmap from "./UserProfileHeatmap";
-import UserProfileHeroSection from "./UserProfileHeroSection";
-import UserProfileRecordsSection from "./UserProfileRecordsSection";
-import UserProfileSelectionCaption from "./UserProfileSelectionCaption";
-import UserProfileStatsGrid from "./UserProfileStatsGrid";
+import UserProfileActionRow from "../profile-actions/UserProfileActionRow";
+import UserProfileActivityHeading from "../profile-activity/UserProfileActivityHeading";
+import UserProfileBioLine from "../profile-bio/UserProfileBioLine";
+import UserProfileHeatmap from "../profile-heatmap/UserProfileHeatmap";
+import UserProfileHeroSection from "../profile-hero/UserProfileHeroSection";
+import UserProfileRecordsSection from "../profile-records/UserProfileRecordsSection";
+import UserProfileSelectionCaption from "../profile-activity/UserProfileSelectionCaption";
+import UserProfileStatsGrid from "../profile-stats/UserProfileStatsGrid";
 
 interface IProps {
   userId: string;
@@ -40,10 +42,31 @@ const UserProfileMain = ({ userId }: IProps) => {
   const { toggleFollowMutation } = useUserMutations();
 
   const [selectedYmd, setSelectedYmd] = useState<string | null>(null);
+  const [followSheet, setFollowSheet] = useState<
+    "followers" | "following" | null
+  >(null);
 
   const onToggleYmd = useCallback((ymd: string) => {
     setSelectedYmd((prev) => (prev === ymd ? null : ymd));
   }, []);
+
+  const shareProfile = async () => {
+    try {
+      const url =
+        typeof window !== "undefined" ? window.location.href : "";
+      if (navigator.share) {
+        await navigator.share({
+          title: `${user.nickname} · 프로필`,
+          url,
+        });
+      } else {
+        await navigator.clipboard.writeText(url);
+        toast.message("프로필 링크를 복사했어요");
+      }
+    } catch {
+      /* 사용자 취소 등 */
+    }
+  };
 
   return (
     <div className="pb-24">
@@ -58,16 +81,19 @@ const UserProfileMain = ({ userId }: IProps) => {
             >
               <ArrowLeft className="size-5" strokeWidth={2} />
             </button>
-            <span className="text-lg font-semibold text-on-surface">프로필</span>
+            <span className="text-lg font-semibold text-on-surface">
+              프로필
+            </span>
           </div>
         }
         right={
           <button
             type="button"
-            className="flex size-9 items-center justify-center rounded-full text-on-surface hover:bg-surface-container-high"
-            aria-label="메뉴"
+            onClick={() => void shareProfile()}
+            className="flex size-9 items-center justify-center rounded-full text-primary hover:bg-surface-container-high"
+            aria-label="공유"
           >
-            <MoreVertical className="size-5" strokeWidth={2} />
+            <Share2 className="size-5" strokeWidth={2} />
           </button>
         }
       />
@@ -91,6 +117,8 @@ const UserProfileMain = ({ userId }: IProps) => {
             sendCount={user.sendCount}
             followerCount={user._count.followers}
             followingCount={user._count.following}
+            onFollowersClick={() => setFollowSheet("followers")}
+            onFollowingClick={() => setFollowSheet("following")}
           />
         </div>
 
@@ -101,6 +129,7 @@ const UserProfileMain = ({ userId }: IProps) => {
             dayKeys={user.activityHeatmapDays}
             selectedYmd={selectedYmd}
             onToggleYmd={onToggleYmd}
+            sessionCountInRange={user.activityHeatmapSessionCount}
           />
           <div className="mt-4">
             <UserProfileSelectionCaption selectedYmd={selectedYmd} />
@@ -109,6 +138,12 @@ const UserProfileMain = ({ userId }: IProps) => {
 
         <UserProfileRecordsSection userId={userId} selectedYmd={selectedYmd} />
       </main>
+
+      <FollowListSheet
+        userId={userId}
+        type={followSheet}
+        onClose={() => setFollowSheet(null)}
+      />
     </div>
   );
 };

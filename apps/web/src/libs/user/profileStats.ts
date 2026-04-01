@@ -1,8 +1,19 @@
-import { addDays, format, startOfDay, subDays } from "date-fns";
+import {
+  eachDayOfInterval,
+  endOfWeek,
+  format,
+  isAfter,
+  isBefore,
+  startOfDay,
+  startOfWeek,
+} from "date-fns";
 
 import { prisma } from "@clog/db";
 
 export type ProfileStatsScope = "owner" | "public";
+
+/** 히트맵 집계 시작일 (로컬 자정 기준 2026-01-01) */
+const HEATMAP_START = startOfDay(new Date(2026, 0, 1));
 
 function sessionWhereForScope(
   userId: string,
@@ -47,26 +58,41 @@ export async function getUserProfileStats(
   return { visitCount, sendCount };
 }
 
+export type TActivityHeatmapResult = {
+  levels: number[];
+  dayKeys: string[];
+  /** HEATMAP_START ~ 오늘 사이 공개 세션 총 개수 */
+  publicSessionCountInRange: number;
+};
+
 /**
- * 최근 N주 × 7일 히트맵 (컬럼 우선: 각 주의 월~일)
- * levels 0~4 — 공개 세션만 집계, dayKeys는 각 셀의 yyyy-MM-dd
+ * 2026-01-01 ~ 오늘, 월요일 시작 주 단위 그리드 (열=주, 행=월~일).
+ * levels 0~4 — 공개 세션만 집계, dayKeys는 각 셀 yyyy-MM-dd
  */
 export async function getUserActivityHeatmap(
   userId: string,
-  weeks = 20,
-): Promise<{ levels: number[]; dayKeys: string[] }> {
-  const totalDays = weeks * 7;
-  const end = startOfDay(new Date());
-  const start = subDays(end, totalDays - 1);
+): Promise<TActivityHeatmapResult> {
+  const today = startOfDay(new Date());
+
+  if (isBefore(today, HEATMAP_START)) {
+    return { levels: [], dayKeys: [], publicSessionCountInRange: 0 };
+  }
+
+  const gridStart = startOfWeek(HEATMAP_START, { weekStartsOn: 1 });
+  const gridEnd = endOfWeek(today, { weekStartsOn: 1 });
+
+  const dayList = eachDayOfInterval({ start: gridStart, end: gridEnd });
 
   const sessions = await prisma.climbingSession.findMany({
     where: {
       userId,
       isPublic: true,
-      date: { gte: start, lte: end },
+      date: { gte: HEATMAP_START, lte: today },
     },
     select: { date: true },
   });
+
+  const publicSessionCountInRange = sessions.length;
 
   const countByDay = new Map<string, number>();
   for (const s of sessions) {
@@ -76,15 +102,20 @@ export async function getUserActivityHeatmap(
 
   const levels: number[] = [];
   const dayKeys: string[] = [];
-  for (let col = 0; col < weeks; col++) {
-    for (let row = 0; row < 7; row++) {
-      const day = addDays(start, col * 7 + row);
-      const key = format(day, "yyyy-MM-dd");
-      dayKeys.push(key);
-      const n = countByDay.get(key) ?? 0;
-      const level = n === 0 ? 0 : n === 1 ? 1 : n <= 2 ? 2 : n <= 4 ? 3 : 4;
-      levels.push(level);
+
+  for (const day of dayList) {
+    const key = format(day, "yyyy-MM-dd");
+    dayKeys.push(key);
+
+    if (isBefore(day, HEATMAP_START) || isAfter(day, today)) {
+      levels.push(0);
+      continue;
     }
+
+    const n = countByDay.get(key) ?? 0;
+    const level = n === 0 ? 0 : n === 1 ? 1 : n <= 2 ? 2 : n <= 4 ? 3 : 4;
+    levels.push(level);
   }
-  return { levels, dayKeys };
+
+  return { levels, dayKeys, publicSessionCountInRange };
 }

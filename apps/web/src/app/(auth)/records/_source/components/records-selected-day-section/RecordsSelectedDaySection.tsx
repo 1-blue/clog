@@ -84,7 +84,7 @@ const RecordsSelectedDaySection: React.FC<IProps> = ({ records }) => {
           description="클라이밍을 기록해 보세요."
         />
       ) : (
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           {selectedDayRecords.map((record) => (
             <RecordDayCard key={record.id} record={record} />
           ))}

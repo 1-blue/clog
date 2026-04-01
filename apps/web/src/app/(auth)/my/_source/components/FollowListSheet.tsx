@@ -15,16 +15,24 @@ import {
 import { ROUTES } from "#web/constants";
 
 interface IProps {
+  userId: string;
   type: "followers" | "following" | null;
   onClose: () => void;
 }
 
-const FollowListSheet: React.FC<IProps> = ({ type, onClose }) => {
+const FollowListSheet: React.FC<IProps> = ({ userId, type, onClose }) => {
   const followersQuery = useInfiniteQuery({
-    queryKey: ["get", "/api/v1/users/me/followers"],
+    queryKey: [
+      "get",
+      "/api/v1/users/{userId}/followers",
+      { userId },
+    ],
     queryFn: async ({ pageParam }) => {
-      const { data } = await fetchClient.GET("/api/v1/users/me/followers", {
-        params: { query: { cursor: pageParam, limit: 20 } },
+      const { data } = await fetchClient.GET("/api/v1/users/{userId}/followers", {
+        params: {
+          path: { userId },
+          query: { cursor: pageParam, limit: 20 },
+        },
       });
       return data!.payload;
     },
@@ -34,10 +42,17 @@ const FollowListSheet: React.FC<IProps> = ({ type, onClose }) => {
   });
 
   const followingQuery = useInfiniteQuery({
-    queryKey: ["get", "/api/v1/users/me/following"],
+    queryKey: [
+      "get",
+      "/api/v1/users/{userId}/following",
+      { userId },
+    ],
     queryFn: async ({ pageParam }) => {
-      const { data } = await fetchClient.GET("/api/v1/users/me/following", {
-        params: { query: { cursor: pageParam, limit: 20 } },
+      const { data } = await fetchClient.GET("/api/v1/users/{userId}/following", {
+        params: {
+          path: { userId },
+          query: { cursor: pageParam, limit: 20 },
+        },
       });
       return data!.payload;
     },
@@ -54,7 +69,7 @@ const FollowListSheet: React.FC<IProps> = ({ type, onClose }) => {
     <Sheet open={type !== null} onOpenChange={(open) => !open && onClose()}>
       <SheetContent
         side="bottom"
-        className="max-h-[80dvh] overflow-y-auto rounded-t-3xl border-t border-outline-variant bg-surface-container"
+        className="max-h-[80dvh] gap-0 overflow-y-auto rounded-t-3xl border-t border-outline-variant bg-surface-container"
         showCloseButton
       >
         <SheetHeader className="text-left">
@@ -82,7 +97,7 @@ const FollowListSheet: React.FC<IProps> = ({ type, onClose }) => {
               hasMore={!!query.hasNextPage}
               isLoading={query.isFetchingNextPage}
             >
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2 px-3">
                 {users.map((user) => (
                   <Link
                     key={user.id}

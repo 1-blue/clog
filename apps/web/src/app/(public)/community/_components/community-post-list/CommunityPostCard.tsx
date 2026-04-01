@@ -8,10 +8,9 @@ import Link from "next/link";
 import {
   categoryToKoreanMap,
   postCategoryMap,
-  type CommunityCategory,
 } from "@clog/utils";
 
-import { components } from "#web/@types/openapi";
+import type { components } from "#web/@types/openapi";
 import { Badge } from "#web/components/ui/badge";
 import { ROUTES } from "#web/constants";
 import { cn } from "#web/libs/utils";
@@ -20,92 +19,39 @@ import { formatCompactCount } from "./formatCompactCount";
 
 type TPost = components["schemas"]["PostListItem"];
 
-type TCommunityPostCardProps =
-  | { post: TPost }
-  | {
-      id: string;
-      title: string;
-      content: string;
-      category: CommunityCategory;
-      authorId: string;
-      authorNickname: string;
-      authorImage: string | null;
-      likeCount: number;
-      commentCount: number;
-      viewCount: number;
-      createdAt: string;
-      imageUrl?: string;
-      isLiked: boolean;
-      isBookmarked: boolean;
-      tags?: string[];
-      bookmarkCount?: number;
-    };
+interface IProps {
+  post: TPost;
+  /** 마이 탭 등에서 API가 likes/bookmarks를 안 줄 때 강제 */
+  forceLiked?: boolean;
+  forceBookmarked?: boolean;
+}
 
-const CommunityPostCard: React.FC<TCommunityPostCardProps> = (props) => {
-  const isPostVariant = "post" in props;
+const CommunityPostCard: React.FC<IProps> = ({
+  post,
+  forceLiked,
+  forceBookmarked,
+}) => {
+  const id = post.id;
+  const category = post.category;
+  const title = post.title;
+  const content = post.content;
+  const createdAt = post.createdAt;
+  const imageUrl = post.imageUrls[0];
 
-  let id: string;
-  let category: CommunityCategory;
-  let title: string;
-  let content: string;
-  let createdAt: string;
-  let imageUrl: string | undefined;
+  const likeCount = post.likeCount;
+  const commentCount = post.commentCount;
+  const viewCount = post.viewCount;
 
-  let likeCount: number;
-  let commentCount: number;
-  let viewCount: number;
+  const isLiked =
+    forceLiked ?? (post.likes?.length ?? 0) > 0;
+  const isBookmarked =
+    forceBookmarked ?? (post.bookmarks?.length ?? 0) > 0;
+  const bookmarkCount = post.bookmarks?.length;
 
-  let isLiked: boolean;
-  let isBookmarked: boolean;
-  let bookmarkCount: number | undefined;
+  const authorNickname = post.author.nickname;
+  const authorImage = post.author.profileImage;
 
-  let authorNickname: string;
-  let authorImage: string | null;
-
-  let tags: string[];
-
-  if (isPostVariant) {
-    const post = props.post;
-    id = post.id;
-    category = post.category;
-    title = post.title;
-    content = post.content;
-    createdAt = post.createdAt;
-    imageUrl = post.imageUrls[0];
-
-    likeCount = post.likeCount;
-    commentCount = post.commentCount;
-    viewCount = post.viewCount;
-
-    isLiked = (post.likes?.length ?? 0) > 0;
-    isBookmarked = (post.bookmarks?.length ?? 0) > 0;
-    bookmarkCount = post.bookmarks?.length;
-
-    authorNickname = post.author.nickname;
-    authorImage = post.author.profileImage;
-
-    tags = post.tags.slice(0, 3);
-  } else {
-    id = props.id;
-    category = props.category;
-    title = props.title;
-    content = props.content;
-    createdAt = props.createdAt;
-    imageUrl = props.imageUrl;
-
-    likeCount = props.likeCount;
-    commentCount = props.commentCount;
-    viewCount = props.viewCount;
-
-    isLiked = props.isLiked;
-    isBookmarked = props.isBookmarked;
-    bookmarkCount = props.bookmarkCount;
-
-    authorNickname = props.authorNickname;
-    authorImage = props.authorImage;
-
-    tags = (props.tags ?? []).slice(0, 3);
-  }
+  const tags = post.tags.slice(0, 3);
 
   const detailHref = ROUTES.COMMUNITY.DETAIL.path(id);
 

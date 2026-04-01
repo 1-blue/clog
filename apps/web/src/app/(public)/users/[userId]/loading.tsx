@@ -1,4 +1,4 @@
-import UserProfileSkeleton from "./_components/user-profile/UserProfileSkeleton";
+import UserProfileSkeleton from "./_components/profile-main/UserProfileSkeleton";
 
 const UserProfileLoading = () => {
   return <UserProfileSkeleton />;

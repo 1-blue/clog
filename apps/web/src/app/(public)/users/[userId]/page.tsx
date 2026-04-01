@@ -7,8 +7,8 @@ import { fetchClient, openapi } from "#web/apis/openapi";
 import { getQueryClient } from "#web/libs/getQueryClient";
 import { getSharedMetadata } from "#web/libs/sharedMetadata";
 
-import UserProfileMain from "./_components/user-profile/UserProfileMain";
-import UserProfileSkeleton from "./_components/user-profile/UserProfileSkeleton";
+import UserProfileMain from "./_components/profile-main/UserProfileMain";
+import UserProfileSkeleton from "./_components/profile-main/UserProfileSkeleton";
 
 export const revalidate = 0;
 

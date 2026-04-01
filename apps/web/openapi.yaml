@@ -969,6 +969,66 @@ paths:
                     properties:
                       following: { type: boolean }
 
+  /api/v1/users/{userId}/followers:
+    get:
+      operationId: getUserFollowers
+      summary: 특정 유저 팔로워 목록
+      tags: [Users]
+      parameters:
+        - {
+            name: userId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
+        - { name: cursor, in: query, schema: { type: string, format: uuid } }
+        - {
+            name: limit,
+            in: query,
+            schema: { type: integer, minimum: 1, maximum: 50, default: 20 },
+          }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    $ref: "#/components/schemas/PaginatedFollowUser"
+
+  /api/v1/users/{userId}/following:
+    get:
+      operationId: getUserFollowing
+      summary: 특정 유저 팔로잉 목록
+      tags: [Users]
+      parameters:
+        - {
+            name: userId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
+        - { name: cursor, in: query, schema: { type: string, format: uuid } }
+        - {
+            name: limit,
+            in: query,
+            schema: { type: integer, minimum: 1, maximum: 50, default: 20 },
+          }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    $ref: "#/components/schemas/PaginatedFollowUser"
+
   /api/v1/users/{userId}/public-records:
     get:
       operationId: getUserPublicRecords
@@ -2008,6 +2068,7 @@ components:
           sendCount,
           activityHeatmap,
           activityHeatmapDays,
+          activityHeatmapSessionCount,
         ]
       properties:
         id: { type: string, format: uuid }
@@ -2026,11 +2087,14 @@ components:
         activityHeatmap:
           type: array
           items: { type: integer, minimum: 0, maximum: 4 }
-          description: "최근 20주×7일 활동 강도 (0~4)"
+          description: "2026-01-01 이후 ~ 오늘, 월요일 시작 주 그리드 활동 강도 (0~4)"
         activityHeatmapDays:
           type: array
           items: { type: string, format: date }
           description: "각 히트맵 셀 날짜 (yyyy-MM-dd), activityHeatmap과 동일 순서"
+        activityHeatmapSessionCount:
+          type: integer
+          description: "2026-01-01 ~ 오늘 사이 공개 세션 개수"
         followers:
           type: array
           items:

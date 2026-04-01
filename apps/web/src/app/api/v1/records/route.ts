@@ -8,6 +8,7 @@ import {
   paginatedJson,
   requireAuth,
 } from "#web/libs/api";
+import { bumpUserMaxDifficultyFromRoutes } from "#web/libs/user/updateUserMaxDifficulty";
 
 /** 기록 목록 (무한스크롤) */
 export const GET = async (request: Request) => {
@@ -93,6 +94,8 @@ export const POST = async (request: Request) => {
         routes: true,
       },
     });
+
+    await bumpUserMaxDifficultyFromRoutes(userId!, session.routes);
 
     return jsonWithToast(session, "기록이 저장되었습니다.", 201);
   } catch {
