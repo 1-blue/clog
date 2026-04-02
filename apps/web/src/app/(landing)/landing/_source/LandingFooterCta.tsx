@@ -3,7 +3,7 @@
 import { motion } from "motion/react";
 import Link from "next/link";
 
-import { buttonVariants } from "#web/components/ui/button";
+import { buttonVariants } from "#web/components/ui/button-variants";
 import { ROUTES } from "#web/constants";
 import { cn } from "#web/libs/utils";
 

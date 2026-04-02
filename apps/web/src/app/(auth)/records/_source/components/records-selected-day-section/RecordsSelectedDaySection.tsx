@@ -10,7 +10,7 @@ import { useSearchParams } from "next/navigation";
 import type { components } from "#web/@types/openapi";
 import EmptyState from "#web/components/shared/EmptyState";
 import { Badge } from "#web/components/ui/badge";
-import { buttonVariants } from "#web/components/ui/button";
+import { buttonVariants } from "#web/components/ui/button-variants";
 import { ROUTES } from "#web/constants";
 import { cn } from "#web/libs/utils";
 

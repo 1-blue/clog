@@ -12,7 +12,7 @@ import {
 } from "@clog/utils";
 
 import { Badge } from "#web/components/ui/badge";
-import { buttonVariants } from "#web/components/ui/button";
+import { buttonVariants } from "#web/components/ui/button-variants";
 import {
   Popover,
   PopoverContent,
