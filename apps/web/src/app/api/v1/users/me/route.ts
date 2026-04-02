@@ -13,6 +13,7 @@ const meInclude = {
   _count: {
     select: { following: true, followers: true, sessions: true },
   },
+  homeGym: { select: { id: true, name: true } },
 } as const;
 
 /** 내 정보 */
@@ -152,6 +153,16 @@ export const PATCH = async (request: Request) => {
       }
     }
 
+    if (data.homeGymId !== undefined && data.homeGymId !== null) {
+      const gym = await prisma.gym.findUnique({
+        where: { id: data.homeGymId },
+        select: { id: true },
+      });
+      if (!gym) {
+        return errorResponse("암장을 찾을 수 없습니다.", 404);
+      }
+    }
+
     const normalized = {
       ...data,
       ...(data.bio !== undefined
@@ -162,6 +173,7 @@ export const PATCH = async (request: Request) => {
     const user = await prisma.user.update({
       where: { id: userId! },
       data: normalized,
+      include: { homeGym: { select: { id: true, name: true } } },
     });
 
     return jsonWithToast(user, "프로필이 수정되었습니다.");

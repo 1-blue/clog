@@ -1,13 +1,11 @@
 "use client";
 
-import { ArrowLeft } from "lucide-react";
 import { FormProvider, type FieldErrors } from "react-hook-form";
 import { useEffect } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { openapi } from "#web/apis/openapi";
-import AppTopBar from "#web/components/layout/AppTopBar";
+import TopBar from "#web/components/layout/TopBar";
 import { ROUTES } from "#web/constants";
 import usePostMutations from "#web/hooks/mutations/posts/usePostMutations";
 import useMe from "#web/hooks/useMe";
@@ -87,24 +85,10 @@ const CommunityPostEditMain: React.FC<IProps> = ({ postId }) => {
     <>
       <FormProvider {...methods}>
         <div className="min-h-svh bg-background pb-[calc(4.5rem+max(1.25rem,env(safe-area-inset-bottom)))]">
-          <AppTopBar
+          <TopBar
             showNotification={false}
             className="bg-background/95"
-            left={
-              <div className="flex min-w-0 flex-1 items-center gap-3">
-                <Link
-                  href={ROUTES.COMMUNITY.DETAIL.path(postId)}
-                  className="flex size-10 shrink-0 items-center justify-center rounded-full text-on-surface hover:bg-surface-container-high"
-                  aria-label="뒤로"
-                >
-                  <ArrowLeft className="size-5" strokeWidth={2} />
-                </Link>
-                <h1 className="min-w-0 flex-1 truncate text-center text-base font-semibold text-on-surface">
-                  게시글 수정
-                </h1>
-                <span className="size-10 shrink-0" aria-hidden />
-              </div>
-            }
+            title="게시글 수정"
           />
           <div className="mx-auto flex max-w-lg flex-col gap-6 pt-5">
             <div data-community-post-field="category">

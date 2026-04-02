@@ -1,6 +1,6 @@
-import NavShell from "#web/components/layout/NavShell";
+import BottomBarShell from "#web/components/layout/BottomBarShell";
 
 const PublicLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
-  return <NavShell>{children}</NavShell>;
+  return <BottomBarShell>{children}</BottomBarShell>;
 };
 export default PublicLayout;

@@ -1,10 +1,9 @@
 "use client";
 
 import { format } from "date-fns";
-import { ArrowLeft } from "lucide-react";
 import { FormProvider, useWatch } from "react-hook-form";
 import { useMemo } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 import { normalizeSessionTimeRange } from "@clog/utils";
 
@@ -25,11 +24,11 @@ import useRecordForm, {
   type TRecordFormData,
 } from "#web/app/(auth)/records/(created-and-edit)/_source/hooks/useRecordForm";
 import { removeRecordCreateDraftForDate } from "#web/app/(auth)/records/(created-and-edit)/_source/utils/record-create-draft-storage";
+import TopBar from "#web/components/layout/TopBar";
+import { ROUTES } from "#web/constants";
 import useRecordMutations from "#web/hooks/mutations/records/useRecordMutations";
-import AppTopBar from "#web/components/layout/AppTopBar";
 
 const RecordNewMain = () => {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const prefilledDateYmd = useMemo(
     () =>
@@ -103,25 +102,10 @@ const RecordNewMain = () => {
   return (
     <FormProvider {...methods}>
       <div className="flex min-h-dvh flex-col bg-background">
-        <AppTopBar
-          className="bg-surface-container/80 border-outline-variant"
+        <TopBar
+          className="border-outline-variant bg-surface-container/80"
           showNotification={false}
-          left={
-            <div className="flex min-w-0 flex-1 items-center gap-2">
-              <button
-                type="button"
-                onClick={() => router.back()}
-                className="flex size-10 shrink-0 items-center justify-center rounded-full text-on-surface hover:bg-surface-container-high"
-                aria-label="뒤로"
-              >
-                <ArrowLeft className="size-5" strokeWidth={2} />
-              </button>
-              <h1 className="min-w-0 flex-1 truncate text-lg font-semibold text-on-surface">
-                기록 추가
-              </h1>
-            </div>
-          }
-          right={<></>}
+          title="기록 추가"
         />
 
         <form
@@ -143,6 +127,7 @@ const RecordNewMain = () => {
             <RecordMemoField />
             <RecordPublicToggleCard />
             <RecordDiscardRow
+              replaceHref={ROUTES.RECORDS.path}
               onBeforeBack={() => {
                 const y = getValues("dateYmd");
                 if (y && /^\d{4}-\d{2}-\d{2}$/.test(y)) {

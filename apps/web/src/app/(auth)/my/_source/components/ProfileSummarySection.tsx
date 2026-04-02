@@ -1,13 +1,22 @@
 "use client";
 
-import { Bell, Check, Instagram, Settings, User, Youtube } from "lucide-react";
+import {
+  BarChart3,
+  Bell,
+  Check,
+  Instagram,
+  MapPin,
+  Settings,
+  User,
+  Youtube,
+} from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 
 import { difficultyToKoreanMap, type Difficulty } from "@clog/utils";
 
 import { openapi } from "#web/apis/openapi";
-import AppTopBar from "#web/components/layout/AppTopBar";
+import TopBar from "#web/components/layout/TopBar";
 import ImageLightboxDialog from "#web/components/shared/image-carousel-lightbox/ImageLightboxDialog";
 import { ROUTES } from "#web/constants";
 import { formatProfileCount } from "#web/libs/format/formatProfileCount";
@@ -33,12 +42,19 @@ const ProfileSummarySection = () => {
   return (
     <div className="w-full">
       {/* 헤더 */}
-      <AppTopBar
+      <TopBar
         left={
           <span className="text-lg font-bold text-on-surface">내 정보</span>
         }
         right={
           <div className="flex items-center gap-4">
+            <Link
+              href={ROUTES.STATISTICS.path}
+              className="text-primary transition-opacity hover:opacity-80 active:scale-95"
+              aria-label="통계"
+            >
+              <BarChart3 className="size-6" strokeWidth={1.75} />
+            </Link>
             <Link
               href={ROUTES.MY.SETTINGS.path}
               className="text-primary transition-opacity hover:opacity-80 active:scale-95"
@@ -128,6 +144,15 @@ const ProfileSummarySection = () => {
                 {difficultyToKoreanMap[me.maxDifficulty as Difficulty]}
               </span>
             </p>
+          ) : null}
+          {me.homeGym ? (
+            <Link
+              href={ROUTES.GYMS.DETAIL.path(me.homeGym.id)}
+              className="mt-3 inline-flex max-w-full items-center gap-1.5 rounded-lg border border-outline-variant/25 bg-surface-container-low px-3 py-2 text-sm font-medium text-primary transition-colors hover:bg-surface-container"
+            >
+              <MapPin className="size-4 shrink-0" strokeWidth={2} />
+              <span className="truncate">홈짐 · {me.homeGym.name}</span>
+            </Link>
           ) : null}
 
           {/* 인스타그램 / 유튜브 */}

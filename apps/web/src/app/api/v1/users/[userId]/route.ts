@@ -21,6 +21,7 @@ export const GET = async (
       where: { id: userId },
       select: {
         id: true,
+        homeGymId: true,
         nickname: true,
         bio: true,
         profileImage: true,
@@ -29,6 +30,7 @@ export const GET = async (
         youtubeUrl: true,
         maxDifficulty: true,
         createdAt: true,
+        homeGym: { select: { id: true, name: true } },
         _count: {
           select: { following: true, followers: true, sessions: true },
         },

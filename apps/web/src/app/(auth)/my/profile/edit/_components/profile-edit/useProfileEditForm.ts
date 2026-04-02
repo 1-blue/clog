@@ -14,6 +14,10 @@ const profileEditSchema = z.object({
     .string()
     .max(50, "인스타그램 아이디는 50자 이하여야 합니다."),
   youtubeUrl: z.string().max(200, "URL은 200자 이하여야 합니다."),
+  /** 홈짐 — null이면 미설정 */
+  homeGymId: z.union([z.string().uuid(), z.null()]),
+  /** 표시용 (검색으로 고른 암장 이름 등) */
+  homeGymName: z.string(),
 });
 
 export type TProfileEditFormData = z.infer<typeof profileEditSchema>;

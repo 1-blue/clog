@@ -14,6 +14,8 @@ export const updateUserSchema = z.object({
   maxDifficulty: difficultyEnum.optional(),
   /** 체크인 후 자동 체크아웃까지 분 (30~720) */
   checkInAutoDurationMinutes: z.number().int().min(30).max(720).optional(),
+  /** 홈짐(암장) ID — null이면 해제 */
+  homeGymId: z.string().uuid().nullable().optional(),
 });
 
 /** GET /users/me/nickname-availability 쿼리 */

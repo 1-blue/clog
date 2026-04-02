@@ -1,8 +1,5 @@
 "use client";
 
-import { ArrowLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
-
 import type { components } from "#web/@types/openapi";
 import { openapi } from "#web/apis/openapi";
 import { getExerciseTimeSummary } from "#web/app/(auth)/records/(created-and-edit)/_source/utils/record-detail-utils";
@@ -16,7 +13,7 @@ import RecordDetailHeroCarousel from "#web/app/(auth)/records/(created-and-edit)
 import RecordDetailRoutesSection from "#web/app/(auth)/records/(created-and-edit)/[recordId]/_source/components/record-detail/records/RecordDetailRoutesSection";
 import RecordDetailSessionCard from "#web/app/(auth)/records/(created-and-edit)/[recordId]/_source/components/record-detail/summary/RecordDetailSessionCard";
 import RecordDetailStatsPanel from "#web/app/(auth)/records/(created-and-edit)/[recordId]/_source/components/record-detail/summary/RecordDetailStatsPanel";
-import AppTopBar from "#web/components/layout/AppTopBar";
+import TopBar from "#web/components/layout/TopBar";
 
 type TRecordDetail = components["schemas"]["RecordDetail"];
 
@@ -26,8 +23,6 @@ interface IContentProps {
 }
 
 const RecordDetailLoaded = ({ recordId, record }: IContentProps) => {
-  const router = useRouter();
-
   const { data: gym } = openapi.useSuspenseQuery(
     "get",
     "/api/v1/gyms/{gymId}",
@@ -40,25 +35,10 @@ const RecordDetailLoaded = ({ recordId, record }: IContentProps) => {
 
   return (
     <div className="flex min-h-dvh flex-col bg-background pb-10">
-      <AppTopBar
+      <TopBar
         className="border-outline-variant bg-surface-container/80"
         showNotification={false}
-        left={
-          <div className="flex min-w-0 flex-1 items-center gap-2">
-            <button
-              type="button"
-              onClick={() => router.back()}
-              className="flex size-10 shrink-0 items-center justify-center rounded-full text-on-surface hover:bg-surface-container-high"
-              aria-label="뒤로"
-            >
-              <ArrowLeft className="size-5" strokeWidth={2} />
-            </button>
-            <h1 className="min-w-0 flex-1 truncate text-lg font-semibold text-on-surface">
-              클라이밍 기록 상세
-            </h1>
-          </div>
-        }
-        right={<></>}
+        title="클라이밍 기록 상세"
       />
 
       <RecordDetailHeroCarousel imageUrls={record.imageUrls} />

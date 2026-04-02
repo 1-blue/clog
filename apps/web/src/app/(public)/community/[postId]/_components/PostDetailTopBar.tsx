@@ -1,14 +1,11 @@
 "use client";
 
-import { ArrowLeft, MoreVertical, Share2 } from "lucide-react";
+import { MoreVertical, Share2 } from "lucide-react";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 
-import AppTopBar from "#web/components/layout/AppTopBar";
+import TopBar from "#web/components/layout/TopBar";
 
 const PostDetailTopBar = () => {
-  const router = useRouter();
-
   const share = async () => {
     try {
       const url = window.location.href;
@@ -27,23 +24,9 @@ const PostDetailTopBar = () => {
   };
 
   return (
-    <AppTopBar
+    <TopBar
       showNotification={false}
-      left={
-        <div className="flex min-w-0 items-center gap-4">
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="shrink-0 text-primary transition-opacity hover:opacity-80 active:scale-95"
-            aria-label="뒤로"
-          >
-            <ArrowLeft className="size-6" strokeWidth={2} aria-hidden />
-          </button>
-          <h1 className="truncate text-lg leading-tight font-semibold tracking-tight text-primary">
-            커뮤니티
-          </h1>
-        </div>
-      }
+      title="커뮤니티"
       right={
         <div className="flex shrink-0 items-center gap-2">
           <button

@@ -390,6 +390,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/users/me/statistics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 내 통계 (기간별) */
+        get: operations["getMyStatistics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/users/{userId}": {
         parameters: {
             query?: never;
@@ -607,6 +624,63 @@ export interface components {
             id: string;
             nickname: string;
             profileImage: string | null;
+        };
+        MeStatisticsPayload: {
+            /** @enum {string} */
+            period: "week" | "month" | "year" | "all";
+            /** @description yyyy-MM-dd */
+            anchor: string;
+            range: {
+                /** Format: date-time */
+                start: string;
+                /** Format: date-time */
+                end: string;
+                label: string;
+            };
+            previousRange: {
+                /** Format: date-time */
+                start: string;
+                /** Format: date-time */
+                end: string;
+            } | null;
+            kpis: {
+                totalSends: number;
+                sendDeltaPercent: number | null;
+                uniqueGyms: number;
+                sessionCount: number;
+                workoutMinutesTotal: number | null;
+            };
+            trend: {
+                peakBucketKey: string | null;
+                buckets: {
+                    key: string;
+                    sends: number;
+                    label: string;
+                }[];
+            };
+            difficultyDistribution: {
+                difficulty: components["schemas"]["Difficulty"];
+                count: number;
+            }[];
+            sendAttempt: {
+                sendCount: number;
+                attemptCount: number;
+                totalRoutes: number;
+                percent: number | null;
+            };
+            topGyms: {
+                /** Format: uuid */
+                gymId: string;
+                name: string;
+                address: string;
+                thumbnailUrl: string | null;
+                visitCount: number;
+            }[];
+            insights: {
+                /** @enum {string} */
+                variant: "primary" | "tertiary";
+                message: string;
+            }[];
         };
         /** @description 암장 이미지 */
         GymImage: {
@@ -1065,6 +1139,7 @@ export interface components {
             id: string;
             /** Format: uuid */
             homeGymId?: string | null;
+            homeGym: components["schemas"]["HomeGymSummary"] | null;
             /** Format: email */
             email: string;
             nickname: string;
@@ -1098,11 +1173,17 @@ export interface components {
             /** Format: date-time */
             endsAt: string;
         };
+        HomeGymSummary: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+        };
         UserMe: {
             /** Format: uuid */
             id: string;
             /** Format: uuid */
             homeGymId?: string | null;
+            homeGym: components["schemas"]["HomeGymSummary"] | null;
             /** Format: email */
             email: string;
             nickname: string;
@@ -1131,6 +1212,9 @@ export interface components {
         UserProfile: {
             /** Format: uuid */
             id: string;
+            /** Format: uuid */
+            homeGymId: string | null;
+            homeGym: components["schemas"]["HomeGymSummary"] | null;
             nickname: string;
             bio: string | null;
             profileImage: string | null;
@@ -1167,6 +1251,11 @@ export interface components {
             maxDifficulty?: components["schemas"]["Difficulty"];
             /** @description 체크인 후 자동 체크아웃까지 분 */
             checkInAutoDurationMinutes?: number;
+            /**
+             * Format: uuid
+             * @description 홈짐 설정 — null이면 해제
+             */
+            homeGymId?: string | null;
         };
         Notification: {
             /** Format: uuid */
@@ -2105,6 +2194,32 @@ export interface operations {
                 content: {
                     "application/json": {
                         payload: components["schemas"]["PaginatedPostListItem"];
+                    };
+                };
+            };
+        };
+    };
+    getMyStatistics: {
+        parameters: {
+            query: {
+                period: "week" | "month" | "year" | "all";
+                /** @description 기준일 yyyy-MM-dd (미입력 시 오늘) */
+                anchor?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payload: components["schemas"]["MeStatisticsPayload"];
                     };
                 };
             };

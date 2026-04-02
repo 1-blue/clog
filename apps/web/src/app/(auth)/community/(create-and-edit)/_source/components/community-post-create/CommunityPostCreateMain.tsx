@@ -1,16 +1,13 @@
 "use client";
 
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
-import { type FieldErrors, FormProvider } from "react-hook-form";
+import { FormProvider, type FieldErrors } from "react-hook-form";
 
-import AppTopBar from "#web/components/layout/AppTopBar";
+import TopBar from "#web/components/layout/TopBar";
 import usePostMutations from "#web/hooks/mutations/posts/usePostMutations";
-import { ROUTES } from "#web/constants";
 
 import useCommunityPostForm, {
-  type TCommunityPostFormData,
   toCreatePostBody,
+  type TCommunityPostFormData,
 } from "../../hooks/useCommunityPostForm";
 import CommunityPostCategoryField from "../community-post-form/CommunityPostCategoryField";
 import CommunityPostContentField from "../community-post-form/CommunityPostContentField";
@@ -51,24 +48,10 @@ const CommunityPostCreateMain: React.FC = () => {
     <>
       <FormProvider {...methods}>
         <div className="min-h-svh bg-background pb-[calc(4.5rem+max(1.25rem,env(safe-area-inset-bottom)))]">
-          <AppTopBar
+          <TopBar
             showNotification={false}
             className="bg-background/95"
-            left={
-              <div className="flex min-w-0 flex-1 items-center gap-3">
-                <Link
-                  href={ROUTES.COMMUNITY.path}
-                  className="flex size-10 shrink-0 items-center justify-center rounded-full text-on-surface hover:bg-surface-container-high"
-                  aria-label="뒤로"
-                >
-                  <ArrowLeft className="size-5" strokeWidth={2} />
-                </Link>
-                <h1 className="min-w-0 flex-1 truncate text-center text-base font-semibold text-on-surface">
-                  커뮤니티 글쓰기
-                </h1>
-                <span className="size-10 shrink-0" aria-hidden />
-              </div>
-            }
+            title="커뮤니티 글쓰기"
           />
           <div className="mx-auto flex max-w-lg flex-col gap-6 pt-5">
             <div data-community-post-field="category">

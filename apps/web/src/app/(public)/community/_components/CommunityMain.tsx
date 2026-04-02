@@ -1,6 +1,6 @@
 "use client";
 
-import AppTopBar from "#web/components/layout/AppTopBar";
+import TopBar from "#web/components/layout/TopBar";
 
 import CommunityCategoryFilterChips from "./community-category-filter-chips/CommunityCategoryFilterChips";
 import CommunityWriteFab from "./community-fab/CommunityWriteFab";
@@ -10,7 +10,7 @@ import PostListSection from "./community-post-list/PostListSection";
 const CommunityMain = () => {
   return (
     <>
-      <AppTopBar
+      <TopBar
         left={
           <span className="text-lg font-bold text-on-surface">커뮤니티</span>
         }

@@ -30,7 +30,7 @@ const NAV_ITEMS: INavItem[] = [
 /** 하단 네비 숨김 경로 */
 const HIDDEN_PATHS = ["/login"];
 
-const BottomNav = () => {
+const BottomBar: React.FC = () => {
   const pathname = usePathname();
 
   if (HIDDEN_PATHS.some((p) => pathname.startsWith(p))) return null;
@@ -69,4 +69,4 @@ const BottomNav = () => {
   );
 };
 
-export default BottomNav;
+export default BottomBar;

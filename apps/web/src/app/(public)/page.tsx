@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import type { NextPage } from "next";
 
-import AppTopBar from "#web/components/layout/AppTopBar";
+import TopBar from "#web/components/layout/TopBar";
 
 import CommunityPreviewSection from "./_source/components/community-preview-section/CommunityPreviewSection";
 import CommunityPreviewSkeleton from "./_source/components/community-preview-section/CommunityPreviewSkeleton";
@@ -24,7 +24,7 @@ const HomePage: NextPage = () => {
   return (
     <div className="pb-8">
       {/* 상단 바 */}
-      <AppTopBar />
+      <TopBar />
 
       <div className="mt-4 flex flex-col gap-10">
         {/* 빠른 체크인 (로그인 유저 전용) */}
