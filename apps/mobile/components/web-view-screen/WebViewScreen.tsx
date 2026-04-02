@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { WebView, type WebViewNavigation } from "react-native-webview";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 import { WEB_URL } from "../../constants";
 import LoadingOverlay from "./LoadingOverlay";
@@ -23,12 +23,17 @@ const IOS_APP_STORE_MAP: Record<string, string> = {
 
 interface IProps {
   path?: string;
+  authCallbackUrl?: string;
 }
 
-const WebViewScreen: React.FC<IProps> = ({ path = "" }) => {
+const WebViewScreen: React.FC<IProps> = ({ path = "", authCallbackUrl }) => {
   const webViewRef = useRef<WebView>(null);
   const canGoBackRef = useRef(false);
   const lastHttpUrlRef = useRef(`${WEB_URL}${path}`);
+
+  const baseUri = `${WEB_URL}${path}`;
+  // 인증 콜백 URL이 있으면 우선 사용, 재시도 시 기본 URL로 복원
+  const [sourceUri, setSourceUri] = useState(authCallbackUrl || baseUri);
 
   // 💡 마지막으로 뒤로가기를 누른 시간을 저장할 변수
   const exitAppRef = useRef(0);
@@ -59,37 +64,6 @@ const WebViewScreen: React.FC<IProps> = ({ path = "" }) => {
       lastHttpUrlRef.current = navState.url;
     }
   };
-
-  const buildWebCallbackUrlFromDeepLink = useCallback((deepLinkUrl: string) => {
-    const u = new URL(deepLinkUrl);
-    if (u.protocol !== "clog:" || u.pathname !== "/auth/callback") return null;
-
-    const code = u.searchParams.get("code");
-    if (!code) return null;
-
-    const next = u.searchParams.get("next") ?? "/";
-    const nextSafe =
-      next.startsWith("/") && !next.startsWith("//") ? next : "/";
-
-    const webCallback = new URL(`${WEB_URL}/auth/callback`);
-    webCallback.searchParams.set("code", code);
-    webCallback.searchParams.set("next", nextSafe);
-    return webCallback.toString();
-  }, []);
-
-  useEffect(() => {
-    const sub = Linking.addEventListener("url", ({ url }) => {
-      const webCallbackUrl = buildWebCallbackUrlFromDeepLink(url);
-      if (!webCallbackUrl) return;
-
-      // WebView 도메인(웹앱)에서 PKCE code 교환 → 쿠키/세션 확정
-      webViewRef.current?.injectJavaScript(
-        `window.location.href = ${JSON.stringify(webCallbackUrl)}; true;`,
-      );
-    });
-
-    return () => sub.remove();
-  }, [buildWebCallbackUrlFromDeepLink]);
 
   const onShouldStartLoadWithRequest = (event: any) => {
     const { url } = event;
@@ -235,6 +209,7 @@ const WebViewScreen: React.FC<IProps> = ({ path = "" }) => {
   const handleRetry = () => {
     setIsOffline(false);
     setIsInitialLoading(true);
+    setSourceUri(baseUri); // 재시도 시 기본 URL로 복원
     hasHiddenSplashRef.current = true; // 재시도 시 스플래시는 다시 띄우지 않음
     setWebviewKey((k) => k + 1);
   };
@@ -247,7 +222,7 @@ const WebViewScreen: React.FC<IProps> = ({ path = "" }) => {
         <WebView
           key={webviewKey}
           ref={webViewRef}
-          source={{ uri: `${WEB_URL}${path}` }}
+          source={{ uri: sourceUri }}
           style={styles.webview}
           onNavigationStateChange={handleNavigationStateChange}
           onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
