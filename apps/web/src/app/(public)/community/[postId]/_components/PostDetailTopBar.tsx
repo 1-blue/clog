@@ -29,7 +29,6 @@ const PostDetailTopBar = () => {
   return (
     <AppTopBar
       showNotification={false}
-      className="fixed top-0 inset-x-0 z-50 mx-0 border-b border-white/5 bg-background/80 backdrop-blur-md"
       left={
         <div className="flex min-w-0 items-center gap-4">
           <button

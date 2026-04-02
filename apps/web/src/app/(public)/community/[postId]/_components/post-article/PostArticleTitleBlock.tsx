@@ -1,13 +1,15 @@
 "use client";
 
+import { MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+
 import {
   categoryToKoreanMap,
   postCategoryMap,
   type CommunityCategory,
 } from "@clog/utils";
-import { MoreVertical, Pencil, Trash2 } from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
 
 import { Badge } from "#web/components/ui/badge";
 import { buttonVariants } from "#web/components/ui/button";
@@ -16,9 +18,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "#web/components/ui/popover";
-import { cn } from "#web/libs/utils";
 import { ROUTES } from "#web/constants";
 import usePostMutations from "#web/hooks/mutations/posts/usePostMutations";
+import { cn } from "#web/libs/utils";
 
 interface IProps {
   postId: string;
@@ -33,6 +35,8 @@ const PostArticleTitleBlock: React.FC<IProps> = ({
   title,
   isOwner,
 }) => {
+  const router = useRouter();
+
   const [open, setOpen] = useState(false);
   const { postDeleteMutation } = usePostMutations();
 
@@ -40,6 +44,7 @@ const PostArticleTitleBlock: React.FC<IProps> = ({
     if (!window.confirm("이 게시글을 삭제할까요?")) return;
     setOpen(false);
     postDeleteMutation.mutate({ params: { path: { postId } } });
+    router.replace(ROUTES.COMMUNITY.path);
   };
 
   return (

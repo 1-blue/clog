@@ -9,6 +9,7 @@ import {
   paginatedJson,
   requireAuth,
 } from "#web/libs/api";
+import { notifySlackPostCreated } from "#web/libs/slack/notifications";
 
 /** 게시글 목록 (무한스크롤) */
 export const GET = async (request: Request) => {
@@ -71,6 +72,22 @@ export const POST = async (request: Request) => {
         tags: data.tags ?? [],
         imageUrls: data.imageUrls ?? [],
       },
+    });
+
+    console.log("🐬 post >> ", post);
+
+    const author = await prisma.user.findUnique({
+      where: { id: userId! },
+      select: { nickname: true },
+    });
+    notifySlackPostCreated({
+      nickname: author?.nickname ?? "(닉네임 없음)",
+      userId: userId!,
+      postId: post.id,
+      category: post.category,
+      title: post.title,
+      content: post.content,
+      tags: post.tags,
     });
 
     return jsonWithToast(post, "게시글이 등록되었습니다.", 201);

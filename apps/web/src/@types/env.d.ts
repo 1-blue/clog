@@ -21,5 +21,14 @@ declare namespace NodeJS {
 
     /** KAKAO MAP APPKEY */
     NEXT_PUBLIC_KAKAO_MAP_APPKEY: string;
+
+    /** Slack Bot User OAuth Token (xoxb-...) — 서버 전용 */
+    SLACK_BOT_TOKEN?: string;
+    /** Slack 채널 ID — 회원가입·탈퇴 알림 */
+    SLACK_CHANNEL_SIGNUP?: string;
+    /** Slack 채널 ID — 커뮤니티 게시글 알림 */
+    SLACK_CHANNEL_COMMUNITY?: string;
+    /** Slack 채널 ID — 체크인·체크아웃 알림 */
+    SLACK_CHANNEL_CHECKIN?: string;
   }
 }

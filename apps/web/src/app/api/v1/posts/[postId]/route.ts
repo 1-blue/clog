@@ -8,6 +8,7 @@ import {
   jsonWithToast,
   requireAuth,
 } from "#web/libs/api";
+import { notifySlackPostUpdated } from "#web/libs/slack/notifications";
 
 /** 게시글 상세 */
 export const GET = async (
@@ -63,6 +64,20 @@ export const PATCH = async (
         ...(data.tags && { tags: data.tags }),
         ...(data.imageUrls && { imageUrls: data.imageUrls }),
       },
+    });
+
+    const editor = await prisma.user.findUnique({
+      where: { id: userId! },
+      select: { nickname: true },
+    });
+    notifySlackPostUpdated({
+      nickname: editor?.nickname ?? "(닉네임 없음)",
+      userId: userId!,
+      postId: post.id,
+      category: post.category,
+      title: post.title,
+      content: post.content,
+      tags: post.tags,
     });
 
     return jsonWithToast(post, "게시글이 수정되었습니다.");

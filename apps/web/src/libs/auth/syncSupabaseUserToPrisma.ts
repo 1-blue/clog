@@ -1,9 +1,17 @@
 import { prisma } from "@clog/db";
 import type { User } from "@supabase/supabase-js";
 
+import { linkedProvidersFromSupabase } from "#web/libs/auth/linkedProvidersFromSupabase";
+import { notifySlackUserSignup } from "#web/libs/slack/notifications";
+
 /** Supabase Auth 유저를 Prisma `User`에 upsert (콜백·/users/me 등에서 공통 사용) */
 export async function syncSupabaseUserToPrisma(user: User) {
   if (!user.email) return;
+
+  const existed = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { id: true },
+  });
 
   const meta = user.user_metadata as Record<string, unknown>;
   const nicknameRaw =
@@ -37,4 +45,13 @@ export async function syncSupabaseUserToPrisma(user: User) {
       ...(avatar ? { profileImage: avatar } : {}),
     },
   });
+
+  if (!existed) {
+    notifySlackUserSignup({
+      nickname,
+      userId: user.id,
+      email: user.email,
+      providers: linkedProvidersFromSupabase(user.identities),
+    });
+  }
 }

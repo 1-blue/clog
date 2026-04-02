@@ -2,23 +2,11 @@ import { prisma } from "@clog/db";
 import { updateUserSchema } from "@clog/utils";
 
 import { errorResponse, json, jsonWithToast, requireAuth } from "#web/libs/api";
+import { linkedProvidersFromSupabase } from "#web/libs/auth/linkedProvidersFromSupabase";
 import { syncSupabaseUserToPrisma } from "#web/libs/auth/syncSupabaseUserToPrisma";
 import { createClient } from "#web/libs/supabase/server";
+import { notifySlackUserWithdrawal } from "#web/libs/slack/notifications";
 import { getUserProfileStats } from "#web/libs/user/profileStats";
-
-type LinkedProvider = "KAKAO" | "GOOGLE";
-
-function linkedProvidersFromSupabase(
-  identities: { provider?: string }[] | null | undefined,
-): LinkedProvider[] {
-  const set = new Set<LinkedProvider>();
-  for (const id of identities ?? []) {
-    const p = id.provider?.toLowerCase();
-    if (p === "kakao") set.add("KAKAO");
-    if (p === "google") set.add("GOOGLE");
-  }
-  return [...set];
-}
 
 const meInclude = {
   _count: {
@@ -102,11 +90,29 @@ export const DELETE = async () => {
   if (error) return error;
 
   try {
+    const supabase = await createClient();
+    const { data: authData } = await supabase.auth.admin.getUserById(userId!);
+    const prismaUser = await prisma.user.findUnique({
+      where: { id: userId! },
+      select: { nickname: true, email: true },
+    });
+    if (!prismaUser) return errorResponse("유저를 찾을 수 없습니다.", 404);
+
+    const providers = linkedProvidersFromSupabase(
+      authData.user?.identities,
+    );
+
     /** Prisma 모델은 onDelete: Cascade이므로 유저 삭제 시 관련 데이터 자동 삭제 */
     await prisma.user.delete({ where: { id: userId! } });
 
+    notifySlackUserWithdrawal({
+      nickname: prismaUser.nickname,
+      userId: userId!,
+      email: prismaUser.email,
+      providers,
+    });
+
     /** Supabase Auth 유저도 삭제 */
-    const supabase = await createClient();
     await supabase.auth.admin.deleteUser(userId!);
 
     return jsonWithToast(null, "회원 탈퇴가 완료되었습니다.");
