@@ -21,7 +21,7 @@ export const notifySlackUserSignup = (input: {
     ...(input.email ? [`📧 이메일: \`${input.email}\``] : []),
     `🔗 로그인: ${formatLinkedProviders(input.providers)}`,
   ];
-  fireSlackNotify(slackChannelIds().signup, lines.join("\n"));
+  fireSlackNotify(slackChannelIds().user, lines.join("\n"));
 };
 
 /** 회원 탈퇴 */
@@ -39,5 +39,5 @@ export const notifySlackUserWithdrawal = (input: {
     ...(input.email ? [`📧 이메일: \`${input.email}\``] : []),
     `🔗 연동: ${formatLinkedProviders(input.providers)}`,
   ];
-  fireSlackNotify(slackChannelIds().signup, lines.join("\n"));
+  fireSlackNotify(slackChannelIds().user, lines.join("\n"));
 };

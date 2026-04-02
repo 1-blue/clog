@@ -1,10 +1,11 @@
 import { prisma } from "@clog/db";
 
 import { errorResponse, json, requireAuth } from "#web/libs/api";
+import { catchApiError } from "#web/libs/api/errorCatch";
 
 /** 팔로우 토글 */
 export const POST = async (
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ userId: string }> },
 ) => {
   const { userId: targetId } = await params;
@@ -31,7 +32,9 @@ export const POST = async (
       });
       return json({ following: true });
     }
-  } catch {
-    return errorResponse("팔로우 처리에 실패했습니다.");
+  } catch (error) {
+    return catchApiError(request, error, "팔로우 처리에 실패했습니다.", {
+      userId: userId!,
+    });
   }
 };

@@ -2,6 +2,7 @@ import { prisma } from "@clog/db";
 import { updateUserSchema } from "@clog/utils";
 
 import { errorResponse, json, jsonWithToast, requireAuth } from "#web/libs/api";
+import { catchApiError } from "#web/libs/api/errorCatch";
 import { linkedProvidersFromSupabase } from "#web/libs/auth/linkedProvidersFromSupabase";
 import { syncSupabaseUserToPrisma } from "#web/libs/auth/syncSupabaseUserToPrisma";
 import { createClient } from "#web/libs/supabase/server";
@@ -15,7 +16,7 @@ const meInclude = {
 } as const;
 
 /** 내 정보 */
-export const GET = async () => {
+export const GET = async (request: Request) => {
   const { userId, error } = await requireAuth();
   if (error) return error;
 
@@ -79,13 +80,15 @@ export const GET = async () => {
           }
         : null,
     });
-  } catch {
-    return errorResponse("유저 정보를 불러올 수 없습니다.");
+  } catch (err) {
+    return catchApiError(request, err, "유저 정보를 불러올 수 없습니다.", {
+      userId: userId!,
+    });
   }
 };
 
 /** 회원 탈퇴 */
-export const DELETE = async () => {
+export const DELETE = async (request: Request) => {
   const { userId, error } = await requireAuth();
   if (error) return error;
 
@@ -116,8 +119,10 @@ export const DELETE = async () => {
     await supabase.auth.admin.deleteUser(userId!);
 
     return jsonWithToast(null, "회원 탈퇴가 완료되었습니다.");
-  } catch {
-    return errorResponse("회원 탈퇴에 실패했습니다.");
+  } catch (err) {
+    return catchApiError(request, err, "회원 탈퇴에 실패했습니다.", {
+      userId: userId!,
+    });
   }
 };
 
@@ -160,7 +165,9 @@ export const PATCH = async (request: Request) => {
     });
 
     return jsonWithToast(user, "프로필이 수정되었습니다.");
-  } catch {
-    return errorResponse("프로필 수정에 실패했습니다.");
+  } catch (err) {
+    return catchApiError(request, err, "프로필 수정에 실패했습니다.", {
+      userId: userId!,
+    });
   }
 };

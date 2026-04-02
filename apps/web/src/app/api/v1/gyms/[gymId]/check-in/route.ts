@@ -1,11 +1,12 @@
 import { prisma } from "@clog/db";
 
 import { errorResponse, jsonWithToast, requireAuth } from "#web/libs/api";
+import { catchApiError } from "#web/libs/api/errorCatch";
 import { notifySlackCheckIn } from "#web/libs/slack/notifications";
 
 /** 암장 체크인 (다른 암장 활성 체크인은 자동 종료) */
 export const POST = async (
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ gymId: string }> },
 ) => {
   const { userId, error } = await requireAuth();
@@ -58,7 +59,9 @@ export const POST = async (
     });
 
     return jsonWithToast({ endsAt: endsAt.toISOString() }, "체크인했어요.");
-  } catch {
-    return errorResponse("체크인에 실패했습니다.");
+  } catch (error) {
+    return catchApiError(request, error, "체크인에 실패했습니다.", {
+      userId: userId!,
+    });
   }
 };

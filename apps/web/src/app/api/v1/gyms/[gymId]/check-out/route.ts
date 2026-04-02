@@ -1,11 +1,12 @@
 import { prisma } from "@clog/db";
 
 import { errorResponse, jsonWithToast, requireAuth } from "#web/libs/api";
+import { catchApiError } from "#web/libs/api/errorCatch";
 import { notifySlackCheckOut } from "#web/libs/slack/notifications";
 
 /** 암장 체크아웃 (수동) */
 export const POST = async (
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ gymId: string }> },
 ) => {
   const { userId, error } = await requireAuth();
@@ -51,7 +52,9 @@ export const POST = async (
     });
 
     return jsonWithToast({ ok: true }, "체크아웃했어요.");
-  } catch {
-    return errorResponse("체크아웃에 실패했습니다.");
+  } catch (error) {
+    return catchApiError(request, error, "체크아웃에 실패했습니다.", {
+      userId: userId!,
+    });
   }
 };

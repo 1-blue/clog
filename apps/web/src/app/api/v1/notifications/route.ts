@@ -7,6 +7,7 @@ import {
   paginatedJson,
   requireAuth,
 } from "#web/libs/api";
+import { catchApiError } from "#web/libs/api/errorCatch";
 
 /** 알림 목록 (무한스크롤) */
 export const GET = async (request: Request) => {
@@ -34,7 +35,9 @@ export const GET = async (request: Request) => {
     const nextCursor = hasMore ? items[items.length - 1]!.id : null;
 
     return paginatedJson(items, nextCursor);
-  } catch {
-    return errorResponse("알림을 불러올 수 없습니다.");
+  } catch (error) {
+    return catchApiError(request, error, "알림을 불러올 수 없습니다.", {
+      userId: userId!,
+    });
   }
 };

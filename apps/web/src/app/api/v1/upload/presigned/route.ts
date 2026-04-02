@@ -3,6 +3,7 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { z } from "zod";
 
 import { errorResponse, json, requireAuth } from "#web/libs/api";
+import { catchApiError } from "#web/libs/api/errorCatch";
 import {
   buildPublicObjectUrl,
   buildUploadObjectKey,
@@ -38,7 +39,7 @@ const bucket = process.env.APP_AWS_S3_BUCKET;
 
 /** S3 Presigned URL 발급 — 객체 키: `{실행환경}/{images|videos}/{원본명}_{timestamp}.{ext}` */
 export const POST = async (request: Request) => {
-  const { error } = await requireAuth();
+  const { userId, error } = await requireAuth();
   if (error) return error;
 
   try {
@@ -77,8 +78,9 @@ export const POST = async (request: Request) => {
       bucket,
       type,
     });
-  } catch (error) {
-    console.error("🐬 error >> ", error);
-    return errorResponse("업로드 URL 생성에 실패했습니다.");
+  } catch (err) {
+    return catchApiError(request, err, "업로드 URL 생성에 실패했습니다.", {
+      userId: userId!,
+    });
   }
 };

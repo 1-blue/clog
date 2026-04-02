@@ -8,6 +8,7 @@ import {
   paginatedJson,
   requireAuth,
 } from "#web/libs/api";
+import { catchApiError } from "#web/libs/api/errorCatch";
 import { normalizeReviewJsonBody } from "#web/libs/reviewBody";
 
 import { gymReviewListInclude } from "./_reviewInclude";
@@ -36,8 +37,8 @@ export const GET = async (
     const nextCursor = hasMore ? items[items.length - 1]!.id : null;
 
     return paginatedJson(items, nextCursor);
-  } catch {
-    return errorResponse("리뷰를 불러올 수 없습니다.");
+  } catch (error) {
+    return catchApiError(request, error, "리뷰를 불러올 수 없습니다.");
   }
 };
 
@@ -89,7 +90,8 @@ export const POST = async (
 
     return jsonWithToast(review, "리뷰가 등록되었습니다.", 201);
   } catch (error) {
-    console.error("🐬 error >> ", error);
-    return errorResponse("리뷰 작성에 실패했습니다.");
+    return catchApiError(request, error, "리뷰 작성에 실패했습니다.", {
+      userId: userId!,
+    });
   }
 };

@@ -8,6 +8,7 @@ import {
   jsonWithToast,
   requireAuth,
 } from "#web/libs/api";
+import { catchApiError } from "#web/libs/api/errorCatch";
 import { notifySlackPostUpdated } from "#web/libs/slack/notifications";
 
 /** 게시글 상세 */
@@ -32,8 +33,10 @@ export const GET = async (
     });
 
     return json(post);
-  } catch {
-    return errorResponse("게시글을 찾을 수 없습니다.", 404);
+  } catch (error) {
+    return catchApiError(_request, error, "게시글을 찾을 수 없습니다.", {
+      status: 404,
+    });
   }
 };
 
@@ -81,8 +84,10 @@ export const PATCH = async (
     });
 
     return jsonWithToast(post, "게시글이 수정되었습니다.");
-  } catch {
-    return errorResponse("게시글 수정에 실패했습니다.");
+  } catch (error) {
+    return catchApiError(request, error, "게시글 수정에 실패했습니다.", {
+      userId: userId!,
+    });
   }
 };
 
@@ -114,7 +119,9 @@ export const DELETE = async (
     await prisma.post.delete({ where: { id: postId } });
 
     return jsonWithToast(null, "게시글이 삭제되었습니다.");
-  } catch {
-    return errorResponse("게시글 삭제에 실패했습니다.");
+  } catch (error) {
+    return catchApiError(_request, error, "게시글 삭제에 실패했습니다.", {
+      userId: userId!,
+    });
   }
 };

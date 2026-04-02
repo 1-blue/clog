@@ -1,10 +1,11 @@
 import { prisma } from "@clog/db";
 
 import { errorResponse, json, requireAuth } from "#web/libs/api";
+import { catchApiError } from "#web/libs/api/errorCatch";
 
 /** 북마크 토글 */
 export const POST = async (
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ postId: string }> },
 ) => {
   const { postId } = await params;
@@ -23,7 +24,9 @@ export const POST = async (
       await prisma.postBookmark.create({ data: { postId, userId: userId! } });
       return json({ bookmarked: true });
     }
-  } catch {
-    return errorResponse("북마크 처리에 실패했습니다.");
+  } catch (error) {
+    return catchApiError(request, error, "북마크 처리에 실패했습니다.", {
+      userId: userId!,
+    });
   }
 };

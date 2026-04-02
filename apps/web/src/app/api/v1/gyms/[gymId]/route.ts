@@ -1,6 +1,7 @@
 import { prisma } from "@clog/db";
 
 import { errorResponse, getAuthUserId, json } from "#web/libs/api";
+import { catchApiError } from "#web/libs/api/errorCatch";
 import {
   countActiveCheckInsForGym,
   monthlyQualifiedCheckInCountForGym,
@@ -50,7 +51,7 @@ export const GET = async (
       monthlyCheckInCount,
       myCheckIn,
     });
-  } catch {
-    return errorResponse("암장 정보를 불러올 수 없습니다.");
+  } catch (error) {
+    return catchApiError(_request, error, "암장 정보를 불러올 수 없습니다.");
   }
 };

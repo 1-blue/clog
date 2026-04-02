@@ -2,6 +2,7 @@ import { prisma } from "@clog/db";
 import { nicknameAvailabilityQuerySchema } from "@clog/utils";
 
 import { errorResponse, getSearchParams, json, requireAuth } from "#web/libs/api";
+import { catchApiError } from "#web/libs/api/errorCatch";
 
 /** 닉네임 사용 가능 여부 (본인 현재 닉네임은 항상 사용 가능으로 간주) */
 export const GET = async (request: Request) => {
@@ -34,7 +35,9 @@ export const GET = async (request: Request) => {
     });
 
     return json({ available: !taken });
-  } catch {
-    return errorResponse("닉네임 확인에 실패했습니다.");
+  } catch (error) {
+    return catchApiError(request, error, "닉네임 확인에 실패했습니다.", {
+      userId: userId!,
+    });
   }
 };

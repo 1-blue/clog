@@ -2,6 +2,7 @@ import { prisma } from "@clog/db";
 import { updateSessionSchema } from "@clog/utils";
 
 import { errorResponse, json, jsonWithToast, requireAuth } from "#web/libs/api";
+import { catchApiError } from "#web/libs/api/errorCatch";
 import { recomputeUserMaxDifficulty } from "#web/libs/user/updateUserMaxDifficulty";
 
 /** 기록 상세 */
@@ -29,8 +30,10 @@ export const GET = async (
     }
 
     return json(session);
-  } catch {
-    return errorResponse("기록을 불러올 수 없습니다.");
+  } catch (error) {
+    return catchApiError(_request, error, "기록을 불러올 수 없습니다.", {
+      userId: userId!,
+    });
   }
 };
 
@@ -88,8 +91,10 @@ export const PATCH = async (
     }
 
     return jsonWithToast(session, "기록이 수정되었습니다.");
-  } catch {
-    return errorResponse("기록 수정에 실패했습니다.");
+  } catch (error) {
+    return catchApiError(request, error, "기록 수정에 실패했습니다.", {
+      userId: userId!,
+    });
   }
 };
 
@@ -115,7 +120,9 @@ export const DELETE = async (
     await recomputeUserMaxDifficulty(userId!);
 
     return jsonWithToast(null, "기록이 삭제되었습니다.");
-  } catch {
-    return errorResponse("기록 삭제에 실패했습니다.");
+  } catch (error) {
+    return catchApiError(_request, error, "기록 삭제에 실패했습니다.", {
+      userId: userId!,
+    });
   }
 };
