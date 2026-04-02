@@ -10,8 +10,9 @@ import {
   User,
   Youtube,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { difficultyToKoreanMap, type Difficulty } from "@clog/utils";
 
@@ -22,19 +23,30 @@ import { ROUTES } from "#web/constants";
 import { formatProfileCount } from "#web/libs/format/formatProfileCount";
 
 import FollowListSheet from "./FollowListSheet";
+import ProfileSummarySkeleton from "./skeleton/ProfileSummarySkeleton";
 
 const ProfileSummarySection = () => {
+  const router = useRouter();
   const { data: me } = openapi.useSuspenseQuery(
     "get",
     "/api/v1/users/me",
     undefined,
     { select: (d) => d.payload },
   );
-
   const [followSheet, setFollowSheet] = useState<
     "followers" | "following" | null
   >(null);
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (me === null) {
+      router.replace(ROUTES.LOGIN.path);
+    }
+  }, [me, router]);
+
+  if (me === null) {
+    return <ProfileSummarySkeleton />;
+  }
 
   const follower = me._count?.followers ?? 0;
   const following = me._count?.following ?? 0;

@@ -12,7 +12,6 @@ import {
   TabsList,
   TabsTrigger,
 } from "#web/components/ui/tabs";
-import { ROUTES } from "#web/constants";
 
 import GymBasicInfoSection from "./gym-basic-info-section/GymBasicInfoSection";
 import GymCheckInBar from "./gym-check-in-bar/GymCheckInBar";

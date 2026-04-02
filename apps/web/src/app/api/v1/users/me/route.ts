@@ -1,7 +1,13 @@
 import { prisma } from "@clog/db";
 import { updateUserSchema } from "@clog/utils";
 
-import { errorResponse, json, jsonWithToast, requireAuth } from "#web/libs/api";
+import {
+  errorResponse,
+  getAuthUserId,
+  json,
+  jsonWithToast,
+  requireAuth,
+} from "#web/libs/api";
 import { catchApiError } from "#web/libs/api/errorCatch";
 import { linkedProvidersFromSupabase } from "#web/libs/auth/linkedProvidersFromSupabase";
 import { syncSupabaseUserToPrisma } from "#web/libs/auth/syncSupabaseUserToPrisma";
@@ -16,14 +22,16 @@ const meInclude = {
   homeGym: { select: { id: true, name: true } },
 } as const;
 
-/** 내 정보 */
+/** 내 정보 — 비로그인 시에도 200 + payload: null (네트워크/401 없이 게스트 처리) */
 export const GET = async (request: Request) => {
-  const { userId, error } = await requireAuth();
-  if (error) return error;
+  const userId = await getAuthUserId();
+  if (!userId) {
+    return json(null);
+  }
 
   try {
     let user = await prisma.user.findUnique({
-      where: { id: userId! },
+      where: { id: userId },
       include: meInclude,
     });
 
@@ -35,7 +43,7 @@ export const GET = async (request: Request) => {
       if (authUser?.id === userId) {
         await syncSupabaseUserToPrisma(authUser);
         user = await prisma.user.findUnique({
-          where: { id: userId! },
+          where: { id: userId },
           include: meInclude,
         });
       }
@@ -83,7 +91,7 @@ export const GET = async (request: Request) => {
     });
   } catch (err) {
     return catchApiError(request, err, "유저 정보를 불러올 수 없습니다.", {
-      userId: userId!,
+      userId,
     });
   }
 };

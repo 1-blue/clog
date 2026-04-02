@@ -746,7 +746,7 @@ paths:
   /api/v1/users/me:
     get:
       operationId: getMe
-      summary: 내 정보
+      summary: 내 정보 (비로그인 시에도 200, payload null)
       tags: [Users]
       responses:
         "200":
@@ -758,7 +758,9 @@ paths:
                 required: [payload]
                 properties:
                   payload:
-                    $ref: "#/components/schemas/UserMe"
+                    nullable: true
+                    allOf:
+                      - $ref: "#/components/schemas/UserMe"
     patch:
       operationId: updateMe
       summary: 내 정보 수정

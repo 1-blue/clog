@@ -6,6 +6,7 @@ import { useMemo, useRef, useState } from "react";
 
 import type { components } from "#web/@types/openapi";
 import usePostDetailMutations from "#web/hooks/mutations/posts/usePostDetailMutations";
+import useMe from "#web/hooks/useMe";
 import { cn } from "#web/libs/utils";
 
 import PostDockUserAvatar from "./PostDockUserAvatar";
@@ -84,6 +85,9 @@ const PostDetailDock = ({
     e.preventDefault();
     submitComment();
   };
+
+  const { me } = useMe();
+  const isLoggedIn = Boolean(me);
 
   return (
     <footer className="fixed right-0 bottom-0 left-0 z-50 border-t border-white/10 bg-background/95 px-2.5 backdrop-blur-2xl">
@@ -165,9 +169,14 @@ const PostDetailDock = ({
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={onCommentKeyDown}
               placeholder={
-                replyParentId ? "답글을 입력하세요" : "댓글을 입력하세요..."
+                isLoggedIn
+                  ? replyParentId
+                    ? "답글을 입력하세요"
+                    : "댓글을 입력하세요..."
+                  : "로그인 후 이용할 수 있습니다."
               }
               className="w-full rounded-full border-none bg-surface-container-low py-2.5 pr-12 pl-5 text-sm text-on-surface shadow-inner placeholder:text-outline focus:ring-1 focus:ring-primary focus:outline-none"
+              disabled={!isLoggedIn || createCommentMutation.isPending}
             />
             <button
               type="button"

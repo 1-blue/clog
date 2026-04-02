@@ -293,7 +293,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 내 정보 */
+        /** 내 정보 (비로그인 시에도 200, payload null) */
         get: operations["getMe"];
         put?: never;
         post?: never;
@@ -2017,7 +2017,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        payload: components["schemas"]["UserMe"];
+                        payload: components["schemas"]["UserMe"] | null;
                     };
                 };
             };
