@@ -1,5 +1,9 @@
 import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
 import { LogBox } from "react-native";
+
+// WebView 로드 완료 전까지 스플래시 화면 유지
+SplashScreen.preventAutoHideAsync();
 
 // Expo Go에서 발생하는 SplashModule 에러 무시
 // development build 또는 프로덕션에서는 발생하지 않음
