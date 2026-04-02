@@ -746,7 +746,7 @@ paths:
   /api/v1/users/me:
     get:
       operationId: getMe
-      summary: 내 정보
+      summary: 내 정보 (비로그인 시에도 200, payload null)
       tags: [Users]
       responses:
         "200":
@@ -758,7 +758,9 @@ paths:
                 required: [payload]
                 properties:
                   payload:
-                    $ref: "#/components/schemas/UserMe"
+                    nullable: true
+                    allOf:
+                      - $ref: "#/components/schemas/UserMe"
     patch:
       operationId: updateMe
       summary: 내 정보 수정
@@ -917,6 +919,36 @@ paths:
                 properties:
                   payload:
                     $ref: "#/components/schemas/PaginatedPostListItem"
+
+  /api/v1/users/me/statistics:
+    get:
+      operationId: getMyStatistics
+      summary: 내 통계 (기간별)
+      tags: [Users]
+      parameters:
+        - name: period
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [week, month, year, all]
+        - name: anchor
+          in: query
+          description: 기준일 yyyy-MM-dd (미입력 시 오늘)
+          schema:
+            type: string
+            pattern: "^\\d{4}-\\d{2}-\\d{2}$"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    $ref: "#/components/schemas/MeStatisticsPayload"
 
   /api/v1/users/{userId}:
     get:
@@ -1277,6 +1309,102 @@ components:
         id: { type: string, format: uuid }
         nickname: { type: string }
         profileImage: { type: string, nullable: true }
+
+    MeStatisticsPayload:
+      type: object
+      required:
+        - period
+        - anchor
+        - range
+        - previousRange
+        - kpis
+        - trend
+        - difficultyDistribution
+        - sendAttempt
+        - topGyms
+        - insights
+      properties:
+        period:
+          type: string
+          enum: [week, month, year, all]
+        anchor: { type: string, description: yyyy-MM-dd }
+        range:
+          type: object
+          required: [start, end, label]
+          properties:
+            start: { type: string, format: date-time }
+            end: { type: string, format: date-time }
+            label: { type: string }
+        previousRange:
+          nullable: true
+          type: object
+          required: [start, end]
+          properties:
+            start: { type: string, format: date-time }
+            end: { type: string, format: date-time }
+        kpis:
+          type: object
+          required:
+            - totalSends
+            - sendDeltaPercent
+            - uniqueGyms
+            - sessionCount
+            - workoutMinutesTotal
+          properties:
+            totalSends: { type: integer }
+            sendDeltaPercent: { type: integer, nullable: true }
+            uniqueGyms: { type: integer }
+            sessionCount: { type: integer }
+            workoutMinutesTotal: { type: integer, nullable: true }
+        trend:
+          type: object
+          required: [buckets, peakBucketKey]
+          properties:
+            peakBucketKey: { type: string, nullable: true }
+            buckets:
+              type: array
+              items:
+                type: object
+                required: [key, sends, label]
+                properties:
+                  key: { type: string }
+                  sends: { type: integer }
+                  label: { type: string }
+        difficultyDistribution:
+          type: array
+          items:
+            type: object
+            required: [difficulty, count]
+            properties:
+              difficulty: { $ref: "#/components/schemas/Difficulty" }
+              count: { type: integer }
+        sendAttempt:
+          type: object
+          required: [sendCount, attemptCount, totalRoutes, percent]
+          properties:
+            sendCount: { type: integer }
+            attemptCount: { type: integer }
+            totalRoutes: { type: integer }
+            percent: { type: integer, nullable: true }
+        topGyms:
+          type: array
+          items:
+            type: object
+            required: [gymId, name, address, thumbnailUrl, visitCount]
+            properties:
+              gymId: { type: string, format: uuid }
+              name: { type: string }
+              address: { type: string }
+              thumbnailUrl: { type: string, nullable: true }
+              visitCount: { type: integer }
+        insights:
+          type: array
+          items:
+            type: object
+            required: [variant, message]
+            properties:
+              variant: { type: string, enum: [primary, tertiary] }
+              message: { type: string }
 
     # ── Gym ──
     GymImage:
@@ -1953,10 +2081,15 @@ components:
           checkInAutoDurationMinutes,
           createdAt,
           updatedAt,
+          homeGym,
         ]
       properties:
         id: { type: string, format: uuid }
         homeGymId: { type: string, format: uuid, nullable: true }
+        homeGym:
+          nullable: true
+          allOf:
+            - $ref: "#/components/schemas/HomeGymSummary"
         email: { type: string, format: email }
         nickname: { type: string }
         bio: { type: string, nullable: true }
@@ -1993,6 +2126,13 @@ components:
         startedAt: { type: string, format: date-time }
         endsAt: { type: string, format: date-time }
 
+    HomeGymSummary:
+      type: object
+      required: [id, name]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+
     UserMe:
       type: object
       required:
@@ -2015,10 +2155,15 @@ components:
           checkInAutoDurationMinutes,
           linkedProviders,
           activeCheckIn,
+          homeGym,
         ]
       properties:
         id: { type: string, format: uuid }
         homeGymId: { type: string, format: uuid, nullable: true }
+        homeGym:
+          nullable: true
+          allOf:
+            - $ref: "#/components/schemas/HomeGymSummary"
         email: { type: string, format: email }
         nickname: { type: string }
         bio: { type: string, nullable: true }
@@ -2055,6 +2200,7 @@ components:
       required:
         [
           id,
+          homeGymId,
           nickname,
           bio,
           profileImage,
@@ -2069,9 +2215,15 @@ components:
           activityHeatmap,
           activityHeatmapDays,
           activityHeatmapSessionCount,
+          homeGym,
         ]
       properties:
         id: { type: string, format: uuid }
+        homeGymId: { type: string, format: uuid, nullable: true }
+        homeGym:
+          nullable: true
+          allOf:
+            - $ref: "#/components/schemas/HomeGymSummary"
         nickname: { type: string }
         bio: { type: string, nullable: true }
         profileImage: { type: string, nullable: true }
@@ -2118,6 +2270,11 @@ components:
           minimum: 30
           maximum: 720
           description: "체크인 후 자동 체크아웃까지 분"
+        homeGymId:
+          type: string
+          format: uuid
+          nullable: true
+          description: "홈짐 설정 — null이면 해제"
 
     # ── Notification ──
     Notification:

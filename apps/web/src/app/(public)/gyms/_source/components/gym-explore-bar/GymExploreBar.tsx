@@ -5,7 +5,7 @@ import GymSearchInput from "./GymSearchInput";
 
 const GymExploreBar: React.FC = () => {
   return (
-    <div className="sticky top-14 z-30 space-y-3 bg-surface pt-4 pb-3">
+    <div className="z-30 space-y-3 bg-surface pt-4 pb-3">
       <GymSearchInput />
       <GymRegionFilterChipList />
     </div>

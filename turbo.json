@@ -28,8 +28,8 @@
       "dependsOn": ["^build"]
     },
     "db:generate": {
-      "inputs": ["prisma/schema.prisma"],
-      "cache": true
+      "inputs": ["package.json", "prisma/schema.prisma", "prisma.config.ts"],
+      "cache": false
     },
     "db:push": {
       "cache": false

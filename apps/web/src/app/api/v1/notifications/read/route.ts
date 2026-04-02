@@ -1,9 +1,10 @@
 import { prisma } from "@clog/db";
 
-import { errorResponse, jsonWithToast, requireAuth } from "#web/libs/api";
+import { jsonWithToast, requireAuth } from "#web/libs/api";
+import { catchApiError } from "#web/libs/api/errorCatch";
 
 /** 알림 읽음 처리 */
-export const PATCH = async () => {
+export const PATCH = async (request: Request) => {
   const { userId, error } = await requireAuth();
   if (error) return error;
 
@@ -14,7 +15,9 @@ export const PATCH = async () => {
     });
 
     return jsonWithToast(null, "모든 알림을 읽음 처리했습니다.");
-  } catch {
-    return errorResponse("알림 읽음 처리에 실패했습니다.");
+  } catch (error) {
+    return catchApiError(request, error, "알림 읽음 처리에 실패했습니다.", {
+      userId: userId!,
+    });
   }
 };

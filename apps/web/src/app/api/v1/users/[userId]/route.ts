@@ -1,6 +1,7 @@
 import { prisma } from "@clog/db";
 
 import { errorResponse, getAuthUserId, json } from "#web/libs/api";
+import { catchApiError } from "#web/libs/api/errorCatch";
 import {
   getUserActivityHeatmap,
   getUserProfileStats,
@@ -20,6 +21,7 @@ export const GET = async (
       where: { id: userId },
       select: {
         id: true,
+        homeGymId: true,
         nickname: true,
         bio: true,
         profileImage: true,
@@ -28,6 +30,7 @@ export const GET = async (
         youtubeUrl: true,
         maxDifficulty: true,
         createdAt: true,
+        homeGym: { select: { id: true, name: true } },
         _count: {
           select: { following: true, followers: true, sessions: true },
         },
@@ -62,7 +65,7 @@ export const GET = async (
       activityHeatmapDays,
       activityHeatmapSessionCount,
     });
-  } catch {
-    return errorResponse("유저 정보를 불러올 수 없습니다.");
+  } catch (error) {
+    return catchApiError(_request, error, "유저 정보를 불러올 수 없습니다.");
   }
 };

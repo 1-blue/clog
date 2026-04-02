@@ -1,12 +1,13 @@
 import { prisma } from "@clog/db";
 
 import { errorResponse, json, requireAuth } from "#web/libs/api";
+import { catchApiError } from "#web/libs/api/errorCatch";
 
 import { gymReviewListInclude } from "../_reviewInclude";
 
 /** 내 리뷰 (해당 암장) — 없으면 payload null */
 export const GET = async (
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ gymId: string }> },
 ) => {
   const { gymId } = await params;
@@ -20,7 +21,9 @@ export const GET = async (
     });
 
     return json(review ?? null);
-  } catch {
-    return errorResponse("리뷰를 불러올 수 없습니다.");
+  } catch (error) {
+    return catchApiError(request, error, "리뷰를 불러올 수 없습니다.", {
+      userId: userId!,
+    });
   }
 };

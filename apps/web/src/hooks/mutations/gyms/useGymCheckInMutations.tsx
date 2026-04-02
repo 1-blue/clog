@@ -13,6 +13,10 @@ const useGymCheckInMutations = (options?: IOptions) => {
   const queryClient = useQueryClient();
   const { queryKey: meQueryKey } = openapi.queryOptions("get", "/api/v1/users/me");
 
+  /** 혼잡도 랭킹·암장 목록 등 visitorCount 반영 */
+  const invalidateGymListQueries = () =>
+    void queryClient.invalidateQueries({ queryKey: ["get", "/api/v1/gyms"] });
+
   const checkInMutation = openapi.useMutation(
     "post",
     "/api/v1/gyms/{gymId}/check-in",
@@ -65,6 +69,7 @@ const useGymCheckInMutations = (options?: IOptions) => {
       },
       onSuccess: () => {
         void queryClient.invalidateQueries({ queryKey: meQueryKey });
+        invalidateGymListQueries();
         toast.success("체크인했어요!");
         options?.onCheckInSuccess?.();
       },
@@ -92,6 +97,7 @@ const useGymCheckInMutations = (options?: IOptions) => {
       },
       onSuccess: () => {
         void queryClient.invalidateQueries({ queryKey: meQueryKey });
+        invalidateGymListQueries();
         toast.success("체크아웃했어요.");
       },
     },

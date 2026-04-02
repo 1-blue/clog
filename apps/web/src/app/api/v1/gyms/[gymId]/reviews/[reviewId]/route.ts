@@ -7,6 +7,7 @@ import {
   jsonWithToast,
   requireAuth,
 } from "#web/libs/api";
+import { catchApiError } from "#web/libs/api/errorCatch";
 import { normalizeReviewJsonBody } from "#web/libs/reviewBody";
 
 import { gymReviewListInclude } from "../_reviewInclude";
@@ -46,8 +47,8 @@ export const GET = async (
     }
 
     return json(review);
-  } catch {
-    return errorResponse("리뷰를 불러올 수 없습니다.");
+  } catch (error) {
+    return catchApiError(_request, error, "리뷰를 불러올 수 없습니다.");
   }
 };
 
@@ -100,8 +101,9 @@ export const PATCH = async (
     await syncGymReviewStats(gymId);
 
     return jsonWithToast(review, "리뷰가 수정되었습니다.");
-  } catch (err) {
-    console.error("🐬 error >> ", err);
-    return errorResponse("리뷰 수정에 실패했습니다.");
+  } catch (error) {
+    return catchApiError(request, error, "리뷰 수정에 실패했습니다.", {
+      userId: userId!,
+    });
   }
 };

@@ -8,6 +8,7 @@ import {
   paginatedJson,
   requireAuth,
 } from "#web/libs/api";
+import { catchApiError } from "#web/libs/api/errorCatch";
 import { bumpUserMaxDifficultyFromRoutes } from "#web/libs/user/updateUserMaxDifficulty";
 
 /** 기록 목록 (무한스크롤) */
@@ -56,8 +57,10 @@ export const GET = async (request: Request) => {
     const nextCursor = hasMore ? items[items.length - 1]!.id : null;
 
     return paginatedJson(items, nextCursor);
-  } catch {
-    return errorResponse("기록을 불러올 수 없습니다.");
+  } catch (error) {
+    return catchApiError(request, error, "기록을 불러올 수 없습니다.", {
+      userId: userId!,
+    });
   }
 };
 
@@ -98,7 +101,9 @@ export const POST = async (request: Request) => {
     await bumpUserMaxDifficultyFromRoutes(userId!, session.routes);
 
     return jsonWithToast(session, "기록이 저장되었습니다.", 201);
-  } catch {
-    return errorResponse("기록 저장에 실패했습니다.");
+  } catch (error) {
+    return catchApiError(request, error, "기록 저장에 실패했습니다.", {
+      userId: userId!,
+    });
   }
 };

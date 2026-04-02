@@ -1,5 +1,7 @@
 "use client";
 
+import { notFound } from "next/navigation";
+
 import { openapi } from "#web/apis/openapi";
 
 import PostDetailLoadedBody from "./PostDetailLoadedBody";
@@ -21,6 +23,8 @@ const PostDetailPreparedBody = ({
     { params: { path: { postId } } },
     { select: (d) => d.payload },
   );
+
+  if (!post) return notFound();
 
   return (
     <PostDetailLoadedBody

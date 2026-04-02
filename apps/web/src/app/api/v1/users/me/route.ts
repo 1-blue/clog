@@ -1,39 +1,37 @@
 import { prisma } from "@clog/db";
 import { updateUserSchema } from "@clog/utils";
 
-import { errorResponse, json, jsonWithToast, requireAuth } from "#web/libs/api";
+import {
+  errorResponse,
+  getAuthUserId,
+  json,
+  jsonWithToast,
+  requireAuth,
+} from "#web/libs/api";
+import { catchApiError } from "#web/libs/api/errorCatch";
+import { linkedProvidersFromSupabase } from "#web/libs/auth/linkedProvidersFromSupabase";
 import { syncSupabaseUserToPrisma } from "#web/libs/auth/syncSupabaseUserToPrisma";
 import { createClient } from "#web/libs/supabase/server";
+import { notifySlackUserWithdrawal } from "#web/libs/slack/notifications";
 import { getUserProfileStats } from "#web/libs/user/profileStats";
-
-type LinkedProvider = "KAKAO" | "GOOGLE";
-
-function linkedProvidersFromSupabase(
-  identities: { provider?: string }[] | null | undefined,
-): LinkedProvider[] {
-  const set = new Set<LinkedProvider>();
-  for (const id of identities ?? []) {
-    const p = id.provider?.toLowerCase();
-    if (p === "kakao") set.add("KAKAO");
-    if (p === "google") set.add("GOOGLE");
-  }
-  return [...set];
-}
 
 const meInclude = {
   _count: {
     select: { following: true, followers: true, sessions: true },
   },
+  homeGym: { select: { id: true, name: true } },
 } as const;
 
-/** 내 정보 */
-export const GET = async () => {
-  const { userId, error } = await requireAuth();
-  if (error) return error;
+/** 내 정보 — 비로그인 시에도 200 + payload: null (네트워크/401 없이 게스트 처리) */
+export const GET = async (request: Request) => {
+  const userId = await getAuthUserId();
+  if (!userId) {
+    return json(null);
+  }
 
   try {
     let user = await prisma.user.findUnique({
-      where: { id: userId! },
+      where: { id: userId },
       include: meInclude,
     });
 
@@ -45,7 +43,7 @@ export const GET = async () => {
       if (authUser?.id === userId) {
         await syncSupabaseUserToPrisma(authUser);
         user = await prisma.user.findUnique({
-          where: { id: userId! },
+          where: { id: userId },
           include: meInclude,
         });
       }
@@ -91,27 +89,49 @@ export const GET = async () => {
           }
         : null,
     });
-  } catch {
-    return errorResponse("유저 정보를 불러올 수 없습니다.");
+  } catch (err) {
+    return catchApiError(request, err, "유저 정보를 불러올 수 없습니다.", {
+      userId,
+    });
   }
 };
 
 /** 회원 탈퇴 */
-export const DELETE = async () => {
+export const DELETE = async (request: Request) => {
   const { userId, error } = await requireAuth();
   if (error) return error;
 
   try {
+    const supabase = await createClient();
+    const { data: authData } = await supabase.auth.admin.getUserById(userId!);
+    const prismaUser = await prisma.user.findUnique({
+      where: { id: userId! },
+      select: { nickname: true, email: true },
+    });
+    if (!prismaUser) return errorResponse("유저를 찾을 수 없습니다.", 404);
+
+    const providers = linkedProvidersFromSupabase(
+      authData.user?.identities,
+    );
+
     /** Prisma 모델은 onDelete: Cascade이므로 유저 삭제 시 관련 데이터 자동 삭제 */
     await prisma.user.delete({ where: { id: userId! } });
 
+    notifySlackUserWithdrawal({
+      nickname: prismaUser.nickname,
+      userId: userId!,
+      email: prismaUser.email,
+      providers,
+    });
+
     /** Supabase Auth 유저도 삭제 */
-    const supabase = await createClient();
     await supabase.auth.admin.deleteUser(userId!);
 
     return jsonWithToast(null, "회원 탈퇴가 완료되었습니다.");
-  } catch {
-    return errorResponse("회원 탈퇴에 실패했습니다.");
+  } catch (err) {
+    return catchApiError(request, err, "회원 탈퇴에 실패했습니다.", {
+      userId: userId!,
+    });
   }
 };
 
@@ -141,6 +161,16 @@ export const PATCH = async (request: Request) => {
       }
     }
 
+    if (data.homeGymId !== undefined && data.homeGymId !== null) {
+      const gym = await prisma.gym.findUnique({
+        where: { id: data.homeGymId },
+        select: { id: true },
+      });
+      if (!gym) {
+        return errorResponse("암장을 찾을 수 없습니다.", 404);
+      }
+    }
+
     const normalized = {
       ...data,
       ...(data.bio !== undefined
@@ -151,10 +181,13 @@ export const PATCH = async (request: Request) => {
     const user = await prisma.user.update({
       where: { id: userId! },
       data: normalized,
+      include: { homeGym: { select: { id: true, name: true } } },
     });
 
     return jsonWithToast(user, "프로필이 수정되었습니다.");
-  } catch {
-    return errorResponse("프로필 수정에 실패했습니다.");
+  } catch (err) {
+    return catchApiError(request, err, "프로필 수정에 실패했습니다.", {
+      userId: userId!,
+    });
   }
 };

@@ -1,14 +1,14 @@
 "use client";
 
-import { ArrowLeft } from "lucide-react";
 import { FormProvider, useFormState, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { fetchClient, openapi } from "#web/apis/openapi";
-import AppTopBar from "#web/components/layout/AppTopBar";
+import TopBar from "#web/components/layout/TopBar";
 import { Button } from "#web/components/ui/button";
+import { ROUTES } from "#web/constants";
 import useUserMutations from "#web/hooks/mutations/users/useUserMutations";
 import useMe from "#web/hooks/useMe";
 
@@ -31,6 +31,8 @@ const ProfileEditMain = () => {
       bio: "",
       instagramId: "",
       youtubeUrl: "",
+      homeGymId: null,
+      homeGymName: "",
     },
   });
 
@@ -41,6 +43,8 @@ const ProfileEditMain = () => {
       bio: me.bio ?? "",
       instagramId: me.instagramId ?? "",
       youtubeUrl: me.youtubeUrl ?? "",
+      homeGymId: me.homeGym?.id ?? null,
+      homeGymName: me.homeGym?.name ?? "",
     });
   }, [me, form]);
 
@@ -105,6 +109,8 @@ const ProfileEditMain = () => {
     const bio = me.bio ?? "";
     const instagramId = me.instagramId ?? "";
     const youtubeUrl = me.youtubeUrl ?? "";
+    const prevHomeGymId = me.homeGymId ?? null;
+    const nextHomeGymId = data.homeGymId;
 
     updateMeMutation.mutate(
       {
@@ -117,12 +123,15 @@ const ProfileEditMain = () => {
           ...(data.youtubeUrl !== youtubeUrl
             ? { youtubeUrl: data.youtubeUrl.trim() || undefined }
             : {}),
+          ...(prevHomeGymId !== nextHomeGymId
+            ? { homeGymId: nextHomeGymId }
+            : {}),
         },
       },
       {
         onSuccess: () => {
           toast.success("프로필이 변경되었습니다.");
-          router.back();
+          router.replace(ROUTES.MY.path);
         },
         onError: () => toast.error("프로필 변경에 실패했습니다."),
       },
@@ -141,24 +150,7 @@ const ProfileEditMain = () => {
           void form.handleSubmit(onSubmit)(e);
         }}
       >
-        <AppTopBar
-          showNotification={false}
-          left={
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => router.back()}
-                className="flex size-10 items-center justify-center rounded-full text-on-surface hover:bg-surface-container-high"
-                aria-label="뒤로"
-              >
-                <ArrowLeft className="size-5" strokeWidth={2} />
-              </button>
-              <h1 className="text-lg font-semibold text-on-surface">
-                프로필 수정
-              </h1>
-            </div>
-          }
-        />
+        <TopBar showNotification={false} title="프로필 수정" />
         <div className="relative">
           <ProfileEditCoverSection coverImage={me.coverImage} />
           <ProfileEditAvatarSection

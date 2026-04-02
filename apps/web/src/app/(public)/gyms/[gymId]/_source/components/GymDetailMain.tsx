@@ -22,6 +22,7 @@ import GymInfoTab from "./gym-tabs/gym-info-tab/GymInfoTab";
 import GymPhotoTab from "./gym-tabs/gym-photo-tab/GymPhotoTab";
 import GymReviewSkeleton from "./gym-tabs/gym-review-tab/gym-review-list/GymReviewSkeleton";
 import GymReviewTab from "./gym-tabs/gym-review-tab/GymReviewTab";
+import GymHomeGymActions from "./GymHomeGymActions";
 
 /** line 탭: 기본 하단 라인 + 활성 라인 강조 */
 const tabTriggerClass =
@@ -81,9 +82,9 @@ const GymDetailMain: React.FC<IProps> = ({ gymId }) => {
   return (
     <div className="relative pb-[calc(5.75rem+env(safe-area-inset-bottom))]">
       <TopBar
-        showBack
+        showNotification={false}
         title={gym.name ?? "암장 상세"}
-        action={
+        right={
           <div className="flex shrink-0 items-center gap-0.5">
             <button
               type="button"
@@ -108,6 +109,8 @@ const GymDetailMain: React.FC<IProps> = ({ gymId }) => {
           visitorCapacity={visitorCapacity}
           monthlyCheckInCount={monthlyCheckInCount}
         />
+
+        <GymHomeGymActions gymId={gymId} />
 
         <GymBasicInfoSection gym={gym} />
       </div>

@@ -10,6 +10,7 @@ import { Input } from "#web/components/ui/input";
 import { Textarea } from "#web/components/ui/textarea";
 
 import type { TProfileEditFormData } from "../useProfileEditForm";
+import ProfileEditHomeGymField from "./ProfileEditHomeGymField";
 import ProfileEditNicknameStatus from "./ProfileEditNicknameStatus";
 
 interface IProps {
@@ -98,7 +99,7 @@ const ProfileEditBasicSection = ({
             <FormHelper
               label="한 줄 소개"
               labelSuffix={
-                <span className="text-xs tabular-nums text-on-surface-variant">
+                <span className="text-xs text-on-surface-variant tabular-nums">
                   {bio.length} / 200
                 </span>
               }
@@ -114,6 +115,17 @@ const ProfileEditBasicSection = ({
             </FormHelper>
           )}
         />
+
+        <div className="space-y-1.5">
+          <FormHelper
+            label="홈짐"
+            description="자주 가는 암장을 하나 지정할 수 있어요. 이름을 입력해 검색한 뒤 선택하세요."
+            cloneChild={false}
+            controlAriaLabel="홈짐 검색"
+          >
+            <ProfileEditHomeGymField />
+          </FormHelper>
+        </div>
 
         <Controller
           control={control}

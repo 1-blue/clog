@@ -1,7 +1,7 @@
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { cache, Suspense } from "react";
 import type { Metadata, NextPage } from "next";
 import { notFound } from "next/navigation";
-import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
 import { fetchClient, openapi } from "#web/apis/openapi";
 import { getQueryClient } from "#web/libs/getQueryClient";
@@ -33,6 +33,7 @@ export const generateMetadata = async ({
   if (!payload) {
     return getSharedMetadata({ title: "프로필" });
   }
+
   return getSharedMetadata({
     title: `${payload.nickname} · 프로필`,
     keywords: [payload.nickname, "프로필"],

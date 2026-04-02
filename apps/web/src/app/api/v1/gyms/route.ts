@@ -1,7 +1,8 @@
 import { prisma } from "@clog/db";
 import { gymQuerySchema } from "@clog/utils";
 
-import { errorResponse, getSearchParams, paginatedJson } from "#web/libs/api";
+import { getSearchParams, paginatedJson } from "#web/libs/api";
+import { catchApiError } from "#web/libs/api/errorCatch";
 import { activeCheckInCountsForGymIds } from "#web/libs/gym/activeCheckInCount";
 
 /** 암장 목록 (검색/지역필터/정렬/무한스크롤) */
@@ -233,7 +234,7 @@ export const GET = async (request: Request) => {
     }));
 
     return paginatedJson(withLive, nextCursor);
-  } catch {
-    return errorResponse("암장 목록을 불러올 수 없습니다.");
+  } catch (error) {
+    return catchApiError(request, error, "암장 목록을 불러올 수 없습니다.");
   }
 };

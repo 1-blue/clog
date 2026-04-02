@@ -2,6 +2,7 @@ import { prisma } from "@clog/db";
 import { recordQuerySchema } from "@clog/utils";
 
 import { errorResponse, getSearchParams, paginatedJson } from "#web/libs/api";
+import { catchApiError } from "#web/libs/api/errorCatch";
 
 /** 타인 프로필용 공개 기록 목록 (무한스크롤) */
 export const GET = async (
@@ -40,7 +41,7 @@ export const GET = async (
     const nextCursor = hasMore ? items[items.length - 1]!.id : null;
 
     return paginatedJson(items, nextCursor);
-  } catch {
-    return errorResponse("기록을 불러올 수 없습니다.");
+  } catch (error) {
+    return catchApiError(request, error, "기록을 불러올 수 없습니다.");
   }
 };

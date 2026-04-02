@@ -7,6 +7,7 @@ import {
   paginatedJson,
   requireAuth,
 } from "#web/libs/api";
+import { catchApiError } from "#web/libs/api/errorCatch";
 
 const querySchema = z.object({
   cursor: z.string().uuid().optional(),
@@ -40,7 +41,9 @@ export const GET = async (request: Request) => {
     const nextCursor = hasMore ? slice[slice.length - 1]!.id : null;
 
     return paginatedJson(items, nextCursor);
-  } catch {
-    return errorResponse("좋아요한 글을 불러올 수 없습니다.");
+  } catch (error) {
+    return catchApiError(request, error, "좋아요한 글을 불러올 수 없습니다.", {
+      userId: userId!,
+    });
   }
 };

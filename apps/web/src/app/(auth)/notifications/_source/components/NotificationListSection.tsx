@@ -7,10 +7,10 @@ import {
   BellOff,
   Heart,
   Info,
-  type LucideIcon,
   MessageCircle,
   Mountain,
   UserPlus,
+  type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -52,8 +52,9 @@ const NotificationListSection = () => {
   return (
     <div className="pb-8">
       <TopBar
-        title="알림"
-        action={
+        showNotification={false}
+        left={<span className="text-lg font-bold text-on-surface">알림</span>}
+        right={
           notifications.some((n) => !n.isRead) ? (
             <Button
               variant="ghost"
@@ -62,7 +63,7 @@ const NotificationListSection = () => {
             >
               모두 읽음
             </Button>
-          ) : undefined
+          ) : null
         }
       />
 

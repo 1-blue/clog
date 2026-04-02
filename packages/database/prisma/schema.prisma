@@ -197,8 +197,42 @@ model User {
   gymCheckIns   GymCheckIn[]
   /// 암장 북마크 목록
   gymBookmarks  GymBookmark[]
+  /// API 라우트 예외 로그 (발생 시 유저)
+  apiErrorLogs  ApiErrorLog[]
 
   @@map("users")
+}
+
+/// API Route Handler에서 catch된 오류 로그
+model ApiErrorLog {
+  /// 로그 ID
+  id            String   @id @default(uuid()) @db.Uuid
+  /// 발생 시각
+  createdAt     DateTime @default(now()) @map("created_at")
+  /// HTTP 메서드
+  method        String
+  /// URL pathname (쿼리 제외)
+  path          String
+  /// method + path 요약
+  endpoint      String
+  /// 메시지·스택 등 상세
+  errorLog      String   @map("error_log") @db.Text
+  /// 로그인 유저 ID (비로그인 null)
+  userId        String?  @map("user_id") @db.Uuid
+  /// 클라이언트에 반환한 HTTP 상태
+  httpStatus    Int?     @map("http_status")
+  /// 클라이언트 토스트 문구
+  clientMessage String?  @map("client_message")
+  /// Error.name 등
+  errorName     String?  @map("error_name")
+  /// x-trace-id / x-request-id 또는 생성 UUID
+  traceId       String?  @map("trace_id")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([userId])
+  @@map("api_error_logs")
 }
 
 /// OAuth 계정

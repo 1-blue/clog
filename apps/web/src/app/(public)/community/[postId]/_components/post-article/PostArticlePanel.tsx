@@ -21,7 +21,7 @@ const PostArticlePanel: React.FC<IProps> = ({ post }) => {
   const hasHeroImage = post.imageUrls.length > 0;
 
   return (
-    <div className={cn("flex flex-col gap-6", !hasHeroImage && "pt-20")}>
+    <div className={cn("flex flex-col gap-6", !hasHeroImage && "pt-6")}>
       <PostArticleMedia imageUrls={post.imageUrls} />
       <PostArticleTitleBlock
         postId={post.id}

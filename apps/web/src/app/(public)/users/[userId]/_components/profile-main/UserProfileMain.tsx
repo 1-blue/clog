@@ -1,22 +1,23 @@
 "use client";
 
-import { ArrowLeft, Share2 } from "lucide-react";
-import { useCallback, useState } from "react";
+import { MapPin, Share2 } from "lucide-react";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useCallback, useState } from "react";
+import Link from "next/link";
 
 import { openapi } from "#web/apis/openapi";
 import FollowListSheet from "#web/app/(auth)/my/_source/components/FollowListSheet";
-import AppTopBar from "#web/components/layout/AppTopBar";
+import TopBar from "#web/components/layout/TopBar";
+import { ROUTES } from "#web/constants";
 import useUserMutations from "#web/hooks/mutations/users/useUserMutations";
 
 import UserProfileActionRow from "../profile-actions/UserProfileActionRow";
 import UserProfileActivityHeading from "../profile-activity/UserProfileActivityHeading";
+import UserProfileSelectionCaption from "../profile-activity/UserProfileSelectionCaption";
 import UserProfileBioLine from "../profile-bio/UserProfileBioLine";
 import UserProfileHeatmap from "../profile-heatmap/UserProfileHeatmap";
 import UserProfileHeroSection from "../profile-hero/UserProfileHeroSection";
 import UserProfileRecordsSection from "../profile-records/UserProfileRecordsSection";
-import UserProfileSelectionCaption from "../profile-activity/UserProfileSelectionCaption";
 import UserProfileStatsGrid from "../profile-stats/UserProfileStatsGrid";
 
 interface IProps {
@@ -24,8 +25,6 @@ interface IProps {
 }
 
 const UserProfileMain = ({ userId }: IProps) => {
-  const router = useRouter();
-
   const { data: user } = openapi.useSuspenseQuery(
     "get",
     "/api/v1/users/{userId}",
@@ -52,8 +51,7 @@ const UserProfileMain = ({ userId }: IProps) => {
 
   const shareProfile = async () => {
     try {
-      const url =
-        typeof window !== "undefined" ? window.location.href : "";
+      const url = typeof window !== "undefined" ? window.location.href : "";
       if (navigator.share) {
         await navigator.share({
           title: `${user.nickname} · 프로필`,
@@ -70,22 +68,8 @@ const UserProfileMain = ({ userId }: IProps) => {
 
   return (
     <div className="pb-24">
-      <AppTopBar
-        left={
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => router.back()}
-              className="flex size-9 items-center justify-center rounded-full text-on-surface hover:bg-surface-container-high"
-              aria-label="뒤로"
-            >
-              <ArrowLeft className="size-5" strokeWidth={2} />
-            </button>
-            <span className="text-lg font-semibold text-on-surface">
-              프로필
-            </span>
-          </div>
-        }
+      <TopBar
+        title="프로필"
         right={
           <button
             type="button"
@@ -101,6 +85,15 @@ const UserProfileMain = ({ userId }: IProps) => {
       <main className="mx-auto max-w-lg">
         <UserProfileHeroSection user={user} />
         <div className="mt-4 space-y-6">
+          {user.homeGym ? (
+            <Link
+              href={ROUTES.GYMS.DETAIL.path(user.homeGym.id)}
+              className="flex w-full items-center gap-2 rounded-xl border border-outline-variant/25 bg-surface-container-low px-4 py-3 text-sm font-medium text-primary transition-colors hover:bg-surface-container"
+            >
+              <MapPin className="size-4 shrink-0" strokeWidth={2} />
+              <span className="truncate">홈짐 · {user.homeGym.name}</span>
+            </Link>
+          ) : null}
           <UserProfileBioLine user={user} />
           <UserProfileActionRow
             isOwnProfile={isOwnProfile}

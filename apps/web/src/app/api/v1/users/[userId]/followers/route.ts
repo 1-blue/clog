@@ -2,6 +2,7 @@ import { prisma } from "@clog/db";
 import { z } from "zod";
 
 import { errorResponse, getSearchParams, paginatedJson } from "#web/libs/api";
+import { catchApiError } from "#web/libs/api/errorCatch";
 
 const querySchema = z.object({
   cursor: z.string().uuid().optional(),
@@ -41,7 +42,7 @@ export const GET = async (
     const nextCursor = hasMore ? slice[slice.length - 1]!.id : null;
 
     return paginatedJson(items, nextCursor);
-  } catch {
-    return errorResponse("팔로워 목록을 불러올 수 없습니다.");
+  } catch (error) {
+    return catchApiError(request, error, "팔로워 목록을 불러올 수 없습니다.");
   }
 };

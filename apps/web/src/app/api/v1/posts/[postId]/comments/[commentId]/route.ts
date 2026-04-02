@@ -6,6 +6,7 @@ import {
   jsonWithToast,
   requireAuth,
 } from "#web/libs/api";
+import { catchApiError } from "#web/libs/api/errorCatch";
 
 const authorInclude = {
   author: { select: { id: true, nickname: true, profileImage: true } },
@@ -41,8 +42,10 @@ export const PATCH = async (
     });
 
     return jsonWithToast(comment, "댓글이 수정되었습니다.");
-  } catch {
-    return errorResponse("댓글 수정에 실패했습니다.");
+  } catch (error) {
+    return catchApiError(request, error, "댓글 수정에 실패했습니다.", {
+      userId: userId!,
+    });
   }
 };
 
@@ -76,7 +79,9 @@ export const DELETE = async (
     });
 
     return jsonWithToast(null, "댓글이 삭제되었습니다.");
-  } catch {
-    return errorResponse("댓글 삭제에 실패했습니다.");
+  } catch (error) {
+    return catchApiError(_request, error, "댓글 삭제에 실패했습니다.", {
+      userId: userId!,
+    });
   }
 };

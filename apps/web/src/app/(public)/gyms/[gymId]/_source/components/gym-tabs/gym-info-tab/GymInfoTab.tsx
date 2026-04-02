@@ -3,6 +3,7 @@ import { ko } from "date-fns/locale";
 
 import type { FacilityType } from "@clog/utils";
 
+import RecordGymDifficultyLegend from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordGymDifficultyLegend";
 import type { components } from "#web/@types/openapi";
 import FacilityChip from "#web/components/gym/FacilityChip";
 import GymMapActionBar from "#web/components/gym/GymMapActionBar";
@@ -32,6 +33,11 @@ const GymInfoTab: React.FC<IProps> = ({ gym }) => {
 
   return (
     <section className="flex flex-col gap-6 py-4">
+      <RecordGymDifficultyLegend
+        difficultyColors={gym.difficultyColors}
+        labelClassName={sectionTitleClass}
+      />
+
       {gym.facilities.length > 0 ? (
         <div>
           <h5 className={sectionTitleClass}>시설</h5>

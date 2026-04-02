@@ -8,6 +8,7 @@ import {
   paginatedJson,
   requireAuth,
 } from "#web/libs/api";
+import { catchApiError } from "#web/libs/api/errorCatch";
 
 /** 댓글 목록 (무한스크롤) */
 export const GET = async (
@@ -43,8 +44,8 @@ export const GET = async (
     const nextCursor = hasMore ? items[items.length - 1]!.id : null;
 
     return paginatedJson(items, nextCursor);
-  } catch {
-    return errorResponse("댓글을 불러올 수 없습니다.");
+  } catch (error) {
+    return catchApiError(request, error, "댓글을 불러올 수 없습니다.");
   }
 };
 
@@ -80,7 +81,9 @@ export const POST = async (
     });
 
     return jsonWithToast(comment, "댓글이 등록되었습니다.", 201);
-  } catch {
-    return errorResponse("댓글 작성에 실패했습니다.");
+  } catch (error) {
+    return catchApiError(request, error, "댓글 작성에 실패했습니다.", {
+      userId: userId!,
+    });
   }
 };

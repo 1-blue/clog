@@ -2,13 +2,14 @@ import { prisma } from "@clog/db";
 import { createPostSchema, postQuerySchema } from "@clog/utils";
 
 import {
-  errorResponse,
   getAuthUserId,
   getSearchParams,
   jsonWithToast,
   paginatedJson,
   requireAuth,
 } from "#web/libs/api";
+import { catchApiError } from "#web/libs/api/errorCatch";
+import { notifySlackPostCreated } from "#web/libs/slack/notifications";
 
 /** 게시글 목록 (무한스크롤) */
 export const GET = async (request: Request) => {
@@ -47,9 +48,7 @@ export const GET = async (request: Request) => {
 
     return paginatedJson(items, nextCursor);
   } catch (error) {
-    console.log("🐬 게시글 불러올 수 없음 error >> ", error);
-
-    return errorResponse("게시글을 불러올 수 없습니다.");
+    return catchApiError(request, error, "게시글을 불러올 수 없습니다.");
   }
 };
 
@@ -73,8 +72,24 @@ export const POST = async (request: Request) => {
       },
     });
 
+    const author = await prisma.user.findUnique({
+      where: { id: userId! },
+      select: { nickname: true },
+    });
+    notifySlackPostCreated({
+      nickname: author?.nickname ?? "(닉네임 없음)",
+      userId: userId!,
+      postId: post.id,
+      category: post.category,
+      title: post.title,
+      content: post.content,
+      tags: post.tags,
+    });
+
     return jsonWithToast(post, "게시글이 등록되었습니다.", 201);
-  } catch {
-    return errorResponse("게시글 작성에 실패했습니다.");
+  } catch (error) {
+    return catchApiError(request, error, "게시글 작성에 실패했습니다.", {
+      userId: userId!,
+    });
   }
 };

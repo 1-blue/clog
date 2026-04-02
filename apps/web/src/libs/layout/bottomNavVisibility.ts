@@ -22,6 +22,7 @@ function isRecordCreateOrEditPath(pathname: string): boolean {
 
 export function shouldShowBottomNav(pathname: string | null): boolean {
   if (!pathname) return true;
+  if (pathname === "/landing" || pathname.startsWith("/landing/")) return false;
   if (pathname.startsWith("/login")) return false;
   if (pathname.startsWith("/gyms/")) return false;
   if (isCommunityPostDetail(pathname)) return false;

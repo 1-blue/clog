@@ -1,9 +1,10 @@
 import { prisma } from "@clog/db";
 
-import { errorResponse, json } from "#web/libs/api";
+import { json } from "#web/libs/api";
+import { catchApiError } from "#web/libs/api/errorCatch";
 
 /** 최근 7일 일별 완등(시도 제외 루트) 합계 — 홈 차트용 */
-export const GET = async () => {
+export const GET = async (request: Request) => {
   try {
     const start = new Date();
     start.setDate(start.getDate() - 6);
@@ -39,7 +40,7 @@ export const GET = async () => {
     }));
 
     return json({ points });
-  } catch {
-    return errorResponse("통계를 불러올 수 없습니다.");
+  } catch (error) {
+    return catchApiError(request, error, "통계를 불러올 수 없습니다.");
   }
 };

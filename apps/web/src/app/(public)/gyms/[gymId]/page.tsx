@@ -1,4 +1,5 @@
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+import { schemas } from "@clog/utils";
 import { cache } from "react";
 import type { Metadata, NextPage } from "next";
 import { notFound } from "next/navigation";
@@ -13,6 +14,9 @@ interface IProps {
   params: Promise<{ gymId: string }>;
 }
 
+const isUuidGymId = (gymId: string): boolean =>
+  schemas.uuid.safeParse(gymId).success;
+
 const prefetchGym = cache((gymId: string) => {
   const queryClient = getQueryClient();
   return queryClient.fetchQuery(
@@ -26,11 +30,16 @@ export const generateMetadata = async ({
   params,
 }: IProps): Promise<Metadata> => {
   const { gymId } = await params;
+  if (!isUuidGymId(gymId)) {
+    notFound();
+  }
+
   try {
     const { payload } = await prefetchGym(gymId);
     if (!payload?.name) {
       return getSharedMetadata({ title: "암장 상세" });
     }
+
     return getSharedMetadata({
       title: payload.name,
       description: payload.description ?? payload.address,
@@ -43,6 +52,10 @@ export const generateMetadata = async ({
 
 const GymDetailPage: NextPage<IProps> = async (props) => {
   const { gymId } = await props.params;
+  if (!isUuidGymId(gymId)) {
+    notFound();
+  }
+
   const queryClient = getQueryClient();
 
   try {

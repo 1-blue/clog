@@ -1,8 +1,6 @@
 "use client";
 
-import { ArrowLeft } from "lucide-react";
 import { FormProvider } from "react-hook-form";
-import { useRouter } from "next/navigation";
 
 import { normalizeSessionTimeRange } from "@clog/utils";
 
@@ -25,8 +23,9 @@ import {
   initialSessionMinutesFromRecord,
   recordDateToYmd,
 } from "#web/app/(auth)/records/(created-and-edit)/_source/utils/sessionTimesFromRecord";
+import TopBar from "#web/components/layout/TopBar";
+import { ROUTES } from "#web/constants";
 import useRecordMutations from "#web/hooks/mutations/records/useRecordMutations";
-import AppTopBar from "#web/components/layout/AppTopBar";
 
 type TRecordDetail = components["schemas"]["RecordDetail"];
 
@@ -36,7 +35,6 @@ interface IProps {
 }
 
 const RecordEditForm: React.FC<IProps> = ({ recordId, record }) => {
-  const router = useRouter();
   const { startMinutes, endMinutes } = initialSessionMinutesFromRecord(
     record.startTime,
     record.endTime,
@@ -108,25 +106,10 @@ const RecordEditForm: React.FC<IProps> = ({ recordId, record }) => {
   return (
     <FormProvider {...methods}>
       <div className="flex min-h-dvh flex-col bg-background">
-        <AppTopBar
-          className="bg-surface-container/80 border-outline-variant"
+        <TopBar
+          className="border-outline-variant bg-surface-container/80"
           showNotification={false}
-          left={
-            <div className="flex min-w-0 flex-1 items-center gap-2">
-              <button
-                type="button"
-                onClick={() => router.back()}
-                className="flex size-10 shrink-0 items-center justify-center rounded-full text-on-surface hover:bg-surface-container-high"
-                aria-label="뒤로"
-              >
-                <ArrowLeft className="size-5" strokeWidth={2} />
-              </button>
-              <h1 className="min-w-0 flex-1 truncate text-lg font-semibold text-on-surface">
-                기록 수정
-              </h1>
-            </div>
-          }
-          right={<></>}
+          title="기록 수정"
         />
 
         <form
@@ -148,7 +131,10 @@ const RecordEditForm: React.FC<IProps> = ({ recordId, record }) => {
             <div className="flex flex-col gap-4">
               <RecordMemoField />
               <RecordPublicToggleCard />
-              <RecordDiscardRow label="수정 취소" />
+              <RecordDiscardRow
+                replaceHref={ROUTES.RECORDS.DETAIL.path(recordId)}
+                label="수정 취소"
+              />
             </div>
           </div>
 

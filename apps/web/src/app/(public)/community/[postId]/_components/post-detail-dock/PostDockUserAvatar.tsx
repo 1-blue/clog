@@ -14,7 +14,7 @@ const PostDockUserAvatar = () => {
 
   return (
     <div className="size-8 shrink-0 overflow-hidden rounded-full bg-surface-container-highest">
-      {me?.payload.profileImage ? (
+      {me?.payload?.profileImage ? (
         <img
           src={me.payload.profileImage}
           alt=""

@@ -3,7 +3,7 @@
 import { MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 
-import { buttonVariants } from "#web/components/ui/button";
+import { buttonVariants } from "#web/components/ui/button-variants";
 import {
   Popover,
   PopoverContent,
