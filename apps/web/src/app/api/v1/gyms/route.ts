@@ -59,11 +59,7 @@ export const GET = async (request: Request) => {
       const allIds = candidateRows.map((r) => r.id);
       if (allIds.length === 0) return paginatedJson([], null);
 
-      // 체크인~체크아웃(또는 진행중 now-startedAt)이 30분 이상인 세션만 집계
-      // - ended_at이 있으면 ended_at - started_at >= 30분
-      // - ended_at이 없으면 started_at <= now - 30분
-      const minDurationStart = new Date(Date.now() - 30 * 60 * 1000);
-
+      // 월간 집계: `started_at`이 해당 월에 포함되는 체크인 세션을 카운트합니다.
       const counts = await prisma.$queryRaw<
         Array<{ gymId: string; checkInCount: number }>
       >`
@@ -74,10 +70,6 @@ export const GET = async (request: Request) => {
         WHERE "gym_id" = ANY(${allIds}::uuid[])
           AND "started_at" >= ${monthStart}
           AND "started_at" < ${nextMonthStart}
-          AND (
-            ("ended_at" IS NOT NULL AND "ended_at" - "started_at" >= interval '30 minutes')
-            OR ("ended_at" IS NULL AND "started_at" <= ${minDurationStart})
-          )
         GROUP BY "gym_id"
       `;
 
