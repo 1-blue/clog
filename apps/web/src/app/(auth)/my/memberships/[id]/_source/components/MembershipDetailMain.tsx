@@ -250,9 +250,19 @@ const MembershipDetailMain: React.FC<IProps> = ({ userMembershipId }) => {
                     href={ROUTES.RECORDS.DETAIL.path(s.id)}
                     className="flex items-center gap-3 rounded-2xl border border-outline-variant/20 bg-surface-container-low px-4 py-3 transition-colors hover:bg-surface-container-high/80"
                   >
-                    <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-tertiary/20 text-sm font-bold text-tertiary">
-                      {s.routeCount}
-                    </span>
+                    {s.gymLogoImageUrl ? (
+                      <span className="relative flex size-10 shrink-0 overflow-hidden rounded-full bg-surface-container-high ring-1 ring-outline-variant/20">
+                        <img
+                          src={s.gymLogoImageUrl}
+                          alt=""
+                          className="size-full object-cover"
+                        />
+                      </span>
+                    ) : (
+                      <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-tertiary/20 text-sm font-bold text-tertiary">
+                        {s.routeCount}
+                      </span>
+                    )}
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium text-on-surface">
                         {format(new Date(s.date), "yyyy년 M월 d일 (EEE)", {

@@ -42,7 +42,10 @@ const RecordDetailLoaded = ({ recordId, record }: IContentProps) => {
         title="클라이밍 기록 상세"
       />
 
-      <RecordDetailHeroCarousel imageUrls={record.imageUrls} />
+      <RecordDetailHeroCarousel
+        imageUrls={record.imageUrls}
+        fallbackImageUrl={record.gym.logoImageUrl}
+      />
 
       <div className="relative z-10 -mt-6 flex flex-col gap-10">
         <RecordDetailEditEntry

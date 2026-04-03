@@ -671,13 +671,10 @@ export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         /**
-         * @description 지역 (17개 시도)
-         *     SEOUL 서울, GYEONGGI 경기, INCHEON 인천, BUSAN 부산, DAEGU 대구, DAEJEON 대전,
-         *     GWANGJU 광주, ULSAN 울산, SEJONG 세종, GANGWON 강원, CHUNGBUK 충북, CHUNGNAM 충남,
-         *     JEONBUK 전북, JEONNAM 전남, GYEONGBUK 경북, GYEONGNAM 경남, JEJU 제주
+         * @description 지역 (서울·경기·인천·부산)
          * @enum {string}
          */
-        Region: "SEOUL" | "GYEONGGI" | "INCHEON" | "BUSAN" | "DAEGU" | "DAEJEON" | "GWANGJU" | "ULSAN" | "SEJONG" | "GANGWON" | "CHUNGBUK" | "CHUNGNAM" | "JEONBUK" | "JEONNAM" | "GYEONGBUK" | "GYEONGNAM" | "JEJU";
+        Region: "SEOUL" | "GYEONGGI" | "INCHEON" | "BUSAN";
         /**
          * @description 난이도 (V0~V10)
          * @enum {string}
@@ -689,10 +686,10 @@ export interface components {
          */
         DayType: "MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT" | "SUN";
         /**
-         * @description 체감 난이도 (EASY 쉬움, NORMAL 보통, HARD 어려움)
+         * @description 체감 난이도 (EASY 쉬움, EASY_NORMAL 쉬움~보통, NORMAL 보통, NORMAL_HARD 보통~어려움, HARD 어려움)
          * @enum {string}
          */
-        GymPerceivedDifficulty: "EASY" | "NORMAL" | "HARD";
+        GymPerceivedDifficulty: "EASY" | "EASY_NORMAL" | "NORMAL" | "NORMAL_HARD" | "HARD";
         /**
          * @description 게시글 카테고리 (FREE 자유, TIPS 팁/노하우, REVIEW 후기, MEETUP 모임, GEAR 장비)
          * @enum {string}
@@ -779,7 +776,7 @@ export interface components {
                 gymId: string;
                 name: string;
                 address: string;
-                thumbnailUrl: string | null;
+                coverImageUrl: string;
                 visitCount: number;
             }[];
             insights: {
@@ -852,7 +849,7 @@ export interface components {
          * @description 암장 회원권 브랜드(체인). STANDALONE은 구매·세션 지점 일치만 허용
          * @enum {string}
          */
-        GymMembershipBrand: "THE_CLIMB" | "SEOULFOREST" | "CLIMBINGPARK" | "STANDALONE";
+        GymMembershipBrand: "THE_CLIMB" | "SEOULFOREST" | "CLIMBINGPARK" | "SONCLIMB" | "PEAKERS" | "WAVEROCK" | "CLIMB_US" | "DAMJANG" | "B_BLOC" | "ALLEZ" | "STANDALONE";
         /** @description 암장 (목록/상세 공통 필드; API는 Prisma Gym + 실시간 visitorCount 등) */
         GymListItem: {
             /**
@@ -891,8 +888,14 @@ export interface components {
             reviewCount: number;
             /** @description 웹사이트 URL */
             website?: string | null;
-            /** @description 목록/카드용 썸네일 */
-            thumbnailUrl?: string | null;
+            /** @description 목록·히어로용 커버 이미지 URL */
+            coverImageUrl: string;
+            /** @description 로고 이미지 URL */
+            logoImageUrl: string;
+            /** @description 난이도표 이미지 URL (브랜드 기본·지점별) */
+            difficultyImageUrl?: string | null;
+            /** @description 세팅 주기·일정 안내 텍스트 */
+            settingScheduleMemo?: string | null;
             /** @description 인스타그램 아이디 */
             instagramId?: string | null;
             /**
@@ -1089,6 +1092,8 @@ export interface components {
             /** Format: uuid */
             id: string;
             name: string;
+            /** @description 암장 로고 URL (기록 썸네일 폴백 등) */
+            logoImageUrl?: string | null;
             /** @description 암장별 난이도 색상 (기록 목록 GET에서 포함) */
             difficultyColors?: components["schemas"]["GymDifficultyColor"][];
         };
@@ -1146,6 +1151,8 @@ export interface components {
                 id: string;
                 name: string;
                 address: string;
+                /** @description 암장 로고 URL (기록 사진 없을 때 폴백) */
+                logoImageUrl?: string | null;
             };
             routes: components["schemas"]["Route"][];
             imageUrls: string[];
@@ -1181,6 +1188,8 @@ export interface components {
                     id: string;
                     name: string;
                     membershipBrand: components["schemas"]["GymMembershipBrand"];
+                    /** @description 암장 로고 URL (사용 기록 썸네일 등) */
+                    logoImageUrl?: string | null;
                 };
             };
             stats: {
@@ -1195,6 +1204,8 @@ export interface components {
                 /** Format: date-time */
                 date: string;
                 gymName: string;
+                /** @description 해당 세션 암장 로고 URL */
+                gymLogoImageUrl?: string | null;
                 routeCount: number;
             }[];
         };

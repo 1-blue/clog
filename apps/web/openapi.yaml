@@ -1495,31 +1495,9 @@ components:
     # ── Enums (Prisma schema.prisma와 동기화) ──
     Region:
       description: |
-        지역 (17개 시도)
-        SEOUL 서울, GYEONGGI 경기, INCHEON 인천, BUSAN 부산, DAEGU 대구, DAEJEON 대전,
-        GWANGJU 광주, ULSAN 울산, SEJONG 세종, GANGWON 강원, CHUNGBUK 충북, CHUNGNAM 충남,
-        JEONBUK 전북, JEONNAM 전남, GYEONGBUK 경북, GYEONGNAM 경남, JEJU 제주
+        지역 (서울·경기·인천·부산)
       type: string
-      enum:
-        [
-          SEOUL,
-          GYEONGGI,
-          INCHEON,
-          BUSAN,
-          DAEGU,
-          DAEJEON,
-          GWANGJU,
-          ULSAN,
-          SEJONG,
-          GANGWON,
-          CHUNGBUK,
-          CHUNGNAM,
-          JEONBUK,
-          JEONNAM,
-          GYEONGBUK,
-          GYEONGNAM,
-          JEJU,
-        ]
+      enum: [SEOUL, GYEONGGI, INCHEON, BUSAN]
     Difficulty:
       description: |
         난이도 (V0~V10)
@@ -1531,9 +1509,10 @@ components:
       type: string
       enum: [MON, TUE, WED, THU, FRI, SAT, SUN]
     GymPerceivedDifficulty:
-      description: 체감 난이도 (EASY 쉬움, NORMAL 보통, HARD 어려움)
+      description: |
+        체감 난이도 (EASY 쉬움, EASY_NORMAL 쉬움~보통, NORMAL 보통, NORMAL_HARD 보통~어려움, HARD 어려움)
       type: string
-      enum: [EASY, NORMAL, HARD]
+      enum: [EASY, EASY_NORMAL, NORMAL, NORMAL_HARD, HARD]
     CommunityCategory:
       description: |
         게시글 카테고리 (FREE 자유, TIPS 팁/노하우, REVIEW 후기, MEETUP 모임, GEAR 장비)
@@ -1663,12 +1642,12 @@ components:
           type: array
           items:
             type: object
-            required: [gymId, name, address, thumbnailUrl, visitCount]
+            required: [gymId, name, address, coverImageUrl, visitCount]
             properties:
               gymId: { type: string, format: uuid }
               name: { type: string }
               address: { type: string }
-              thumbnailUrl: { type: string, nullable: true }
+              coverImageUrl: { type: string }
               visitCount: { type: integer }
         insights:
           type: array
@@ -1722,6 +1701,13 @@ components:
         - THE_CLIMB
         - SEOULFOREST
         - CLIMBINGPARK
+        - SONCLIMB
+        - PEAKERS
+        - WAVEROCK
+        - CLIMB_US
+        - DAMJANG
+        - B_BLOC
+        - ALLEZ
         - STANDALONE
 
     GymListItem:
@@ -1743,6 +1729,8 @@ components:
           description,
           avgRating,
           reviewCount,
+          coverImageUrl,
+          logoImageUrl,
           createdAt,
           updatedAt,
           membershipBrand,
@@ -1782,8 +1770,17 @@ components:
         avgRating: { type: number, description: 평균 평점 }
         reviewCount: { type: integer, description: 리뷰 수 }
         website: { type: string, nullable: true, description: 웹사이트 URL }
-        thumbnailUrl:
-          { type: string, nullable: true, description: 목록/카드용 썸네일 }
+        coverImageUrl:
+          { type: string, description: 목록·히어로용 커버 이미지 URL }
+        logoImageUrl: { type: string, description: 로고 이미지 URL }
+        difficultyImageUrl:
+          type: string
+          nullable: true
+          description: 난이도표 이미지 URL (브랜드 기본·지점별)
+        settingScheduleMemo:
+          type: string
+          nullable: true
+          description: 세팅 주기·일정 안내 텍스트
         instagramId: { type: string, nullable: true, description: 인스타그램 아이디 }
         createdAt: { type: string, format: date-time, description: 생성일 }
         updatedAt: { type: string, format: date-time, description: 수정일 }
@@ -2069,6 +2066,10 @@ components:
       properties:
         id: { type: string, format: uuid }
         name: { type: string }
+        logoImageUrl:
+          type: string
+          nullable: true
+          description: 암장 로고 URL (기록 썸네일 폴백 등)
         difficultyColors:
           type: array
           description: 암장별 난이도 색상 (기록 목록 GET에서 포함)
@@ -2153,6 +2154,10 @@ components:
             id: { type: string, format: uuid }
             name: { type: string }
             address: { type: string }
+            logoImageUrl:
+              type: string
+              nullable: true
+              description: 암장 로고 URL (기록 사진 없을 때 폴백)
         routes:
           type: array
           items: { $ref: "#/components/schemas/Route" }
@@ -2213,6 +2218,10 @@ components:
                 id: { type: string, format: uuid }
                 name: { type: string }
                 membershipBrand: { $ref: "#/components/schemas/GymMembershipBrand" }
+                logoImageUrl:
+                  type: string
+                  nullable: true
+                  description: 암장 로고 URL (사용 기록 썸네일 등)
         stats:
           type: object
           required: [totalUsed, weeklyAverage]
@@ -2230,6 +2239,10 @@ components:
               id: { type: string, format: uuid }
               date: { type: string, format: date-time }
               gymName: { type: string }
+              gymLogoImageUrl:
+                type: string
+                nullable: true
+                description: 해당 세션 암장 로고 URL
               routeCount: { type: integer }
 
     PaginatedRecordListItem:

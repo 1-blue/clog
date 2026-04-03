@@ -27,7 +27,14 @@ export const GET = async (
       where: { id: userMembershipId, userId: userId! },
       include: {
         plan: true,
-        gym: { select: { id: true, name: true, membershipBrand: true } },
+        gym: {
+          select: {
+            id: true,
+            name: true,
+            membershipBrand: true,
+            logoImageUrl: true,
+          },
+        },
         pauses: { orderBy: { startDate: "asc" } },
       },
     });
@@ -56,7 +63,7 @@ export const GET = async (
       where: { userId: userId!, userMembershipId },
       orderBy: { date: "desc" },
       include: {
-        gym: { select: { id: true, name: true } },
+        gym: { select: { id: true, name: true, logoImageUrl: true } },
         _count: { select: { routes: true } },
       },
     });
@@ -98,6 +105,7 @@ export const GET = async (
         id: s.id,
         date: s.date.toISOString(),
         gymName: s.gym.name,
+        gymLogoImageUrl: s.gym.logoImageUrl,
         routeCount: s._count.routes,
       })),
     });

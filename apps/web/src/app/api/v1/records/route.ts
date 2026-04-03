@@ -13,6 +13,7 @@ import {
   applyMembershipOnSessionCreate,
   sessionDateForValidation,
 } from "#web/libs/membership/sessionMembership";
+import { resolveSessionImageUrlsForDb } from "#web/libs/record/resolveSessionImageUrls";
 import { bumpUserMaxDifficultyFromRoutes } from "#web/libs/user/updateUserMaxDifficulty";
 
 const membershipErrorMessage = (e: unknown): string | null => {
@@ -63,6 +64,7 @@ export const GET = async (request: Request) => {
           select: {
             id: true,
             name: true,
+            logoImageUrl: true,
             difficultyColors: { orderBy: { order: "asc" } },
           },
         },
@@ -106,6 +108,12 @@ export const POST = async (request: Request) => {
         throw me;
       }
 
+      const imageUrls = await resolveSessionImageUrlsForDb(
+        tx,
+        data.gymId,
+        data.imageUrls ?? [],
+      );
+
       return tx.climbingSession.create({
         data: {
           userId: userId!,
@@ -125,7 +133,7 @@ export const POST = async (request: Request) => {
               order: i,
             })),
           },
-          imageUrls: data.imageUrls ?? [],
+          imageUrls,
         },
         include: {
           routes: true,

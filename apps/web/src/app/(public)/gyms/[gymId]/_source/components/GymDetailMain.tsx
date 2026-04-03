@@ -156,7 +156,11 @@ const GymDetailMain: React.FC<IProps> = ({ gymId }) => {
           value="photos"
           className="mt-0 flex-none p-0 px-2 text-base"
         >
-          <GymPhotoTab images={gym.images} gymName={gym.name} />
+          <GymPhotoTab
+            images={gym.images}
+            gymName={gym.name}
+            difficultyImageUrl={gym.difficultyImageUrl}
+          />
         </TabsContent>
       </Tabs>
 

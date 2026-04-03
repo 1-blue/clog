@@ -8,7 +8,10 @@ export const gymQuerySchema = z.object({
   cursor: schemas.cursor,
   limit: schemas.limit,
   region: regionEnum.optional(),
-  search: z.string().optional(),
+  search: z
+    .string()
+    .optional()
+    .transform((s) => (s == null ? undefined : s.trim() || undefined)),
   sort: z
     .enum([
       "name",

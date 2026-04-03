@@ -1,3 +1,6 @@
+-- CreateSchema
+CREATE SCHEMA IF NOT EXISTS "public";
+
 -- CreateEnum
 CREATE TYPE "Provider" AS ENUM ('KAKAO', 'GOOGLE');
 
@@ -5,7 +8,7 @@ CREATE TYPE "Provider" AS ENUM ('KAKAO', 'GOOGLE');
 CREATE TYPE "Role" AS ENUM ('ADMIN', 'MANAGER', 'GUEST');
 
 -- CreateEnum
-CREATE TYPE "Region" AS ENUM ('SEOUL', 'GYEONGGI', 'INCHEON', 'BUSAN', 'DAEGU', 'DAEJEON', 'GWANGJU', 'ULSAN', 'SEJONG', 'GANGWON', 'CHUNGBUK', 'CHUNGNAM', 'JEONBUK', 'JEONNAM', 'GYEONGBUK', 'GYEONGNAM', 'JEJU');
+CREATE TYPE "Region" AS ENUM ('SEOUL', 'GYEONGGI', 'INCHEON', 'BUSAN');
 
 -- CreateEnum
 CREATE TYPE "Difficulty" AS ENUM ('V0', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'V7', 'V8', 'V9', 'V10');
@@ -20,7 +23,7 @@ CREATE TYPE "GymFacilityType" AS ENUM ('PARKING', 'SHOWER', 'LOCKER', 'REST_AREA
 CREATE TYPE "GymReviewFeature" AS ENUM ('COOL_AIR', 'WIDE_STRETCH', 'VARIOUS_LEVEL', 'KIND_STAFF', 'EASY_PARKING', 'SHOWER_ROOM', 'CLEAN_FACILITY', 'GOOD_VENT');
 
 -- CreateEnum
-CREATE TYPE "GymPerceivedDifficulty" AS ENUM ('EASY', 'NORMAL', 'HARD');
+CREATE TYPE "GymPerceivedDifficulty" AS ENUM ('EASY', 'EASY_NORMAL', 'NORMAL', 'NORMAL_HARD', 'HARD');
 
 -- CreateEnum
 CREATE TYPE "ClimbingAttemptResult" AS ENUM ('SEND', 'ATTEMPT', 'FLASH', 'ONSIGHT');
@@ -35,7 +38,7 @@ CREATE TYPE "NotificationType" AS ENUM ('COMMENT', 'LIKE', 'FOLLOW', 'SYSTEM', '
 CREATE TYPE "MembershipPlanCode" AS ENUM ('PERIOD_1M', 'PERIOD_3M', 'PERIOD_6M', 'PERIOD_12M', 'COUNT_DAY', 'COUNT_3', 'COUNT_5', 'COUNT_10');
 
 -- CreateEnum
-CREATE TYPE "GymMembershipBrand" AS ENUM ('THE_CLIMB', 'SEOULFOREST', 'CLIMBINGPARK', 'STANDALONE');
+CREATE TYPE "GymMembershipBrand" AS ENUM ('THE_CLIMB', 'SEOULFOREST', 'CLIMBINGPARK', 'SONCLIMB', 'PEAKERS', 'WAVEROCK', 'CLIMB_US', 'DAMJANG', 'B_BLOC', 'ALLEZ', 'STANDALONE');
 
 -- CreateTable
 CREATE TABLE "users" (
@@ -113,7 +116,9 @@ CREATE TABLE "gyms" (
     "longitude" DOUBLE PRECISION NOT NULL,
     "description" TEXT NOT NULL,
     "website" TEXT,
-    "thumbnail_url" TEXT,
+    "setting_schedule_memo" TEXT,
+    "cover_image_url" TEXT NOT NULL,
+    "logo_image_url" TEXT NOT NULL,
     "instagram_id" TEXT,
     "avg_rating" DOUBLE PRECISION NOT NULL DEFAULT 0,
     "review_count" INTEGER NOT NULL DEFAULT 0,
@@ -220,20 +225,6 @@ CREATE TABLE "gym_bookmarks" (
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "gym_bookmarks_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "gym_setting_schedules" (
-    "id" UUID NOT NULL,
-    "gym_id" UUID NOT NULL,
-    "interval_days" INTEGER,
-    "last_setting_date" DATE,
-    "next_setting_date" DATE,
-    "memo" TEXT,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "gym_setting_schedules_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -402,9 +393,6 @@ CREATE UNIQUE INDEX "gym_difficulty_colors_gym_id_difficulty_key" ON "gym_diffic
 CREATE UNIQUE INDEX "gym_bookmarks_user_id_gym_id_key" ON "gym_bookmarks"("user_id", "gym_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "gym_setting_schedules_gym_id_key" ON "gym_setting_schedules"("gym_id");
-
--- CreateIndex
 CREATE UNIQUE INDEX "reviews_user_id_gym_id_key" ON "reviews"("user_id", "gym_id");
 
 -- CreateIndex
@@ -466,9 +454,6 @@ ALTER TABLE "gym_bookmarks" ADD CONSTRAINT "gym_bookmarks_user_id_fkey" FOREIGN 
 
 -- AddForeignKey
 ALTER TABLE "gym_bookmarks" ADD CONSTRAINT "gym_bookmarks_gym_id_fkey" FOREIGN KEY ("gym_id") REFERENCES "gyms"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "gym_setting_schedules" ADD CONSTRAINT "gym_setting_schedules_gym_id_fkey" FOREIGN KEY ("gym_id") REFERENCES "gyms"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "reviews" ADD CONSTRAINT "reviews_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;

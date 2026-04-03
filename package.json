@@ -15,6 +15,7 @@
     "db:push": "pnpm --filter @clog/db db:push",
     "db:migrate": "pnpm --filter @clog/db db:migrate",
     "db:seed": "pnpm --filter @clog/db db:seed",
+    "db:seed:prod": "pnpm --filter @clog/db db:seed:prod",
     "db:studio": "pnpm --filter @clog/db db:studio",
     "db:reset": "pnpm --filter @clog/db db:reset",
     "db:reset:force": "pnpm --filter @clog/db db:reset:force",

@@ -6,25 +6,7 @@ export type Provider = z.infer<typeof providerEnum>;
 export const roleEnum = z.enum(["ADMIN", "MANAGER", "GUEST"]);
 export type Role = z.infer<typeof roleEnum>;
 
-export const regionEnum = z.enum([
-  "SEOUL",
-  "GYEONGGI",
-  "INCHEON",
-  "BUSAN",
-  "DAEGU",
-  "DAEJEON",
-  "GWANGJU",
-  "ULSAN",
-  "SEJONG",
-  "GANGWON",
-  "CHUNGBUK",
-  "CHUNGNAM",
-  "JEONBUK",
-  "JEONNAM",
-  "GYEONGBUK",
-  "GYEONGNAM",
-  "JEJU",
-]);
+export const regionEnum = z.enum(["SEOUL", "GYEONGGI", "INCHEON", "BUSAN"]);
 export type Region = z.infer<typeof regionEnum>;
 
 export const difficultyEnum = z.enum([
@@ -77,7 +59,13 @@ export const attemptResultEnum = z.enum([
 ]);
 export type AttemptResult = z.infer<typeof attemptResultEnum>;
 
-export const perceivedDifficultyEnum = z.enum(["EASY", "NORMAL", "HARD"]);
+export const perceivedDifficultyEnum = z.enum([
+  "EASY",
+  "EASY_NORMAL",
+  "NORMAL",
+  "NORMAL_HARD",
+  "HARD",
+]);
 export type PerceivedDifficulty = z.infer<typeof perceivedDifficultyEnum>;
 
 export const gymReviewFeatureEnum = z.enum([
@@ -97,6 +85,13 @@ export const gymMembershipBrandEnum = z.enum([
   "THE_CLIMB",
   "SEOULFOREST",
   "CLIMBINGPARK",
+  "SONCLIMB",
+  "PEAKERS",
+  "WAVEROCK",
+  "CLIMB_US",
+  "DAMJANG",
+  "B_BLOC",
+  "ALLEZ",
   "STANDALONE",
 ]);
 export type GymMembershipBrand = z.infer<typeof gymMembershipBrandEnum>;

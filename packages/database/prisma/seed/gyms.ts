@@ -1,13 +1,16 @@
 import type {
   DayType,
+  Difficulty,
   Gym,
   GymFacilityType,
   GymMembershipBrand,
   MembershipPlanCode,
   PrismaClient,
+  Region,
 } from "@prisma/client";
 
-interface IGymSeed {
+/** 시드 암장 1개 + 브랜드 메타 */
+interface IGymListItemJson {
   key: string;
   name: string;
   address: string;
@@ -17,786 +20,72 @@ interface IGymSeed {
   longitude: number;
   visitorCapacity: number;
   description: string;
-  website?: string;
   instagramId?: string;
-  thumbnailUrl?: string;
-  priceImageUrl?: string;
-  /** 시드용 구 가격표 → GymMembershipPlan 행으로 변환 */
+  notice?: string;
+  settingScheduleMemo?: string;
+  coverImageUrl: string;
+  logoImageUrl: string;
   legacyPrices: {
     daily: number;
     monthly: number;
     threeMonths: number;
+    fiveSession?: number;
     tenSession: number;
-    /** 6개월 정기권 — 없으면 PERIOD_6M 행을 만들지 않음 */
     sixMonths?: number;
-    /** 12개월 정기권 — 없으면 PERIOD_12M 행을 만들지 않음 */
     twelveMonths?: number;
   };
-  facilities: GymFacilityType[];
-  notice?: string;
+  openHours: Array<{ dayType: string; open: string; close: string }>;
+  facilities: string[];
+  priceImageUrl?: string;
+  website?: string;
+  /** 지점별로 브랜드 기본 난이도표 이미지를 덮어쓸 때 */
+  difficultyImageUrl?: string;
 }
 
-interface IOpenHourSeed {
-  dayType: DayType;
-  open: string;
-  close: string;
+interface IBrandBlockJson {
+  membershipBrand: string;
+  /** 브랜드 공통 난이도표 이미지 (지점 시드에 없으면 이 값 사용) */
+  difficultyImageUrl?: string;
+  difficultyColors: Array<{
+    difficulty: string;
+    color: string;
+    label: string;
+    order: number;
+  }>;
+  priceImageUrl?: string;
+  website?: string;
+  list: IGymListItemJson[];
 }
 
-const GYMS_DATA: IGymSeed[] = [
-  {
-    key: "theclimb_yeonnam",
-    name: "더클라임 연남점",
-    address: "서울 마포구 양화로 186 LC타워 3층",
-    region: "SEOUL",
-    phone: "02-2088-5071",
-    latitude: 37.5576684824211,
-    longitude: 126.92589313527,
-    visitorCapacity: 60,
-    description:
-      "홍대입구역 4·8번 출구 도보 3분\n3개 섹터(툇마루·연남·신촌)\n\n더클라임 13개 지점 통합 회원권",
-    website: "http://theclimb.co.kr",
-    instagramId: "theclimb_yeonnam",
-    thumbnailUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%8B%E1%85%A7%E1%86%AB%E1%84%82%E1%85%A1%E1%86%B7.jpeg",
-    priceImageUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    legacyPrices: {
-      daily: 22000,
-      monthly: 140000,
-      threeMonths: 330000,
-      tenSession: 170000,
-    },
-    facilities: ["SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
-  },
-  {
-    key: "theclimb_b_hongdae",
-    name: "더클라임 홍대B점",
-    address: "서울 마포구 양화로 125 경남관광빌딩 B동",
-    region: "SEOUL",
-    phone: "02-332-5014",
-    latitude: 37.5547493986687,
-    longitude: 126.920309389675,
-    visitorCapacity: 60,
-    description:
-      "홍대입구역 1번 출구 도보 5분\n합정역 2번 출구 도보 7분\n\n경남관광빌딩 스타벅스 리저브 건물 2층\n\n더클라임 13개 지점 통합 회원권",
-    website: "http://theclimb.co.kr",
-    instagramId: "theclimb_b_hongdae",
-    thumbnailUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%92%E1%85%A9%E1%86%BC%E1%84%83%E1%85%A2B.jpeg",
-    priceImageUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.pngg",
-    legacyPrices: {
-      daily: 22000,
-      monthly: 140000,
-      threeMonths: 330000,
-      tenSession: 170000,
-    },
-    facilities: ["SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
-  },
-  {
-    key: "theclimb_ilsan",
-    name: "더클라임 일산점",
-    address: "경기 고양시 일산동구 중앙로 1160 5층 더클라임",
-    region: "GYEONGGI",
-    phone: "031-905-5014",
-    latitude: 37.6509174810735,
-    longitude: 126.778893109192,
-    visitorCapacity: 80,
-    description: "더클라임 13개 지점 통합 회원권",
-    website: "http://theclimb.co.kr",
-    instagramId: "theclimb_ilsan",
-    thumbnailUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%8B%E1%85%B5%E1%86%AF%E1%84%89%E1%85%A1%E1%86%AB.jpeg",
-    priceImageUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    legacyPrices: {
-      daily: 22000,
-      monthly: 140000,
-      threeMonths: 330000,
-      tenSession: 170000,
-    },
-    facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
-  },
-  {
-    key: "theclimb_magok",
-    name: "더클라임 마곡점",
-    address: "서울 강서구 마곡동로 62 마곡사이언스타워 7층",
-    region: "SEOUL",
-    phone: "02-2668-5014",
-    latitude: 37.5605537644679,
-    longitude: 126.833890184435,
-    visitorCapacity: 60,
-    description:
-      "5호선 발산역 9번 출구에서 도보 5분\n5호선 마곡역 2번 출구에서 도보 10분\n9호선 마곡나루역 2번 출구에서 도보 15분\n버스 정류장 발산역 16-017에서 도보 5분\n\n더클라임 13개 지점 통합 회원권",
-    website: "http://theclimb.co.kr",
-    instagramId: "theclimb_magok",
-    thumbnailUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%86%E1%85%A1%E1%84%80%E1%85%A9%E1%86%A8.jpeg",
-    priceImageUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    legacyPrices: {
-      daily: 22000,
-      monthly: 140000,
-      threeMonths: 330000,
-      tenSession: 170000,
-    },
-    facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
-  },
-  {
-    key: "theclimb_yangjae",
-    name: "더클라임 양재점",
-    address: "서울 강남구 남부순환로 2615 지하1층",
-    region: "SEOUL",
-    phone: "02-576-8821",
-    latitude: 37.4851852937745,
-    longitude: 127.035883711966,
-    visitorCapacity: 80,
-    description:
-      "3호선 양재역 4번 출구에서 직진 (도보 2분 거리)\n\n더클라임 13개 지점 통합 회원권",
-    website: "http://theclimb.co.kr",
-    instagramId: "theclimb_yangjae",
-    thumbnailUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%8B%E1%85%A3%E1%86%BC%E1%84%8C%E1%85%A2.jpeg",
-    priceImageUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    legacyPrices: {
-      daily: 22000,
-      monthly: 140000,
-      threeMonths: 330000,
-      tenSession: 170000,
-    },
-    facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
-  },
-  {
-    key: "theclimb_sillim",
-    name: "더클라임 신림점",
-    address: "서울 관악구 신원로 35 삼모더프라임타워 5층",
-    region: "SEOUL",
-    phone: "02-877-8821",
-    latitude: 37.4823122359729,
-    longitude: 126.929023376476,
-    visitorCapacity: 70,
-    description:
-      "신림역 2호선 3번 출구 3분 거리\n\n더클라임 13개 지점 통합 회원권",
-    website: "http://theclimb.co.kr",
-    instagramId: "theclimb_sillim",
-    thumbnailUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%89%E1%85%B5%E1%86%AB%E1%84%85%E1%85%B5%E1%86%B7.jpeg",
-    priceImageUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    legacyPrices: {
-      daily: 22000,
-      monthly: 140000,
-      threeMonths: 330000,
-      tenSession: 170000,
-    },
-    facilities: ["SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
-  },
-  {
-    key: "theclimb_gangnam",
-    name: "더클라임 강남점",
-    address: "서울 강남구 테헤란로8길 21 화인강남빌딩 B1층",
-    region: "SEOUL",
-    phone: "02-566-8821",
-    latitude: 37.4975931910405,
-    longitude: 127.032001186611,
-    visitorCapacity: 60,
-    description:
-      "찾아가는길\n강남역 1,2,3번출구 5분거리에 위치해있습니다.\n주차 : 건물 내 지하 주차장 주차 가능 30분 할인권 적용 가능(이후 10분당 1,000원)\n\n더클라임 13개 지점 통합 회원권",
-    website: "http://theclimb.co.kr",
-    instagramId: "theclimb_gangnam",
-    thumbnailUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%86%BC%E1%84%82%E1%85%A1%E1%86%B7.jpeg",
-    priceImageUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    legacyPrices: {
-      daily: 22000,
-      monthly: 140000,
-      threeMonths: 330000,
-      tenSession: 170000,
-    },
-    facilities: ["SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
-  },
-  {
-    key: "theclimb_sadang",
-    name: "더클라임 사당점",
-    address: "서울 관악구 과천대로 939 지층 B201호",
-    region: "SEOUL",
-    phone: "02-585-8821",
-    latitude: 37.4743771732195,
-    longitude: 126.981430242321,
-    visitorCapacity: 60,
-    description:
-      "지하철 사당역 4호선 4번출구 도보 1분거리\n\n더클라임 13개 지점 통합 회원권",
-    website: "http://theclimb.co.kr",
-    instagramId: "theclimb_sadang",
-    thumbnailUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%89%E1%85%A1%E1%84%83%E1%85%A1%E1%86%BC.jpeg",
-    priceImageUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    legacyPrices: {
-      daily: 22000,
-      monthly: 140000,
-      threeMonths: 330000,
-      tenSession: 170000,
-    },
-    facilities: ["SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
-  },
-  {
-    key: "theclimb_sinsa",
-    name: "더클라임 신사점",
-    address: "서울 강남구 압구정로2길 6 지하2층",
-    region: "SEOUL",
-    phone: "02-549-8821",
-    latitude: 37.5210863385776,
-    longitude: 127.019138224359,
-    visitorCapacity: 60,
-    description:
-      "지하철 신사역 3호선 6번출구 도보 9분거리\n\n더클라임 13개 지점 통합 회원권",
-    website: "http://theclimb.co.kr",
-    instagramId: "theclimb_sinsa",
-    thumbnailUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%89%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A1.jpeg",
-    priceImageUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    legacyPrices: {
-      daily: 22000,
-      monthly: 140000,
-      threeMonths: 330000,
-      tenSession: 170000,
-    },
-    facilities: ["SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
-  },
-  {
-    key: "theclimb_nonhyeon",
-    name: "더클라임 논현점",
-    address: "서울 서초구 강남대로 519 지하1층",
-    region: "SEOUL",
-    phone: "02-545-5014",
-    latitude: 37.5082880328998,
-    longitude: 127.022205905271,
-    visitorCapacity: 60,
-    description:
-      "논현역 4번출구 2분거리 및 신논현역2번출구 6분거리\n\n더클라임 13개 지점 통합 회원권",
-    website: "http://theclimb.co.kr",
-    instagramId: "theclimb_nonhyeon",
-    thumbnailUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%82%E1%85%A9%E1%86%AB%E1%84%92%E1%85%A7%E1%86%AB.jpeg",
-    priceImageUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    legacyPrices: {
-      daily: 22000,
-      monthly: 140000,
-      threeMonths: 330000,
-      tenSession: 170000,
-    },
-    facilities: ["SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
-  },
-  {
-    key: "theclimb_mullae",
-    name: "더클라임 문래점",
-    address: "서울 영등포구 당산로 63 1동",
-    region: "SEOUL",
-    phone: "02-3667-5014",
-    latitude: 37.5205582802612,
-    longitude: 126.895001322291,
-    visitorCapacity: 100,
-    description:
-      "문래역[2호선] 3번 출구 도보 2분거리\n영등포구청 [5호선] 6번 출구 도보 7분거리\n\n더클라임 13개 지점 통합 회원권",
-    website: "http://theclimb.co.kr",
-    instagramId: "theclimb_mullae",
-    thumbnailUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%86%E1%85%AE%E1%86%AB%E1%84%85%E1%85%A2.jpeg",
-    priceImageUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    legacyPrices: {
-      daily: 22000,
-      monthly: 140000,
-      threeMonths: 330000,
-      tenSession: 170000,
-    },
-    facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
-  },
-  {
-    key: "theclimb_isu",
-    name: "더클라임 이수점",
-    address: "서울 동작구 동작대로 59 지하1층",
-    region: "SEOUL",
-    phone: "02-588-5014",
-    latitude: 37.4820109847453,
-    longitude: 126.981487484949,
-    visitorCapacity: 60,
-    description:
-      "4호선 이수역 7번출구 도보4분\n4호선 사당역 10번출구 도보5분\n\n더클라임 13개 지점 통합 회원권",
-    website: "http://theclimb.co.kr",
-    instagramId: "theclimb_isu",
-    thumbnailUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%8B%E1%85%B5%E1%84%89%E1%85%AE.jpeg",
-    priceImageUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    legacyPrices: {
-      daily: 22000,
-      monthly: 140000,
-      threeMonths: 330000,
-      tenSession: 170000,
-    },
-    facilities: ["SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
-  },
-  {
-    key: "theclimb_seongsu",
-    name: "더클라임 성수점",
-    address: "서울 성동구 아차산로17길 49 생각공장 데시앙플렉스 B1층",
-    region: "SEOUL",
-    phone: "02-499-5014",
-    latitude: 37.5467683738173,
-    longitude: 127.065279307819,
-    visitorCapacity: 60,
-    description:
-      "2호선 성수역,건대입구역 2번출구 도보 15분\n7호선 어린이대공원역 4번출구 도보 13분\n\n더클라임 13개 지점 통합 회원권",
-    website: "http://theclimb.co.kr",
-    instagramId: "theclimb_seongsu",
-    thumbnailUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%89%E1%85%A5%E1%86%BC%E1%84%89%E1%85%AE.jpeg",
-    priceImageUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    legacyPrices: {
-      daily: 22000,
-      monthly: 140000,
-      threeMonths: 330000,
-      tenSession: 170000,
-    },
-    facilities: ["SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
-  },
-  // 서울숲클라이밍
-  {
-    key: "seoulforest_jongno",
-    name: "서울숲클라이밍 종로점",
-    address: "서울 종로구 수표로 96 지하1층",
-    region: "SEOUL",
-    phone: "010-3289-2705",
-    latitude: 37.5697050231621,
-    longitude: 126.99002424417,
-    visitorCapacity: 80,
-    description:
-      "찾아가는길\n종로3가역 15번 출구에서 도보 3분\n* 건물 입구를 바라보고 오른편에 서울숲클라이밍으로 연결되는 계단 입구가 따로 있습니다.\n* 엘리베이터 이용 시, 4호기 엘리베이터만 이용 가능합니다.\n\n서울숲클라이밍 4개 지점 통합 회원권",
-    instagramId: "seoulforest_jongro",
-    thumbnailUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%8C%E1%85%A9%E1%86%BC%E1%84%85%E1%85%A9.jpeg",
-    priceImageUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    legacyPrices: {
-      daily: 20000,
-      monthly: 130000,
-      threeMonths: 330000,
-      tenSession: 170000,
-    },
-    facilities: ["SHOWER", "LOCKER", "REST_AREA"],
-  },
-  {
-    key: "seoulforest_jamsil",
-    name: "서울숲클라이밍 잠실점",
-    address: "서울 송파구 백제고분로7길 49 지하1층",
-    region: "SEOUL",
-    phone: "010-7710-2703",
-    latitude: 37.510948520197,
-    longitude: 127.084336791957,
-    visitorCapacity: 60,
-    description:
-      "잠실새내역 4번출구 버스정류장 도보 2분\n잠실새내역 3번출구 도보 4분\n\n서울숲클라이밍 4개 지점 통합 회원권",
-    instagramId: "seoulforest_climbing",
-    thumbnailUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%8C%E1%85%A1%E1%86%B7%E1%84%89%E1%85%B5%E1%86%AF.jpeg",
-    priceImageUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.pngg",
-    legacyPrices: {
-      daily: 20000,
-      monthly: 130000,
-      threeMonths: 330000,
-      tenSession: 170000,
-    },
-    facilities: ["SHOWER", "LOCKER", "REST_AREA"],
-  },
-  {
-    key: "seoulforest_yeongdeungpo",
-    name: "서울숲클라이밍 영등포점",
-    address: "서울 영등포구 문래로 164 1층",
-    region: "SEOUL",
-    phone: "010-6686-2700",
-    latitude: 37.5177939016069,
-    longitude: 126.900076883603,
-    visitorCapacity: 60,
-    description:
-      "문래역 5번 출구로 나와 400m 직진 SK리더스뷰 1층 서울숲클라이밍\n규수당 카페 맞은편 건물 1층에 위치해있습니다.\n\n서울숲클라이밍 4개 지점 통합 회원권",
-    instagramId: "seoulforest_climbing",
-    thumbnailUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%8B%E1%85%A7%E1%86%BC%E1%84%83%E1%85%B3%E1%86%BC%E1%84%91%E1%85%A9.jpeg",
-    priceImageUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    legacyPrices: {
-      daily: 20000,
-      monthly: 130000,
-      threeMonths: 330000,
-      tenSession: 170000,
-    },
-    facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA"],
-  },
-  {
-    key: "seoulforest_guro",
-    name: "서울숲클라이밍 구로점",
-    address: "서울 구로구 디지털로 300 지하1층",
-    region: "SEOUL",
-    phone: "010-3374-2704",
-    latitude: 37.4849270383011,
-    longitude: 126.896538036905,
-    visitorCapacity: 90,
-    description: "서울숲클라이밍 4개 지점 통합 회원권",
-    instagramId: "seoulforest_climbing",
-    thumbnailUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%80%E1%85%AE%E1%84%85%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%B7.png",
-    priceImageUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    legacyPrices: {
-      daily: 20000,
-      monthly: 130000,
-      threeMonths: 330000,
-      tenSession: 170000,
-    },
-    facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA"],
-  },
-  // 클라이밍파크
-  {
-    key: "climbingpark_gangnam",
-    name: "클라이밍파크 강남점",
-    address: "서울 강남구 강남대로 364 지하1층",
-    region: "SEOUL",
-    phone: "0507-1391-4662",
-    latitude: 37.4955498697675,
-    longitude: 127.029293901519,
-    visitorCapacity: 70,
-    description:
-      "강남역 4번출구 바로 앞에 있는 미왕빌딩 지하1층에 있습니다.\n건물 안으로 들어올 필요 없이 건물 외부에(건물 입구를 바라보고 좌측) 있는 엘리베이터를 이용해서 지하1층으로 내려오면 됩니다\n\n클라이밍파크 5개 지점 통합 회원권",
-    instagramId: "climbingpark_gangnam",
-    thumbnailUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%80%E1%85%A1%E1%86%BC%E1%84%82%E1%85%A1%E1%86%B7.jpeg",
-    priceImageUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.jpegg",
-    legacyPrices: {
-      daily: 22000,
-      monthly: 130000,
-      threeMonths: 330000,
-      tenSession: 170000,
-    },
-    facilities: ["SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
-  },
-  {
-    key: "climbingpark_sinnonhyeon",
-    name: "클라이밍파크 신논현점",
-    address: "서울 강남구 강남대로 468 지하3층",
-    region: "SEOUL",
-    phone: "0507-1362-4662",
-    latitude: 37.5041557043851,
-    longitude: 127.025145513654,
-    visitorCapacity: 60,
-    description:
-      "신논현역 5번출구에서 다섯걸음\n\n클라이밍파크 5개 지점 통합 회원권",
-    instagramId: "climbingpark_sinnonhyeon",
-    thumbnailUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%89%E1%85%B5%E1%86%AB%E1%84%82%E1%85%A9%E1%86%AB%E1%84%92%E1%85%A7%E1%86%AB.jpeg",
-    priceImageUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.jpeg",
-    legacyPrices: {
-      daily: 22000,
-      monthly: 130000,
-      threeMonths: 330000,
-      tenSession: 170000,
-    },
-    facilities: ["SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
-  },
-  {
-    key: "climbingpark_hanti",
-    name: "클라이밍파크 한티점",
-    address: "서울 강남구 선릉로 324 SH타워 지하3층",
-    region: "SEOUL",
-    phone: "0507-1340-4662",
-    latitude: 37.4985303841214,
-    longitude: 127.052094163626,
-    visitorCapacity: 60,
-    description:
-      "지하철 분당선 한티역에 내려서 1번출구로 나오셔서 건물들을 바라보면 SH타워가 보입니다.\n1번출구에서 2분 정도 걸으면 클라이밍파크 간판이 보여요.\n\n클라이밍파크 5개 지점 통합 회원권",
-    instagramId: "climbing_park_hanti",
-    thumbnailUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%92%E1%85%A1%E1%86%AB%E1%84%90%E1%85%B5.jpeg",
-    priceImageUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.jpeg",
-    legacyPrices: {
-      daily: 22000,
-      monthly: 130000,
-      threeMonths: 330000,
-      tenSession: 170000,
-    },
-    facilities: ["SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
-  },
-  {
-    key: "climbingpark_seongsu",
-    name: "클라이밍파크 성수점",
-    address: "서울 성동구 연무장13길 7 매니아빌딩",
-    region: "SEOUL",
-    phone: "0507-1322-4662",
-    latitude: 37.5423065177285,
-    longitude: 127.058068446213,
-    visitorCapacity: 60,
-    description:
-      "성수역 3번출구에서 4분 거리에 위치\n\n클라이밍파크 5개 지점 통합 회원권",
-    instagramId: "climbingpark_seongsu",
-    thumbnailUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%89%E1%85%A5%E1%86%BC%E1%84%89%E1%85%AE.jpeg",
-    priceImageUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.jpeg",
-    legacyPrices: {
-      daily: 22000,
-      monthly: 130000,
-      threeMonths: 330000,
-      tenSession: 170000,
-    },
-    facilities: ["SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
-  },
-  {
-    key: "climbingpark_jongno",
-    name: "클라이밍파크 종로점",
-    address: "서울 종로구 종로 199 한일빌딩 지하2층",
-    region: "SEOUL",
-    phone: "0507-1358-4662",
-    latitude: 37.5714335534085,
-    longitude: 126.999746324303,
-    visitorCapacity: 80,
-    description:
-      "1.지하철 1호선 종로5가역 하차후 1번 출구로 나와서 2분 정도 직진\n2.지하철 1호선 종로5가역 지하쇼핑센터 13번 출구로 나와서 3미터 직진\n국민은행 건물 주차장 큰 대로변 입구쪽 옆에 엘리베이터 및 지하로 내려가는 계단 입구 있습니다. ( 새종로약국 정면으로 바라보며 왼쪽 )\n\n클라이밍파크 5개 지점 통합 회원권",
-    instagramId: "climbing_park_jongro",
-    thumbnailUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%8C%E1%85%A9%E1%86%BC%E1%84%85%E1%85%A9.jpeg",
-    priceImageUrl:
-      "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.jpeg",
-    legacyPrices: {
-      daily: 22000,
-      monthly: 130000,
-      threeMonths: 330000,
-      tenSession: 170000,
-    },
-    facilities: ["SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
-  },
-];
+interface IGymsSampleRoot {
+  brands: Record<string, IBrandBlockJson>;
+}
 
-const OPEN_HOURS: Record<string, IOpenHourSeed[]> = {
-  theclimb_yeonnam: [
-    { dayType: "MON", open: "07:30", close: "24:00" },
-    { dayType: "TUE", open: "07:30", close: "24:00" },
-    { dayType: "WED", open: "07:30", close: "24:00" },
-    { dayType: "THU", open: "07:30", close: "24:00" },
-    { dayType: "FRI", open: "07:30", close: "24:00" },
-    { dayType: "SAT", open: "08:00", close: "22:00" },
-    { dayType: "SUN", open: "08:00", close: "22:00" },
-  ],
-  theclimb_b_hongdae: [
-    { dayType: "MON", open: "10:00", close: "23:00" },
-    { dayType: "TUE", open: "10:00", close: "23:00" },
-    { dayType: "WED", open: "10:00", close: "23:00" },
-    { dayType: "THU", open: "10:00", close: "23:00" },
-    { dayType: "FRI", open: "10:00", close: "23:00" },
-    { dayType: "SAT", open: "08:00", close: "22:00" },
-    { dayType: "SUN", open: "08:00", close: "22:00" },
-  ],
-  theclimb_ilsan: [
-    { dayType: "MON", open: "08:30", close: "24:00" },
-    { dayType: "TUE", open: "08:30", close: "24:00" },
-    { dayType: "WED", open: "08:30", close: "24:00" },
-    { dayType: "THU", open: "08:30", close: "24:00" },
-    { dayType: "FRI", open: "08:30", close: "24:00" },
-    { dayType: "SAT", open: "08:00", close: "22:00" },
-    { dayType: "SUN", open: "08:00", close: "22:00" },
-  ],
-  theclimb_magok: [
-    { dayType: "MON", open: "09:30", close: "23:30" },
-    { dayType: "TUE", open: "09:30", close: "23:30" },
-    { dayType: "WED", open: "09:30", close: "23:30" },
-    { dayType: "THU", open: "09:30", close: "23:30" },
-    { dayType: "FRI", open: "09:30", close: "23:30" },
-    { dayType: "SAT", open: "08:00", close: "22:00" },
-    { dayType: "SUN", open: "08:00", close: "22:00" },
-  ],
-  theclimb_yangjae: [
-    { dayType: "MON", open: "08:30", close: "24:00" },
-    { dayType: "TUE", open: "08:30", close: "24:00" },
-    { dayType: "WED", open: "08:30", close: "24:00" },
-    { dayType: "THU", open: "08:30", close: "24:00" },
-    { dayType: "FRI", open: "08:30", close: "24:00" },
-    { dayType: "SAT", open: "08:00", close: "22:00" },
-    { dayType: "SUN", open: "08:00", close: "22:00" },
-  ],
-  theclimb_sillim: [
-    { dayType: "MON", open: "07:30", close: "24:00" },
-    { dayType: "TUE", open: "07:30", close: "24:00" },
-    { dayType: "WED", open: "07:30", close: "24:00" },
-    { dayType: "THU", open: "07:30", close: "24:00" },
-    { dayType: "FRI", open: "07:30", close: "24:00" },
-    { dayType: "SAT", open: "07:30", close: "22:00" },
-    { dayType: "SUN", open: "08:00", close: "22:00" },
-  ],
-  theclimb_gangnam: [
-    { dayType: "MON", open: "09:30", close: "23:30" },
-    { dayType: "TUE", open: "09:30", close: "23:30" },
-    { dayType: "WED", open: "09:30", close: "23:30" },
-    { dayType: "THU", open: "09:30", close: "23:30" },
-    { dayType: "FRI", open: "09:30", close: "23:30" },
-    { dayType: "SAT", open: "10:00", close: "20:00" },
-    { dayType: "SUN", open: "10:00", close: "20:00" },
-  ],
-  theclimb_sadang: [
-    { dayType: "MON", open: "09:30", close: "23:30" },
-    { dayType: "TUE", open: "09:30", close: "23:30" },
-    { dayType: "WED", open: "09:30", close: "23:30" },
-    { dayType: "THU", open: "09:30", close: "23:30" },
-    { dayType: "FRI", open: "09:30", close: "23:30" },
-    { dayType: "SAT", open: "08:00", close: "22:00" },
-    { dayType: "SUN", open: "08:00", close: "22:00" },
-  ],
-  theclimb_sinsa: [
-    { dayType: "MON", open: "12:00", close: "23:00" },
-    { dayType: "TUE", open: "12:00", close: "23:00" },
-    { dayType: "WED", open: "12:00", close: "23:00" },
-    { dayType: "THU", open: "12:00", close: "23:00" },
-    { dayType: "FRI", open: "12:00", close: "23:00" },
-    { dayType: "SAT", open: "10:00", close: "22:00" },
-    { dayType: "SUN", open: "10:00", close: "20:00" },
-  ],
-  theclimb_nonhyeon: [
-    { dayType: "MON", open: "09:30", close: "23:30" },
-    { dayType: "TUE", open: "09:30", close: "23:30" },
-    { dayType: "WED", open: "09:30", close: "23:30" },
-    { dayType: "THU", open: "09:30", close: "23:30" },
-    { dayType: "FRI", open: "09:30", close: "23:30" },
-    { dayType: "SAT", open: "08:00", close: "22:00" },
-    { dayType: "SUN", open: "08:00", close: "22:00" },
-  ],
-  theclimb_mullae: [
-    { dayType: "MON", open: "07:30", close: "24:00" },
-    { dayType: "TUE", open: "07:30", close: "24:00" },
-    { dayType: "WED", open: "07:30", close: "24:00" },
-    { dayType: "THU", open: "07:30", close: "24:00" },
-    { dayType: "FRI", open: "07:30", close: "24:00" },
-    { dayType: "SAT", open: "08:00", close: "22:00" },
-    { dayType: "SUN", open: "08:00", close: "22:00" },
-  ],
-  theclimb_isu: [
-    { dayType: "MON", open: "09:30", close: "23:30" },
-    { dayType: "TUE", open: "09:30", close: "23:30" },
-    { dayType: "WED", open: "09:30", close: "23:30" },
-    { dayType: "THU", open: "09:30", close: "23:30" },
-    { dayType: "FRI", open: "09:30", close: "23:30" },
-    { dayType: "SAT", open: "08:00", close: "22:00" },
-    { dayType: "SUN", open: "08:00", close: "22:00" },
-  ],
-  theclimb_seongsu: [
-    { dayType: "MON", open: "09:30", close: "23:30" },
-    { dayType: "TUE", open: "09:30", close: "23:30" },
-    { dayType: "WED", open: "09:30", close: "23:30" },
-    { dayType: "THU", open: "09:30", close: "23:30" },
-    { dayType: "FRI", open: "09:30", close: "23:30" },
-    { dayType: "SAT", open: "08:00", close: "22:00" },
-    { dayType: "SUN", open: "08:00", close: "22:00" },
-  ],
-  seoulforest_jongno: [
-    { dayType: "MON", open: "09:00", close: "23:00" },
-    { dayType: "TUE", open: "09:00", close: "23:00" },
-    { dayType: "WED", open: "09:00", close: "23:00" },
-    { dayType: "THU", open: "09:00", close: "23:00" },
-    { dayType: "FRI", open: "09:00", close: "23:00" },
-    { dayType: "SAT", open: "09:00", close: "20:00" },
-    { dayType: "SUN", open: "09:00", close: "21:00" },
-  ],
-  seoulforest_jamsil: [
-    { dayType: "MON", open: "10:00", close: "23:00" },
-    { dayType: "TUE", open: "10:00", close: "23:00" },
-    { dayType: "WED", open: "10:00", close: "23:00" },
-    { dayType: "THU", open: "10:00", close: "23:00" },
-    { dayType: "FRI", open: "10:00", close: "23:00" },
-    { dayType: "SAT", open: "10:00", close: "21:00" },
-    { dayType: "SUN", open: "10:00", close: "21:00" },
-  ],
-  seoulforest_yeongdeungpo: [
-    { dayType: "MON", open: "10:00", close: "23:00" },
-    { dayType: "TUE", open: "10:00", close: "23:00" },
-    { dayType: "WED", open: "10:00", close: "23:00" },
-    { dayType: "THU", open: "10:00", close: "23:00" },
-    { dayType: "FRI", open: "10:00", close: "23:00" },
-    { dayType: "SAT", open: "09:00", close: "21:00" },
-    { dayType: "SUN", open: "09:00", close: "21:00" },
-  ],
-  seoulforest_guro: [
-    { dayType: "MON", open: "10:00", close: "23:00" },
-    { dayType: "TUE", open: "10:00", close: "23:00" },
-    { dayType: "WED", open: "10:00", close: "23:00" },
-    { dayType: "THU", open: "10:00", close: "23:00" },
-    { dayType: "FRI", open: "10:00", close: "23:00" },
-    { dayType: "SAT", open: "09:00", close: "21:00" },
-    { dayType: "SUN", open: "09:00", close: "21:00" },
-  ],
-  climbingpark_gangnam: [
-    { dayType: "MON", open: "07:00", close: "23:00" },
-    { dayType: "TUE", open: "07:00", close: "23:00" },
-    { dayType: "WED", open: "07:00", close: "23:00" },
-    { dayType: "THU", open: "07:00", close: "23:00" },
-    { dayType: "FRI", open: "07:00", close: "23:00" },
-    { dayType: "SAT", open: "10:00", close: "21:00" },
-    { dayType: "SUN", open: "10:00", close: "21:00" },
-  ],
-  climbingpark_sinnonhyeon: [
-    { dayType: "MON", open: "10:00", close: "23:00" },
-    { dayType: "TUE", open: "10:00", close: "23:00" },
-    { dayType: "WED", open: "10:00", close: "23:00" },
-    { dayType: "THU", open: "10:00", close: "23:00" },
-    { dayType: "FRI", open: "10:00", close: "23:00" },
-    { dayType: "SAT", open: "10:00", close: "20:00" },
-    { dayType: "SUN", open: "10:00", close: "20:00" },
-  ],
-  climbingpark_hanti: [
-    { dayType: "MON", open: "10:00", close: "23:00" },
-    { dayType: "TUE", open: "10:00", close: "23:00" },
-    { dayType: "WED", open: "10:00", close: "23:00" },
-    { dayType: "THU", open: "10:00", close: "23:00" },
-    { dayType: "FRI", open: "10:00", close: "23:00" },
-    { dayType: "SAT", open: "10:00", close: "20:00" },
-    { dayType: "SUN", open: "10:00", close: "20:00" },
-  ],
-  climbingpark_seongsu: [
-    { dayType: "MON", open: "10:00", close: "23:00" },
-    { dayType: "TUE", open: "10:00", close: "23:00" },
-    { dayType: "WED", open: "10:00", close: "23:00" },
-    { dayType: "THU", open: "10:00", close: "23:00" },
-    { dayType: "FRI", open: "10:00", close: "23:00" },
-    { dayType: "SAT", open: "10:00", close: "21:00" },
-    { dayType: "SUN", open: "10:00", close: "21:00" },
-  ],
-  climbingpark_jongno: [
-    { dayType: "MON", open: "10:00", close: "23:00" },
-    { dayType: "TUE", open: "10:00", close: "23:00" },
-    { dayType: "WED", open: "10:00", close: "23:00" },
-    { dayType: "THU", open: "10:00", close: "23:00" },
-    { dayType: "FRI", open: "10:00", close: "23:00" },
-    { dayType: "SAT", open: "10:00", close: "21:00" },
-    { dayType: "SUN", open: "10:00", close: "21:00" },
-  ],
+export interface IDifficultyColorSeed {
+  difficulty: Difficulty;
+  color: string;
+  label: string;
+  order: number;
+}
+
+export type TGymSeedResult = {
+  gymMap: Record<string, Gym>;
+  difficultyColorsByKey: Record<string, IDifficultyColorSeed[]>;
 };
 
 /** 구 시드 가격 → 요금표 템플릿(활성). 6·12개월은 `legacyPrices`에 값이 있을 때만 행 생성 */
 const buildMembershipPlanRows = (
   gymId: string,
-  p: IGymSeed["legacyPrices"],
+  p: IGymListItemJson["legacyPrices"],
 ): Array<{
   gymId: string;
   code: MembershipPlanCode;
   priceWon: number;
   sortOrder: number;
 }> => {
+  const count5Price =
+    typeof p.fiveSession === "number" ? p.fiveSession : Math.round(p.daily * 4);
+
   const rows: Array<{
     gymId: string;
     code: MembershipPlanCode;
@@ -804,14 +93,24 @@ const buildMembershipPlanRows = (
     sortOrder: number;
   }> = [
     { gymId, code: "COUNT_DAY", priceWon: p.daily, sortOrder: 0 },
-    { gymId, code: "COUNT_3", priceWon: Math.round(p.daily * 2.5), sortOrder: 1 },
-    { gymId, code: "COUNT_5", priceWon: Math.round(p.daily * 4), sortOrder: 2 },
+    {
+      gymId,
+      code: "COUNT_3",
+      priceWon: Math.round(p.daily * 2.5),
+      sortOrder: 1,
+    },
+    { gymId, code: "COUNT_5", priceWon: count5Price, sortOrder: 2 },
     { gymId, code: "COUNT_10", priceWon: p.tenSession, sortOrder: 3 },
     { gymId, code: "PERIOD_1M", priceWon: p.monthly, sortOrder: 10 },
     { gymId, code: "PERIOD_3M", priceWon: p.threeMonths, sortOrder: 11 },
   ];
   if (typeof p.sixMonths === "number") {
-    rows.push({ gymId, code: "PERIOD_6M", priceWon: p.sixMonths, sortOrder: 12 });
+    rows.push({
+      gymId,
+      code: "PERIOD_6M",
+      priceWon: p.sixMonths,
+      sortOrder: 12,
+    });
   }
   if (typeof p.twelveMonths === "number") {
     rows.push({
@@ -824,90 +123,3408 @@ const buildMembershipPlanRows = (
   return rows;
 };
 
-export async function seedGyms(
-  prisma: PrismaClient,
-): Promise<Record<string, Gym>> {
+const normalizeMembershipBrand = (raw: string): GymMembershipBrand => {
+  if (raw === "CLIMBING_PARK") return "CLIMBINGPARK";
+  return raw as GymMembershipBrand;
+};
+
+/** 브랜드·암장 전체 시드(외부 JSON 없음 — 이 객체만 수정) */
+const GYMS_SEED_ROOT: IGymsSampleRoot = {
+  brands: {
+    the_climb: {
+      membershipBrand: "THE_CLIMB",
+      difficultyColors: [
+        {
+          difficulty: "V0",
+          color: "#FFFFFF",
+          label: "흰색",
+          order: 0,
+        },
+        {
+          difficulty: "V1",
+          color: "#F5D800",
+          label: "노랑",
+          order: 1,
+        },
+        {
+          difficulty: "V2",
+          color: "#FF7F00",
+          label: "주황",
+          order: 2,
+        },
+        {
+          difficulty: "V3",
+          color: "#4CAF50",
+          label: "초록",
+          order: 3,
+        },
+        {
+          difficulty: "V4",
+          color: "#2196F3",
+          label: "파랑",
+          order: 4,
+        },
+        {
+          difficulty: "V5",
+          color: "#E53935",
+          label: "빨강",
+          order: 5,
+        },
+        {
+          difficulty: "V6",
+          color: "#E91E8C",
+          label: "분홍",
+          order: 6,
+        },
+        {
+          difficulty: "V7",
+          color: "#9C27B0",
+          label: "보라",
+          order: 7,
+        },
+        {
+          difficulty: "V8",
+          color: "#9E9E9E",
+          label: "회색",
+          order: 8,
+        },
+        {
+          difficulty: "V9",
+          color: "#795548",
+          label: "갈색",
+          order: 9,
+        },
+        {
+          difficulty: "V10",
+          color: "#212121",
+          label: "검정",
+          order: 10,
+        },
+      ],
+      priceImageUrl:
+        "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/theclimb/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
+      difficultyImageUrl:
+        "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/theclimb/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%82%E1%85%A1%E1%86%AB%E1%84%8B%E1%85%B5%E1%84%83%E1%85%A9%E1%84%91%E1%85%AD.jpg",
+      website: "http://theclimb.co.kr",
+      list: [
+        {
+          key: "theclimb_yeonnam",
+          name: "더클라임 연남",
+          address: "서울 마포구 양화로 186 3층",
+          region: "SEOUL",
+          phone: "02-2088-5071",
+          latitude: 37.5576684824211,
+          longitude: 126.92589313527,
+          visitorCapacity: 100,
+          description:
+            "홍대입구역 4번 출구 30초 거리!\n체계적인 커리큘럼과 전문 강사진!\n하나의 회원권으로 13개 지점을 자유롭게!",
+          instagramId: "theclimb_yeonnam",
+          notice: "",
+          settingScheduleMemo: "인스타 참고",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/theclimb/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%8B%E1%85%A7%E1%86%AB%E1%84%82%E1%85%A1%E1%86%B7.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/theclimb/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%8B%E1%85%A7%E1%86%AB%E1%84%82%E1%85%A1%E1%86%B7_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 22000,
+            monthly: 140000,
+            threeMonths: 330000,
+            fiveSession: 90000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "07:30",
+              close: "24:00",
+            },
+            {
+              dayType: "TUE",
+              open: "07:30",
+              close: "24:00",
+            },
+            {
+              dayType: "WED",
+              open: "07:30",
+              close: "24:00",
+            },
+            {
+              dayType: "THU",
+              open: "07:30",
+              close: "24:00",
+            },
+            {
+              dayType: "FRI",
+              open: "07:30",
+              close: "24:00",
+            },
+            {
+              dayType: "SAT",
+              open: "08:00",
+              close: "22:00",
+            },
+            {
+              dayType: "SUN",
+              open: "08:00",
+              close: "22:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+        {
+          key: "theclimb_b_hongdae",
+          name: "더클라임 B 홍대",
+          address: "서울 마포구 양화로 125 경남관광빌딩 2층",
+          region: "SEOUL",
+          phone: "02-332-5014",
+          latitude: 37.5547493986687,
+          longitude: 126.920309389675,
+          visitorCapacity: 100,
+          description:
+            "홍대입구역 1번 출구 5분 거리!\n체계적인 커리큘럼과 전문 강사진!\n하나의 회원권으로 13개의 지점을 자유롭게!",
+          instagramId: "theclimb_b_hongdae",
+          notice: "",
+          settingScheduleMemo: "인스타 참고",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/theclimb/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%92%E1%85%A9%E1%86%BC%E1%84%83%E1%85%A2B.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/theclimb/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%92%E1%85%A9%E1%86%BC%E1%84%83%E1%85%A2B_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 22000,
+            monthly: 140000,
+            threeMonths: 330000,
+            fiveSession: 90000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "TUE",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "WED",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "THU",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "FRI",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "SAT",
+              open: "08:00",
+              close: "22:00",
+            },
+            {
+              dayType: "SUN",
+              open: "08:00",
+              close: "22:00",
+            },
+          ],
+          facilities: ["PARKING", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+        {
+          key: "theclimb_ilsan",
+          name: "더클라임 일산",
+          address: "경기 고양시 일산동구 중앙로 1160 5층 더클라임",
+          region: "GYEONGGI",
+          phone: "031-905-5014",
+          latitude: 37.6509174810735,
+          longitude: 126.778893109192,
+          visitorCapacity: 100,
+          description: "하나의 회원권으로 더클라임 13개 지점 모두 이용",
+          instagramId: "theclimb_ilsan",
+          notice: "",
+          settingScheduleMemo: "인스타 참고",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/theclimb/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%8B%E1%85%B5%E1%86%AF%E1%84%89%E1%85%A1%E1%86%AB.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/theclimb/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%8B%E1%85%B5%E1%86%AF%E1%84%89%E1%85%A1%E1%86%AB_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 22000,
+            monthly: 140000,
+            threeMonths: 330000,
+            fiveSession: 90000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "08:30",
+              close: "24:00",
+            },
+            {
+              dayType: "TUE",
+              open: "08:30",
+              close: "24:00",
+            },
+            {
+              dayType: "WED",
+              open: "08:30",
+              close: "24:00",
+            },
+            {
+              dayType: "THU",
+              open: "08:30",
+              close: "24:00",
+            },
+            {
+              dayType: "FRI",
+              open: "08:30",
+              close: "24:00",
+            },
+            {
+              dayType: "SAT",
+              open: "08:00",
+              close: "22:00",
+            },
+            {
+              dayType: "SUN",
+              open: "08:00",
+              close: "22:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+        {
+          key: "theclimb_magok",
+          name: "더클라임 마곡",
+          address: "서울 강서구 마곡동로 62 마곡사이언스타워 7층",
+          region: "SEOUL",
+          phone: "02-2668-5014",
+          latitude: 37.5605537644679,
+          longitude: 126.833890184435,
+          visitorCapacity: 100,
+          description:
+            "전국 최대 볼더링 브랜드\n체계적인 커리큘럼과 전문 강사진\n하나의 회원권으로 13개 지점을 자유롭게",
+          instagramId: "theclimb_magok",
+          notice: "",
+          settingScheduleMemo: "인스타 참고",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/theclimb/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%86%E1%85%A1%E1%84%80%E1%85%A9%E1%86%A8.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/theclimb/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%86%E1%85%A1%E1%84%80%E1%85%A9%E1%86%A8_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 22000,
+            monthly: 140000,
+            threeMonths: 330000,
+            fiveSession: 90000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "09:30",
+              close: "23:30",
+            },
+            {
+              dayType: "TUE",
+              open: "09:30",
+              close: "23:30",
+            },
+            {
+              dayType: "WED",
+              open: "09:30",
+              close: "23:30",
+            },
+            {
+              dayType: "THU",
+              open: "09:30",
+              close: "23:30",
+            },
+            {
+              dayType: "FRI",
+              open: "09:30",
+              close: "23:30",
+            },
+            {
+              dayType: "SAT",
+              open: "08:00",
+              close: "22:00",
+            },
+            {
+              dayType: "SUN",
+              open: "08:00",
+              close: "22:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+        {
+          key: "theclimb_yangjae",
+          name: "더클라임 양재",
+          address: "서울 강남구 남부순환로 2615 지하1층",
+          region: "SEOUL",
+          phone: "02-576-8821",
+          latitude: 37.4851852937745,
+          longitude: 127.035883711966,
+          visitorCapacity: 100,
+          description:
+            "양재역 4번 출구 1분 거리!\n체계적인 커리큘럼과 전문 강사진!\n하나의 회원권으로 13개 지점을 자유롭게!",
+          instagramId: "theclimb_yangjae",
+          notice: "",
+          settingScheduleMemo: "인스타 참고",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/theclimb/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%8B%E1%85%A3%E1%86%BC%E1%84%8C%E1%85%A2.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/theclimb/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%8B%E1%85%A3%E1%86%BC%E1%84%8C%E1%85%A2_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 22000,
+            monthly: 140000,
+            threeMonths: 330000,
+            fiveSession: 90000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "08:30",
+              close: "24:00",
+            },
+            {
+              dayType: "TUE",
+              open: "08:30",
+              close: "24:00",
+            },
+            {
+              dayType: "WED",
+              open: "08:30",
+              close: "24:00",
+            },
+            {
+              dayType: "THU",
+              open: "08:30",
+              close: "24:00",
+            },
+            {
+              dayType: "FRI",
+              open: "08:30",
+              close: "24:00",
+            },
+            {
+              dayType: "SAT",
+              open: "08:00",
+              close: "22:00",
+            },
+            {
+              dayType: "SUN",
+              open: "08:00",
+              close: "22:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+        {
+          key: "theclimb_gangnam",
+          name: "더클라임 강남",
+          address: "서울 강남구 테헤란로8길 21 화인강남빌딩 B1층",
+          region: "SEOUL",
+          phone: "02-566-8821",
+          latitude: 37.4975931910405,
+          longitude: 127.032001186611,
+          visitorCapacity: 100,
+          description:
+            "강남역 5분 거리!\n체계적인 커리큘럼과 전문 강사진!\n하나의 회원권으로 13개 지점을 자유롭게!",
+          instagramId: "theclimb_gangnam",
+          notice: "",
+          settingScheduleMemo: "인스타 참고",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/theclimb/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%86%BC%E1%84%82%E1%85%A1%E1%86%B7.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/theclimb/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%86%BC%E1%84%82%E1%85%A1%E1%86%B7_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 22000,
+            monthly: 140000,
+            threeMonths: 330000,
+            fiveSession: 90000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "09:30",
+              close: "23:30",
+            },
+            {
+              dayType: "TUE",
+              open: "09:30",
+              close: "23:30",
+            },
+            {
+              dayType: "WED",
+              open: "09:30",
+              close: "23:30",
+            },
+            {
+              dayType: "THU",
+              open: "09:30",
+              close: "23:30",
+            },
+            {
+              dayType: "FRI",
+              open: "09:30",
+              close: "23:30",
+            },
+            {
+              dayType: "SAT",
+              open: "08:00",
+              close: "22:00",
+            },
+            {
+              dayType: "SUN",
+              open: "08:00",
+              close: "22:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+        {
+          key: "theclimb_sadang",
+          name: "더클라임 사당",
+          address: "서울 관악구 과천대로 939 지층 B201호",
+          region: "SEOUL",
+          phone: "02-585-8821",
+          latitude: 37.4743771732195,
+          longitude: 126.981430242321,
+          visitorCapacity: 100,
+          description:
+            "사당역 4번출구 도보 1분\n하나의 회원권으로 더클라임 13개 지점 모두 이용!",
+          instagramId: "theclimb_sadang",
+          notice: "",
+          settingScheduleMemo: "인스타 참고",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/theclimb/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%89%E1%85%A1%E1%84%83%E1%85%A1%E1%86%BC.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/theclimb/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%89%E1%85%A1%E1%84%83%E1%85%A1%E1%86%BC_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 22000,
+            monthly: 140000,
+            threeMonths: 330000,
+            fiveSession: 90000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "09:30",
+              close: "23:30",
+            },
+            {
+              dayType: "TUE",
+              open: "09:30",
+              close: "23:30",
+            },
+            {
+              dayType: "WED",
+              open: "09:30",
+              close: "23:30",
+            },
+            {
+              dayType: "THU",
+              open: "09:30",
+              close: "23:30",
+            },
+            {
+              dayType: "FRI",
+              open: "09:30",
+              close: "23:30",
+            },
+            {
+              dayType: "SAT",
+              open: "08:00",
+              close: "22:00",
+            },
+            {
+              dayType: "SUN",
+              open: "08:00",
+              close: "22:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+        {
+          key: "theclimb_sinsa",
+          name: "더클라임 신사",
+          address: "서울 강남구 압구정로2길 6 지하2층",
+          region: "SEOUL",
+          phone: "02-549-8821",
+          latitude: 37.5210863385776,
+          longitude: 127.019138224359,
+          visitorCapacity: 100,
+          description:
+            "신사역 도보7분\n하나의 회원권으로 더클라임 13개 지점 모두 이용\n전문 강사진과 체계적인 커리큘럼",
+          instagramId: "theclimb_sinsa",
+          notice: "",
+          settingScheduleMemo: "인스타 참고",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/theclimb/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%89%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A1.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/theclimb/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%89%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A1_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 22000,
+            monthly: 140000,
+            threeMonths: 330000,
+            fiveSession: 90000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "12:00",
+              close: "23:00",
+            },
+            {
+              dayType: "TUE",
+              open: "12:00",
+              close: "23:00",
+            },
+            {
+              dayType: "WED",
+              open: "12:00",
+              close: "23:00",
+            },
+            {
+              dayType: "THU",
+              open: "12:00",
+              close: "23:00",
+            },
+            {
+              dayType: "FRI",
+              open: "12:00",
+              close: "23:00",
+            },
+            {
+              dayType: "SAT",
+              open: "10:00",
+              close: "22:00",
+            },
+            {
+              dayType: "SUN",
+              open: "10:00",
+              close: "20:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+        {
+          key: "theclimb_isu",
+          name: "더클라임 이수",
+          address: "서울 동작구 동작대로 59 지하1층",
+          region: "SEOUL",
+          phone: "02-588-5014",
+          latitude: 37.4820109847453,
+          longitude: 126.981487484949,
+          visitorCapacity: 100,
+          description:
+            "이수역 7번 출구 도보 4분\n체계적인 커리큘럼과 전문 강사진\n하나의 회원권으로 13개 지점 이용 가능",
+          instagramId: "theclimb_isu",
+          notice: "",
+          settingScheduleMemo: "인스타 참고",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/theclimb/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%8B%E1%85%B5%E1%84%89%E1%85%AE.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/theclimb/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%8B%E1%85%B5%E1%84%89%E1%85%AE_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 22000,
+            monthly: 140000,
+            threeMonths: 330000,
+            fiveSession: 90000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "09:30",
+              close: "23:30",
+            },
+            {
+              dayType: "TUE",
+              open: "09:30",
+              close: "23:30",
+            },
+            {
+              dayType: "WED",
+              open: "09:30",
+              close: "23:30",
+            },
+            {
+              dayType: "THU",
+              open: "09:30",
+              close: "23:30",
+            },
+            {
+              dayType: "FRI",
+              open: "09:30",
+              close: "23:30",
+            },
+            {
+              dayType: "SAT",
+              open: "08:00",
+              close: "22:00",
+            },
+            {
+              dayType: "SUN",
+              open: "08:00",
+              close: "22:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+        {
+          key: "theclimb_sillim",
+          name: "더클라임 신림",
+          address: "서울 관악구 신원로 35 삼모더프라임타워 5층",
+          region: "SEOUL",
+          phone: "02-877-8821",
+          latitude: 37.4823122359729,
+          longitude: 126.929023376476,
+          visitorCapacity: 100,
+          description:
+            "신림역 4번 출구 2분 거리!\n체계적인 커리큘럼과 전문 강사진!\n하나의 회원권으로 13개 지점을 자유롭게!",
+          instagramId: "theclimb_sillim",
+          notice: "",
+          settingScheduleMemo: "인스타 참고",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/theclimb/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%89%E1%85%B5%E1%86%AB%E1%84%85%E1%85%B5%E1%86%B7.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/theclimb/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%89%E1%85%B5%E1%86%AB%E1%84%85%E1%85%B5%E1%86%B7_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 22000,
+            monthly: 140000,
+            threeMonths: 330000,
+            fiveSession: 90000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "07:30",
+              close: "24:00",
+            },
+            {
+              dayType: "TUE",
+              open: "07:30",
+              close: "24:00",
+            },
+            {
+              dayType: "WED",
+              open: "07:30",
+              close: "24:00",
+            },
+            {
+              dayType: "THU",
+              open: "07:30",
+              close: "24:00",
+            },
+            {
+              dayType: "FRI",
+              open: "07:30",
+              close: "24:00",
+            },
+            {
+              dayType: "SAT",
+              open: "08:00",
+              close: "22:00",
+            },
+            {
+              dayType: "SUN",
+              open: "08:00",
+              close: "22:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+        {
+          key: "theclimb_nonhyeon",
+          name: "더클라임 논현",
+          address: "서울 서초구 강남대로 519 지하1층",
+          region: "SEOUL",
+          phone: "02-545-5014",
+          latitude: 37.5082880328998,
+          longitude: 127.022205905271,
+          visitorCapacity: 100,
+          description:
+            "논현역 4번 출구 2분 거리!\n체계적인 커리큘럼과 전문 강사진!\n하나의 회원권으로 13개 지점을 자유롭게!",
+          instagramId: "theclimb_nonhyeon",
+          notice: "",
+          settingScheduleMemo: "인스타 참고",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/theclimb/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%82%E1%85%A9%E1%86%AB%E1%84%92%E1%85%A7%E1%86%AB.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/theclimb/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%82%E1%85%A9%E1%86%AB%E1%84%92%E1%85%A7%E1%86%AB_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 22000,
+            monthly: 140000,
+            threeMonths: 330000,
+            fiveSession: 90000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "09:30",
+              close: "23:30",
+            },
+            {
+              dayType: "TUE",
+              open: "09:30",
+              close: "23:30",
+            },
+            {
+              dayType: "WED",
+              open: "09:30",
+              close: "23:30",
+            },
+            {
+              dayType: "THU",
+              open: "09:30",
+              close: "23:30",
+            },
+            {
+              dayType: "FRI",
+              open: "09:30",
+              close: "23:30",
+            },
+            {
+              dayType: "SAT",
+              open: "08:00",
+              close: "22:00",
+            },
+            {
+              dayType: "SUN",
+              open: "08:00",
+              close: "22:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+        {
+          key: "theclimb_mullae",
+          name: "더클라임 문래",
+          address: "서울 영등포구 당산로 63 1동",
+          region: "SEOUL",
+          phone: "02-3667-5014",
+          latitude: 37.5205582802612,
+          longitude: 126.895001322291,
+          visitorCapacity: 100,
+          description:
+            "전국 최대 볼더링 브랜드\n체계적인 커리큘럼과 전문 강사진\n하나의 회원권으로 13개 지점을 자유롭게",
+          instagramId: "theclimb_mullae",
+          notice: "",
+          settingScheduleMemo: "인스타 참고",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/theclimb/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%86%E1%85%AE%E1%86%AB%E1%84%85%E1%85%A2.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/theclimb/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%86%E1%85%AE%E1%86%AB%E1%84%85%E1%85%A2_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 22000,
+            monthly: 140000,
+            threeMonths: 330000,
+            fiveSession: 90000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "07:30",
+              close: "24:00",
+            },
+            {
+              dayType: "TUE",
+              open: "07:30",
+              close: "24:00",
+            },
+            {
+              dayType: "WED",
+              open: "07:30",
+              close: "24:00",
+            },
+            {
+              dayType: "THU",
+              open: "07:30",
+              close: "24:00",
+            },
+            {
+              dayType: "FRI",
+              open: "07:30",
+              close: "24:00",
+            },
+            {
+              dayType: "SAT",
+              open: "08:00",
+              close: "22:00",
+            },
+            {
+              dayType: "SUN",
+              open: "08:00",
+              close: "22:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+        {
+          key: "theclimb_seongsu",
+          name: "더클라임 성수",
+          address: "서울 성동구 아차산로17길 49 생각공장 데시앙플렉스 B1층",
+          region: "SEOUL",
+          phone: "02-499-5014",
+          latitude: 37.5467683738173,
+          longitude: 127.065279307819,
+          visitorCapacity: 100,
+          description:
+            "전국 최대 볼더링 브랜드\n체계적인 커리큘럼과 전문 강사진!\n하나의 회원권으로 13개 지점을 자유롭게!",
+          instagramId: "theclimb_seongsu",
+          notice: "",
+          settingScheduleMemo: "인스타 참고",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/theclimb/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%89%E1%85%A5%E1%86%BC%E1%84%89%E1%85%AE.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/theclimb/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%89%E1%85%A5%E1%86%BC%E1%84%89%E1%85%AE_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 22000,
+            monthly: 140000,
+            threeMonths: 330000,
+            fiveSession: 90000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "09:30",
+              close: "23:30",
+            },
+            {
+              dayType: "TUE",
+              open: "09:30",
+              close: "23:30",
+            },
+            {
+              dayType: "WED",
+              open: "09:30",
+              close: "23:30",
+            },
+            {
+              dayType: "THU",
+              open: "09:30",
+              close: "23:30",
+            },
+            {
+              dayType: "FRI",
+              open: "09:30",
+              close: "23:30",
+            },
+            {
+              dayType: "SAT",
+              open: "08:00",
+              close: "22:00",
+            },
+            {
+              dayType: "SUN",
+              open: "08:00",
+              close: "22:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+      ],
+    },
+    seoulforest: {
+      membershipBrand: "SEOULFOREST",
+      difficultyColors: [
+        {
+          difficulty: "V1",
+          color: "#FF69B4",
+          label: "분홍",
+          order: 0,
+        },
+        {
+          difficulty: "V2",
+          color: "#E53935",
+          label: "빨강",
+          order: 1,
+        },
+        {
+          difficulty: "V3",
+          color: "#FF7F00",
+          label: "주황",
+          order: 2,
+        },
+        {
+          difficulty: "V4",
+          color: "#F5D800",
+          label: "노랑",
+          order: 3,
+        },
+        {
+          difficulty: "V5",
+          color: "#4CAF50",
+          label: "초록",
+          order: 4,
+        },
+        {
+          difficulty: "V6",
+          color: "#2196F3",
+          label: "파랑",
+          order: 5,
+        },
+        {
+          difficulty: "V7",
+          color: "#1A237E",
+          label: "남색",
+          order: 6,
+        },
+        {
+          difficulty: "V8",
+          color: "#9C27B0",
+          label: "보라",
+          order: 7,
+        },
+        {
+          difficulty: "V9",
+          color: "#795548",
+          label: "갈색",
+          order: 8,
+        },
+        {
+          difficulty: "V10",
+          color: "#212121",
+          label: "검정",
+          order: 9,
+        },
+      ],
+      priceImageUrl:
+        "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/seoulforest/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
+      difficultyImageUrl:
+        "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/seoulforest/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%82%E1%85%A1%E1%86%AB%E1%84%8B%E1%85%B5%E1%84%83%E1%85%A9%E1%84%91%E1%85%AD.jpg",
+      website: "",
+      list: [
+        {
+          key: "seoulforest_jongro",
+          name: "서울숲클라이밍 종로",
+          address: "서울 종로구 수표로 96 지하1층",
+          region: "SEOUL",
+          phone: "010-3289-2705",
+          latitude: 37.5697050231621,
+          longitude: 126.99002424417,
+          visitorCapacity: 100,
+          description: "1호선 종로3가역 도보 8분\n주차 3시간 6000원",
+          instagramId: "seoulforest_jongro",
+          notice: "",
+          settingScheduleMemo: "매주 수요일 정규세팅\n매주 목요일 위클리 세팅",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/seoulforest/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%8C%E1%85%A9%E1%86%BC%E1%84%85%E1%85%A9.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/seoulforest/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%8C%E1%85%A9%E1%86%BC%E1%84%85%E1%85%A9_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 20000,
+            monthly: 130000,
+            threeMonths: 330000,
+            fiveSession: 90000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "09:00",
+              close: "23:00",
+            },
+            {
+              dayType: "TUE",
+              open: "09:00",
+              close: "23:00",
+            },
+            {
+              dayType: "WED",
+              open: "09:00",
+              close: "23:00",
+            },
+            {
+              dayType: "THU",
+              open: "09:00",
+              close: "23:00",
+            },
+            {
+              dayType: "FRI",
+              open: "09:00",
+              close: "23:00",
+            },
+            {
+              dayType: "SAT",
+              open: "09:00",
+              close: "21:00",
+            },
+            {
+              dayType: "SUN",
+              open: "09:00",
+              close: "21:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+        {
+          key: "seoulforest_yeongdeungpo",
+          name: "서울숲클라이밍 영등포",
+          address: "서울 영등포구 문래로 164 1층",
+          region: "SEOUL",
+          phone: "010-6686-2700",
+          latitude: 37.5177939016069,
+          longitude: 126.900076883603,
+          visitorCapacity: 100,
+          description:
+            "영등포구 문래로 164 1층 (문래역 도보 8분)\n룩스상가 주차장 B3층, 주차 4시간 무료",
+          instagramId: "seoulforest_yeongdp",
+          notice: "",
+          settingScheduleMemo: "매주 목요일 정규세팅\n월요일 위클리세팅",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/seoulforest/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%8B%E1%85%A7%E1%86%BC%E1%84%83%E1%85%B3%E1%86%BC%E1%84%91%E1%85%A9.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/seoulforest/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%8B%E1%85%A7%E1%86%BC%E1%84%83%E1%85%B3%E1%86%BC%E1%84%91%E1%85%A9_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 20000,
+            monthly: 130000,
+            threeMonths: 330000,
+            fiveSession: 90000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "TUE",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "WED",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "THU",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "FRI",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "SAT",
+              open: "09:00",
+              close: "21:00",
+            },
+            {
+              dayType: "SUN",
+              open: "09:00",
+              close: "21:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+        {
+          key: "seoulforest_jamsil",
+          name: "서울숲클라이밍 잠실",
+          address: "서울 송파구 백제고분로7길 49 지하1층",
+          region: "SEOUL",
+          phone: "010-7710-2703",
+          latitude: 37.510948520197,
+          longitude: 127.084336791957,
+          visitorCapacity: 100,
+          description: "잠실새내역 도보 3분\n주차 30분당 600원 (최초30분무료)",
+          instagramId: "seoulforest_jamsil",
+          notice: "",
+          settingScheduleMemo: "매주 화요일 정규세팅",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/seoulforest/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%8C%E1%85%A1%E1%86%B7%E1%84%89%E1%85%B5%E1%86%AF.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/seoulforest/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%8C%E1%85%A9%E1%86%BC%E1%84%85%E1%85%A9_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 20000,
+            monthly: 130000,
+            threeMonths: 330000,
+            fiveSession: 90000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "TUE",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "WED",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "THU",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "FRI",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "SAT",
+              open: "09:00",
+              close: "21:00",
+            },
+            {
+              dayType: "SUN",
+              open: "09:00",
+              close: "21:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+        {
+          key: "seoulforest_guro",
+          name: "서울숲클라이밍 구로",
+          address: "서울 구로구 디지털로 300 지하1층",
+          region: "SEOUL",
+          phone: "010-3374-2704",
+          latitude: 37.4849270383011,
+          longitude: 126.896538036905,
+          visitorCapacity: 100,
+          description:
+            "2호선 구디역 도보6분\n지밸리몰 주차장 B2-B4층 (주차 5시간 무료)",
+          instagramId: "seoulforest_guro",
+          notice: "",
+          settingScheduleMemo: "매주 화요일 정규세팅\n수요일 위클리세팅",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/seoulforest/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%80%E1%85%AE%E1%84%85%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%B7.png",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/seoulforest/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%80%E1%85%AE%E1%84%85%E1%85%A9_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 20000,
+            monthly: 130000,
+            threeMonths: 330000,
+            fiveSession: 90000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "TUE",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "WED",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "THU",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "FRI",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "SAT",
+              open: "09:00",
+              close: "21:00",
+            },
+            {
+              dayType: "SUN",
+              open: "09:00",
+              close: "21:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+      ],
+    },
+    climbing_park: {
+      membershipBrand: "CLIMBING_PARK",
+      difficultyColors: [
+        {
+          difficulty: "V1",
+          color: "#F5D800",
+          label: "노랑",
+          order: 0,
+        },
+        {
+          difficulty: "V2",
+          color: "#FF69B4",
+          label: "분홍",
+          order: 1,
+        },
+        {
+          difficulty: "V3",
+          color: "#2196F3",
+          label: "파랑",
+          order: 2,
+        },
+        {
+          difficulty: "V4",
+          color: "#E53935",
+          label: "빨강",
+          order: 3,
+        },
+        {
+          difficulty: "V5",
+          color: "#9C27B0",
+          label: "보라",
+          order: 4,
+        },
+        {
+          difficulty: "V6",
+          color: "#795548",
+          label: "갈색",
+          order: 5,
+        },
+        {
+          difficulty: "V7",
+          color: "#9E9E9E",
+          label: "회색",
+          order: 6,
+        },
+        {
+          difficulty: "V8",
+          color: "#212121",
+          label: "검정",
+          order: 7,
+        },
+        {
+          difficulty: "V9",
+          color: "#FFFFFF",
+          label: "흰색",
+          order: 8,
+        },
+      ],
+      priceImageUrl:
+        "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/climbing_park/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.jpeg",
+      difficultyImageUrl:
+        "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/climbing_park/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%82%E1%85%A1%E1%86%AB%E1%84%8B%E1%85%B5%E1%84%83%E1%85%A9.jpg",
+      website: "",
+      list: [
+        {
+          key: "climbing_park_gangnam",
+          name: "클라이밍파크 강남",
+          address: "서울 강남구 강남대로 364 지하1층",
+          region: "SEOUL",
+          phone: "0507-1391-4662",
+          latitude: 37.4955498697675,
+          longitude: 127.029293901519,
+          visitorCapacity: 100,
+          description:
+            "역삼동에 위치한 250평 규모 클라이밍짐(강남역 4번출구 앞)",
+          instagramId: "climbing_park_gangnam",
+          notice: "",
+          settingScheduleMemo: "매주 목요일 세팅(세팅 중 이용가능)",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/climbing_park/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%80%E1%85%A1%E1%86%BC%E1%84%82%E1%85%A1%E1%86%B7.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/climbing_park/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%80%E1%85%A1%E1%86%BC%E1%84%82%E1%85%A1%E1%86%B7_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 20000,
+            monthly: 130000,
+            threeMonths: 330000,
+            sixMonths: 600000,
+            twelveMonths: 1080000,
+            fiveSession: 90000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "07:00",
+              close: "23:00",
+            },
+            {
+              dayType: "TUE",
+              open: "07:00",
+              close: "23:00",
+            },
+            {
+              dayType: "WED",
+              open: "07:00",
+              close: "23:00",
+            },
+            {
+              dayType: "THU",
+              open: "07:00",
+              close: "23:00",
+            },
+            {
+              dayType: "FRI",
+              open: "07:00",
+              close: "23:00",
+            },
+            {
+              dayType: "SAT",
+              open: "10:00",
+              close: "21:00",
+            },
+            {
+              dayType: "SUN",
+              open: "10:00",
+              close: "21:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+        {
+          key: "climbing_park_shinnonhyun",
+          name: "클라이밍파크 신논현",
+          address: "서울 강남구 강남대로 468 지하3층",
+          region: "SEOUL",
+          phone: "0507-1362-4662",
+          latitude: 37.5041557043851,
+          longitude: 127.025145513654,
+          visitorCapacity: 100,
+          description: "",
+          instagramId: "climbing_park_shinnonhyun",
+          notice: "",
+          settingScheduleMemo: "세팅날 금요일 16시 오픈",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/climbing_park/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%89%E1%85%B5%E1%86%AB%E1%84%82%E1%85%A9%E1%86%AB%E1%84%92%E1%85%A7%E1%86%AB.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/climbing_park/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%89%E1%85%B5%E1%86%AB%E1%84%82%E1%85%A9%E1%86%AB%E1%84%92%E1%85%A7%E1%86%AB_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 20000,
+            monthly: 130000,
+            threeMonths: 330000,
+            sixMonths: 600000,
+            twelveMonths: 1080000,
+            fiveSession: 90000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "TUE",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "WED",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "THU",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "FRI",
+              open: "16:00",
+              close: "23:00",
+            },
+            {
+              dayType: "SAT",
+              open: "19:00",
+              close: "20:00",
+            },
+            {
+              dayType: "SUN",
+              open: "19:00",
+              close: "20:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+        {
+          key: "climbing_park_seongsu",
+          name: "클라이밍파크 성수",
+          address: "서울 성동구 연무장13길 7 매니아빌딩",
+          region: "SEOUL",
+          phone: "0507-1322-4662",
+          latitude: 37.5423065177285,
+          longitude: 127.058068446213,
+          visitorCapacity: 100,
+          description:
+            "성수동에 위치한 500평 지하-3층의 클라이밍장\n클라이밍파크 4️⃣호점",
+          instagramId: "climbing_park_seongsu",
+          notice: "",
+          settingScheduleMemo: "인스타 참고",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/climbing_park/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%89%E1%85%A5%E1%86%BC%E1%84%89%E1%85%AE.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/climbing_park/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%89%E1%85%A5%E1%86%BC%E1%84%89%E1%85%AE_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 20000,
+            monthly: 130000,
+            threeMonths: 330000,
+            sixMonths: 600000,
+            twelveMonths: 1080000,
+            fiveSession: 90000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "TUE",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "WED",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "THU",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "FRI",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "SAT",
+              open: "09:00",
+              close: "21:00",
+            },
+            {
+              dayType: "SUN",
+              open: "09:00",
+              close: "21:00",
+            },
+          ],
+          facilities: ["SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+        {
+          key: "climbing_park_hanti",
+          name: "클라이밍파크 한티",
+          address: "서울 강남구 선릉로 324 SH타워 지하3층",
+          region: "SEOUL",
+          phone: "0507-1340-4662",
+          latitude: 37.4985303841214,
+          longitude: 127.052094163626,
+          visitorCapacity: 100,
+          description: "",
+          instagramId: "climbing_park_hanti",
+          notice: "",
+          settingScheduleMemo: "세팅날 금요일 16시 오픈",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/climbing_park/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%92%E1%85%A1%E1%86%AB%E1%84%90%E1%85%B5.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/climbing_park/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%92%E1%85%A1%E1%86%AB%E1%84%90%E1%85%B5_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 20000,
+            monthly: 130000,
+            threeMonths: 330000,
+            sixMonths: 600000,
+            twelveMonths: 1080000,
+            fiveSession: 90000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "TUE",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "WED",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "THU",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "FRI",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "SAT",
+              open: "10:00",
+              close: "20:00",
+            },
+            {
+              dayType: "SUN",
+              open: "10:00",
+              close: "20:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+        {
+          key: "climbing_park_jongro",
+          name: "클라이밍파크 종로",
+          address: "서울 종로구 종로 199 한일빌딩 지하2층",
+          region: "SEOUL",
+          phone: "0507-1358-4662",
+          latitude: 37.5714335534085,
+          longitude: 126.999746324303,
+          visitorCapacity: 100,
+          description:
+            "💞 종로 300평 규모의 클라이밍장\n💞이용권 하나로 5개지점 사용가능\n💞10인이상 단체 예약시 할인\n📍종로5가역 종오지하쇼핑센터 13번 출구 30초거리",
+          instagramId: "climbing_park_jongro",
+          notice: "",
+          settingScheduleMemo: "매주 화요일 세팅 (전체세팅 한달주기)",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/climbing_park/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%8C%E1%85%A9%E1%86%BC%E1%84%85%E1%85%A9.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/climbing_park/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%8C%E1%85%A9%E1%86%BC%E1%84%85%E1%85%A9_%EB%A1%9C%EA%B3%A0.jpg",
+          legacyPrices: {
+            daily: 20000,
+            monthly: 130000,
+            threeMonths: 330000,
+            sixMonths: 600000,
+            twelveMonths: 1080000,
+            fiveSession: 90000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "TUE",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "WED",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "THU",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "FRI",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "SAT",
+              open: "10:00",
+              close: "21:00",
+            },
+            {
+              dayType: "SUN",
+              open: "10:00",
+              close: "21:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+      ],
+    },
+    sonclimb: {
+      membershipBrand: "SONCLIMB",
+      difficultyColors: [
+        {
+          difficulty: "V1",
+          color: "#FFFFFF",
+          label: "흰색",
+          order: 0,
+        },
+        {
+          difficulty: "V2",
+          color: "#F5D800",
+          label: "노랑",
+          order: 1,
+        },
+        {
+          difficulty: "V3",
+          color: "#4CAF50",
+          label: "초록",
+          order: 2,
+        },
+        {
+          difficulty: "V4",
+          color: "#2196F3",
+          label: "파랑",
+          order: 3,
+        },
+        {
+          difficulty: "V5",
+          color: "#E53935",
+          label: "빨강",
+          order: 4,
+        },
+        {
+          difficulty: "V6",
+          color: "#212121",
+          label: "검정",
+          order: 5,
+        },
+        {
+          difficulty: "V7",
+          color: "#9E9E9E",
+          label: "회색",
+          order: 6,
+        },
+        {
+          difficulty: "V8",
+          color: "#795548",
+          label: "갈색",
+          order: 7,
+        },
+        {
+          difficulty: "V9",
+          color: "#E91E8C",
+          label: "분홍",
+          order: 8,
+        },
+      ],
+      priceImageUrl:
+        "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/sonclimb/%E1%84%89%E1%85%A9%E1%86%AB%E1%84%89%E1%85%A1%E1%86%BC%E1%84%8B%E1%85%AF%E1%86%AB%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
+      difficultyImageUrl:
+        "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/sonclimb/%E1%84%89%E1%85%A9%E1%86%AB%E1%84%89%E1%85%A1%E1%86%BC%E1%84%8B%E1%85%AF%E1%86%AB%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%82%E1%85%A1%E1%86%AB%E1%84%8B%E1%85%B5%E1%84%83%E1%85%A9%E1%84%91%E1%85%AD.jpg",
+      website: "",
+      list: [
+        {
+          key: "sonclimb_gangnam",
+          name: "손클라임 강남",
+          address: "서울 서초구 강남대로 331 지하1층",
+          region: "SEOUL",
+          phone: "02-523-3094",
+          latitude: 37.4926256682761,
+          longitude: 127.029588346617,
+          visitorCapacity: 100,
+          description: "강남역 5번 출구 도보 4분",
+          instagramId: "sonclimb_gangnam",
+          notice: "",
+          settingScheduleMemo: "매주 월요일 정규 세팅",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/sonclimb/%E1%84%89%E1%85%A9%E1%86%AB%E1%84%89%E1%85%A1%E1%86%BC%E1%84%8B%E1%85%AF%E1%86%AB%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%80%E1%85%A1%E1%86%BC%E1%84%82%E1%85%A1%E1%86%B7.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/sonclimb/%E1%84%89%E1%85%A9%E1%86%AB%E1%84%89%E1%85%A1%E1%86%BC%E1%84%8B%E1%85%AF%E1%86%AB%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%80%E1%85%A1%E1%86%BC%E1%84%82%E1%85%A1%E1%86%B7_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 20000,
+            monthly: 130000,
+            threeMonths: 330000,
+            fiveSession: 90000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "TUE",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "WED",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "THU",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "FRI",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "SAT",
+              open: "10:00",
+              close: "22:00",
+            },
+            {
+              dayType: "SUN",
+              open: "10:00",
+              close: "22:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+        {
+          key: "sonclimb_pangyo",
+          name: "손클라임 판교",
+          address: "경기 성남시 분당구 대왕판교로 670 유스페이스2 B동 지하 1층",
+          region: "GYEONGGI",
+          phone: "031-739-8332",
+          latitude: 37.4020767798399,
+          longitude: 127.106110401586,
+          visitorCapacity: 100,
+          description: "",
+          instagramId: "sonclimb_pangyo",
+          notice: "",
+          settingScheduleMemo: "인스타 참고",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/sonclimb/%E1%84%89%E1%85%A9%E1%86%AB%E1%84%89%E1%85%A1%E1%86%BC%E1%84%8B%E1%85%AF%E1%86%AB%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%91%E1%85%A1%E1%86%AB%E1%84%80%E1%85%AD.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/sonclimb/%E1%84%89%E1%85%A9%E1%86%AB%E1%84%89%E1%85%A1%E1%86%BC%E1%84%8B%E1%85%AF%E1%86%AB%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%91%E1%85%A1%E1%86%AB%E1%84%80%E1%85%AD_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 20000,
+            monthly: 130000,
+            threeMonths: 330000,
+            fiveSession: 90000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "TUE",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "WED",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "THU",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "FRI",
+              open: "10:00",
+              close: "22:00",
+            },
+            {
+              dayType: "SAT",
+              open: "10:00",
+              close: "19:00",
+            },
+            {
+              dayType: "SUN",
+              open: "10:00",
+              close: "19:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+        {
+          key: "sonclimb_euljiro",
+          name: "손클라임 을지로",
+          address: "서울 중구 남대문로 125 지하1층 손상원 클라이밍짐 을지로점",
+          region: "SEOUL",
+          phone: "02-318-3094",
+          latitude: 37.5683712746828,
+          longitude: 126.982297534493,
+          visitorCapacity: 100,
+          description:
+            "을지로입구역 2번출구 226m 도보3분\n종각역 5번출구 158m 도보2분",
+          instagramId: "sonclimb_euljiro",
+          notice: "",
+          settingScheduleMemo: "매주 수요일 정규 세팅",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/sonclimb/%E1%84%89%E1%85%A9%E1%86%AB%E1%84%89%E1%85%A1%E1%86%BC%E1%84%8B%E1%85%AF%E1%86%AB%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%8B%E1%85%B3%E1%86%AF%E1%84%8C%E1%85%B5%E1%84%85%E1%85%A9.png",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/sonclimb/%E1%84%89%E1%85%A9%E1%86%AB%E1%84%89%E1%85%A1%E1%86%BC%E1%84%8B%E1%85%AF%E1%86%AB%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%8B%E1%85%B3%E1%86%AF%E1%84%8C%E1%85%B5%E1%84%85%E1%85%A9_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 20000,
+            monthly: 130000,
+            threeMonths: 330000,
+            fiveSession: 90000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "TUE",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "WED",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "THU",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "FRI",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "SAT",
+              open: "10:00",
+              close: "22:00",
+            },
+            {
+              dayType: "SUN",
+              open: "10:00",
+              close: "22:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+      ],
+    },
+    peakers: {
+      membershipBrand: "PEAKERS",
+      difficultyColors: [
+        {
+          difficulty: "V1",
+          color: "#E53935",
+          label: "빨강",
+          order: 0,
+        },
+        {
+          difficulty: "V2",
+          color: "#FF7F00",
+          label: "주황",
+          order: 1,
+        },
+        {
+          difficulty: "V3",
+          color: "#F5D800",
+          label: "노랑",
+          order: 2,
+        },
+        {
+          difficulty: "V4",
+          color: "#4CAF50",
+          label: "초록",
+          order: 3,
+        },
+        {
+          difficulty: "V5",
+          color: "#2196F3",
+          label: "파랑",
+          order: 4,
+        },
+        {
+          difficulty: "V6",
+          color: "#1A237E",
+          label: "남색",
+          order: 5,
+        },
+        {
+          difficulty: "V7",
+          color: "#9C27B0",
+          label: "보라",
+          order: 6,
+        },
+        {
+          difficulty: "V8",
+          color: "#9E9E9E",
+          label: "회색",
+          order: 7,
+        },
+      ],
+      priceImageUrl:
+        "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/peakers/%E1%84%91%E1%85%B5%E1%84%8F%E1%85%A5%E1%84%89%E1%85%B3_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
+      difficultyImageUrl:
+        "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/peakers/%E1%84%91%E1%85%B5%E1%84%8F%E1%85%A5%E1%84%89%E1%85%B3_%E1%84%82%E1%85%A1%E1%86%AB%E1%84%8B%E1%85%B5%E1%84%83%E1%85%A9%E1%84%91%E1%85%AD.jpeg",
+      website: "",
+      list: [
+        {
+          key: "peakers_guro",
+          name: "피커스 구로",
+          address: "서울 구로구 구로중앙로 152 NC신구로점 6층",
+          region: "SEOUL",
+          phone: "02-526-8850",
+          latitude: 37.5011601442131,
+          longitude: 126.882773011925,
+          visitorCapacity: 100,
+          description: "강습 및 단체 이용문의 : 02) 526-8850",
+          instagramId: "peakers_guro",
+          notice: "",
+          settingScheduleMemo: "인스타 참고",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/peakers/%E1%84%91%E1%85%B5%E1%84%8F%E1%85%A5%E1%84%89%E1%85%B3_%E1%84%80%E1%85%AE%E1%84%85%E1%85%A9.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/peakers/%E1%84%91%E1%85%B5%E1%84%8F%E1%85%A5%E1%84%89%E1%85%B3_%E1%84%80%E1%85%AE%E1%84%85%E1%85%A9_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 20000,
+            monthly: 129000,
+            threeMonths: 297000,
+            fiveSession: 80000,
+            tenSession: 150000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "TUE",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "WED",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "THU",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "FRI",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "SAT",
+              open: "10:00",
+              close: "20:00",
+            },
+            {
+              dayType: "SUN",
+              open: "10:00",
+              close: "20:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+        {
+          key: "peakers_sinchon",
+          name: "피커스 신촌",
+          address: "서울 서대문구 신촌로 129 아트레온 11층",
+          region: "SEOUL",
+          phone: "02-526-8989",
+          latitude: 37.5565639285478,
+          longitude: 126.940328119434,
+          visitorCapacity: 100,
+          description: "강습 및 단체 이용문의 : 02)526-8989",
+          instagramId: "peakers_sinchon",
+          notice: "",
+          settingScheduleMemo: "인스타 참고",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/peakers/%E1%84%91%E1%85%B5%E1%84%8F%E1%85%A5%E1%84%89%E1%85%B3_%E1%84%89%E1%85%B5%E1%86%AB%E1%84%8E%E1%85%A9%E1%86%AB.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/peakers/%E1%84%91%E1%85%B5%E1%84%8F%E1%85%A5%E1%84%89%E1%85%B3_%E1%84%89%E1%85%B5%E1%86%AB%E1%84%8E%E1%85%A9%E1%86%AB_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 20000,
+            monthly: 129000,
+            threeMonths: 297000,
+            fiveSession: 80000,
+            tenSession: 150000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "TUE",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "WED",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "THU",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "FRI",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "SAT",
+              open: "10:00",
+              close: "20:00",
+            },
+            {
+              dayType: "SUN",
+              open: "10:00",
+              close: "20:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+        {
+          key: "peakers_jongro",
+          name: "피커스 종로",
+          address: "서울 종로구 돈화문로5가길 1 지하 4층",
+          region: "SEOUL",
+          phone: "02-526-8862",
+          latitude: 37.5710275098022,
+          longitude: 126.991230294263,
+          visitorCapacity: 100,
+          description: "강습 및 이용문의 : 02) 526-8862",
+          instagramId: "peakers_jongro",
+          notice: "",
+          settingScheduleMemo: "인스타 참고",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/peakers/%E1%84%91%E1%85%B5%E1%84%8F%E1%85%A5%E1%84%89%E1%85%B3_%E1%84%8C%E1%85%A9%E1%86%BC%E1%84%85%E1%85%A9.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/peakers/%E1%84%91%E1%85%B5%E1%84%8F%E1%85%A5%E1%84%89%E1%85%B3_%E1%84%8C%E1%85%A9%E1%86%BC%E1%84%85%E1%85%A9_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 20000,
+            monthly: 129000,
+            threeMonths: 297000,
+            fiveSession: 80000,
+            tenSession: 150000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "TUE",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "WED",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "THU",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "FRI",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "SAT",
+              open: "10:00",
+              close: "20:00",
+            },
+            {
+              dayType: "SUN",
+              open: "10:00",
+              close: "20:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+      ],
+    },
+    waverock: {
+      membershipBrand: "WAVEROCK",
+      difficultyColors: [
+        {
+          difficulty: "V1",
+          color: "#E53935",
+          label: "빨강",
+          order: 0,
+        },
+        {
+          difficulty: "V2",
+          color: "#FF7F00",
+          label: "주황",
+          order: 1,
+        },
+        {
+          difficulty: "V3",
+          color: "#F5D800",
+          label: "노랑",
+          order: 2,
+        },
+        {
+          difficulty: "V4",
+          color: "#4CAF50",
+          label: "초록",
+          order: 3,
+        },
+        {
+          difficulty: "V5",
+          color: "#2196F3",
+          label: "파랑",
+          order: 4,
+        },
+        {
+          difficulty: "V6",
+          color: "#1A237E",
+          label: "남색",
+          order: 5,
+        },
+        {
+          difficulty: "V7",
+          color: "#9C27B0",
+          label: "보라",
+          order: 6,
+        },
+        {
+          difficulty: "V8",
+          color: "#795548",
+          label: "갈색",
+          order: 7,
+        },
+        {
+          difficulty: "V9",
+          color: "#FFFFFF",
+          label: "흰색",
+          order: 8,
+        },
+        {
+          difficulty: "V10",
+          color: "#9E9E9E",
+          label: "회색",
+          order: 9,
+        },
+      ],
+      priceImageUrl:
+        "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/waverock/%E1%84%8B%E1%85%B0%E1%84%8B%E1%85%B5%E1%84%87%E1%85%B3%E1%84%85%E1%85%A1%E1%86%A8_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
+      difficultyImageUrl:
+        "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/waverock/%E1%84%8B%E1%85%B0%E1%84%8B%E1%85%B5%E1%84%87%E1%85%B3%E1%84%85%E1%85%A1%E1%86%A8_%E1%84%82%E1%85%A1%E1%86%AB%E1%84%8B%E1%85%B5%E1%84%83%E1%85%A9%E1%84%91%E1%85%AD.jpg",
+      website: "https://waverock.co.kr",
+      list: [
+        {
+          key: "waverock_pnu",
+          name: "웨이브락 부산대",
+          address: "부산 금정구 장전온천천로 51 테라스파크 2층 (201호)",
+          region: "BUSAN",
+          phone: "051-513-0231",
+          latitude: 35.2295937783773,
+          longitude: 129.088815730713,
+          visitorCapacity: 100,
+          description: "📍상가 지하 주차가능",
+          instagramId: "waverock_pnu",
+          notice: "",
+          settingScheduleMemo: "인스타 참고",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/waverock/%E1%84%8B%E1%85%B0%E1%84%8B%E1%85%B5%E1%84%87%E1%85%B3%E1%84%85%E1%85%A1%E1%86%A8_%E1%84%87%E1%85%AE%E1%84%89%E1%85%A1%E1%86%AB%E1%84%83%E1%85%A2.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/waverock/%E1%84%8B%E1%85%B0%E1%84%8B%E1%85%B5%E1%84%87%E1%85%B3%E1%84%85%E1%85%A1%E1%86%A8_%E1%84%87%E1%85%AE%E1%84%89%E1%85%A1%E1%86%AB%E1%84%83%E1%85%A2_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 20000,
+            monthly: 130000,
+            threeMonths: 330000,
+            sixMonths: 580000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "12:00",
+              close: "22:30",
+            },
+            {
+              dayType: "TUE",
+              open: "12:00",
+              close: "22:30",
+            },
+            {
+              dayType: "WED",
+              open: "12:00",
+              close: "22:30",
+            },
+            {
+              dayType: "THU",
+              open: "12:00",
+              close: "22:30",
+            },
+            {
+              dayType: "FRI",
+              open: "12:00",
+              close: "22:30",
+            },
+            {
+              dayType: "SAT",
+              open: "10:00",
+              close: "21:00",
+            },
+            {
+              dayType: "SUN",
+              open: "10:00",
+              close: "21:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+        {
+          key: "waverock_namcheon",
+          name: "웨이브락 남천",
+          address: "부산 수영구 황령대로473번길 15 3층 웨이브락남천점",
+          region: "BUSAN",
+          phone: "0507-1378-4226",
+          latitude: 35.1399316610651,
+          longitude: 129.106487767528,
+          visitorCapacity: 100,
+          description:
+            "📍 상가 지하주차장 주차 가능\n(1시간 무료, 그 이후 1시간에 3,000원)",
+          instagramId: "waverock_namcheon",
+          notice: "",
+          settingScheduleMemo: "인스타 참고",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/waverock/%E1%84%8B%E1%85%B0%E1%84%8B%E1%85%B5%E1%84%87%E1%85%B3%E1%84%85%E1%85%A1%E1%86%A8_%E1%84%82%E1%85%A1%E1%86%B7%E1%84%8E%E1%85%A5%E1%86%AB.png",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/waverock/%E1%84%8B%E1%85%B0%E1%84%8B%E1%85%B5%E1%84%87%E1%85%B3%E1%84%85%E1%85%A1%E1%86%A8_%E1%84%82%E1%85%A1%E1%86%B7%E1%84%8E%E1%85%A5%E1%86%AB_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 20000,
+            monthly: 130000,
+            threeMonths: 330000,
+            sixMonths: 580000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "10:00",
+              close: "23:30",
+            },
+            {
+              dayType: "TUE",
+              open: "10:00",
+              close: "23:30",
+            },
+            {
+              dayType: "WED",
+              open: "10:00",
+              close: "23:30",
+            },
+            {
+              dayType: "THU",
+              open: "10:00",
+              close: "23:30",
+            },
+            {
+              dayType: "FRI",
+              open: "10:00",
+              close: "23:30",
+            },
+            {
+              dayType: "SAT",
+              open: "10:00",
+              close: "21:00",
+            },
+            {
+              dayType: "SUN",
+              open: "10:00",
+              close: "21:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+        {
+          key: "waverock_seomyeon",
+          name: "웨이브락 서면",
+          address:
+            "부산 부산진구 서전로9번길 20 혜도인파크에비뉴 오피스텔 상가 3층",
+          region: "BUSAN",
+          phone: "051-728-7170",
+          latitude: 35.1587082822336,
+          longitude: 129.0611185567,
+          visitorCapacity: 100,
+          description: "📍 상가 타워 주차가능",
+          instagramId: "waverock_seomyeon",
+          notice: "",
+          settingScheduleMemo: "인스타 참고",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/waverock/%E1%84%8B%E1%85%B0%E1%84%8B%E1%85%B5%E1%84%87%E1%85%B3%E1%84%85%E1%85%A1%E1%86%A8_%E1%84%89%E1%85%A5%E1%84%86%E1%85%A7%E1%86%AB.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/waverock/%E1%84%8B%E1%85%B0%E1%84%8B%E1%85%B5%E1%84%87%E1%85%B3%E1%84%85%E1%85%A1%E1%86%A8_%E1%84%89%E1%85%A5%E1%84%86%E1%85%A7%E1%86%AB_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 20000,
+            monthly: 130000,
+            threeMonths: 330000,
+            sixMonths: 580000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "10:00",
+              close: "23:30",
+            },
+            {
+              dayType: "TUE",
+              open: "10:00",
+              close: "23:30",
+            },
+            {
+              dayType: "WED",
+              open: "10:00",
+              close: "23:30",
+            },
+            {
+              dayType: "THU",
+              open: "10:00",
+              close: "23:30",
+            },
+            {
+              dayType: "FRI",
+              open: "10:00",
+              close: "23:30",
+            },
+            {
+              dayType: "SAT",
+              open: "10:00",
+              close: "21:00",
+            },
+            {
+              dayType: "SUN",
+              open: "10:00",
+              close: "21:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+      ],
+    },
+    climb_us: {
+      membershipBrand: "CLIMB_US",
+      difficultyColors: [
+        {
+          difficulty: "V1",
+          color: "#E53935",
+          label: "빨강",
+          order: 0,
+        },
+        {
+          difficulty: "V2",
+          color: "#FF7F00",
+          label: "주황",
+          order: 1,
+        },
+        {
+          difficulty: "V3",
+          color: "#F5D800",
+          label: "노랑",
+          order: 2,
+        },
+        {
+          difficulty: "V4",
+          color: "#4CAF50",
+          label: "초록",
+          order: 3,
+        },
+        {
+          difficulty: "V5",
+          color: "#2196F3",
+          label: "파랑",
+          order: 4,
+        },
+        {
+          difficulty: "V6",
+          color: "#1A237E",
+          label: "남색",
+          order: 5,
+        },
+        {
+          difficulty: "V7",
+          color: "#9C27B0",
+          label: "보라",
+          order: 6,
+        },
+        {
+          difficulty: "V8",
+          color: "#FFFFFF",
+          label: "흰색",
+          order: 7,
+        },
+        {
+          difficulty: "V9",
+          color: "#212121",
+          label: "검정",
+          order: 8,
+        },
+      ],
+      priceImageUrl:
+        "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/climb_us/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7%E1%84%8B%E1%85%A5%E1%84%89%E1%85%B3_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.jpeg",
+      difficultyImageUrl:
+        "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/climb_us/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7%E1%84%8B%E1%85%A5%E1%84%89%E1%85%B3_%E1%84%82%E1%85%A1%E1%86%AB%E1%84%8B%E1%85%B5%E1%84%83%E1%85%A9%E1%84%91%E1%85%AD.jpeg",
+      website: "",
+      list: [
+        {
+          key: "climb_us_moran",
+          name: "클라임어스 모란",
+          address: "경기 성남시 중원구 성남대로 1126 6층 클라임어스",
+          region: "GYEONGGI",
+          phone: "0507-1410-5962",
+          latitude: 37.4302779255228,
+          longitude: 127.129865094766,
+          visitorCapacity: 100,
+          description:
+            "🌱𝘾𝙇𝙄𝙈𝘽 US MORAN🌱\n하나의 회원권으로 미사,장한평점이 함께 사용 기능합니다",
+          instagramId: "climb_us_moran",
+          notice: "",
+          settingScheduleMemo: "매주 월요일 정규세팅",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/climb_us/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7%E1%84%8B%E1%85%A5%E1%84%89%E1%85%B3_%E1%84%86%E1%85%A9%E1%84%85%E1%85%A1%E1%86%AB.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/climb_us/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7%E1%84%8B%E1%85%A5%E1%84%89%E1%85%B3_%E1%84%86%E1%85%A9%E1%84%85%E1%85%A1%E1%86%AB_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 20000,
+            monthly: 130000,
+            threeMonths: 300000,
+            sixMonths: 550000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "10:30",
+              close: "23:00",
+            },
+            {
+              dayType: "TUE",
+              open: "10:30",
+              close: "23:00",
+            },
+            {
+              dayType: "WED",
+              open: "10:30",
+              close: "23:00",
+            },
+            {
+              dayType: "THU",
+              open: "10:30",
+              close: "23:00",
+            },
+            {
+              dayType: "FRI",
+              open: "10:30",
+              close: "23:00",
+            },
+            {
+              dayType: "SAT",
+              open: "10:00",
+              close: "20:00",
+            },
+            {
+              dayType: "SUN",
+              open: "10:00",
+              close: "20:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+        {
+          key: "climb_us_misa",
+          name: "클라임어스 미사",
+          address: "경기 하남시 미사강변동로 81 13층",
+          region: "GYEONGGI",
+          phone: "0507-1390-5963",
+          latitude: 37.5622506296228,
+          longitude: 127.192718271233,
+          visitorCapacity: 100,
+          description:
+            "🌷𝘾𝙇𝙄𝙈𝘽 US 𝙈𝙄𝙎𝘼🌷\n하나의 회원권으로 모란, 장한평점이 함께 사용 기능합니다",
+          instagramId: "climb_us_misa",
+          notice: "",
+          settingScheduleMemo: "인스타 참고",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/climb_us/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7%E1%84%8B%E1%85%A5%E1%84%89%E1%85%B3_%E1%84%86%E1%85%B5%E1%84%89%E1%85%A1.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/climb_us/%ED%81%B4%EB%9D%BC%EC%9E%84%EC%96%B4%EC%8A%A4_%E1%84%86%E1%85%B5%E1%84%89%E1%85%A1_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 20000,
+            monthly: 130000,
+            threeMonths: 300000,
+            sixMonths: 550000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "11:00",
+              close: "23:00",
+            },
+            {
+              dayType: "TUE",
+              open: "11:00",
+              close: "23:00",
+            },
+            {
+              dayType: "WED",
+              open: "11:00",
+              close: "23:00",
+            },
+            {
+              dayType: "THU",
+              open: "11:00",
+              close: "23:00",
+            },
+            {
+              dayType: "FRI",
+              open: "11:00",
+              close: "23:00",
+            },
+            {
+              dayType: "SAT",
+              open: "11:00",
+              close: "20:00",
+            },
+            {
+              dayType: "SUN",
+              open: "11:00",
+              close: "20:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+        {
+          key: "climb_us_janghanp",
+          name: "클라임어스 장한평",
+          address: "서울 동대문구 장한로2길 63 호종빌딩 2층",
+          region: "SEOUL",
+          phone: "0507-1410-5963",
+          latitude: 37.5618402416109,
+          longitude: 127.068807354174,
+          visitorCapacity: 100,
+          description:
+            "🌻𝘾𝙇𝙄𝙈𝘽 US 𝙅𝙖𝙣𝙜𝙝𝙖𝙣𝙥🌻\n하나의 회원권으로 모란, 장한평점이 함께 사용 기능합니다",
+          instagramId: "climb_us_janghanp",
+          notice: "",
+          settingScheduleMemo: "인스타 참고",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/climb_us/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7%E1%84%8B%E1%85%A5%E1%84%89%E1%85%B3_%E1%84%8C%E1%85%A1%E1%86%BC%E1%84%92%E1%85%A1%E1%86%AB%E1%84%91%E1%85%A7%E1%86%BC.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/climb_us/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7%E1%84%8B%E1%85%A5%E1%84%89%E1%85%B3_%E1%84%8C%E1%85%A1%E1%86%BC%E1%84%92%E1%85%A1%E1%86%AB%E1%84%91%E1%85%A7%E1%86%BC_%EB%A1%9C%EA%B3%A0.jpg",
+          legacyPrices: {
+            daily: 20000,
+            monthly: 130000,
+            threeMonths: 300000,
+            sixMonths: 550000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "TUE",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "WED",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "THU",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "FRI",
+              open: "10:00",
+              close: "23:00",
+            },
+            {
+              dayType: "SAT",
+              open: "09:00",
+              close: "21:00",
+            },
+            {
+              dayType: "SUN",
+              open: "09:00",
+              close: "21:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+      ],
+    },
+    damjang: {
+      membershipBrand: "DAMJANG",
+      difficultyColors: [
+        {
+          difficulty: "V1",
+          color: "#E53935",
+          label: "빨강",
+          order: 0,
+        },
+        {
+          difficulty: "V2",
+          color: "#FF7F00",
+          label: "주황",
+          order: 1,
+        },
+        {
+          difficulty: "V3",
+          color: "#F5D800",
+          label: "노랑",
+          order: 2,
+        },
+        {
+          difficulty: "V4",
+          color: "#4CAF50",
+          label: "초록",
+          order: 3,
+        },
+        {
+          difficulty: "V5",
+          color: "#2196F3",
+          label: "파랑",
+          order: 4,
+        },
+        {
+          difficulty: "V6",
+          color: "#1A237E",
+          label: "남색",
+          order: 5,
+        },
+        {
+          difficulty: "V7",
+          color: "#9C27B0",
+          label: "보라",
+          order: 6,
+        },
+        {
+          difficulty: "V8",
+          color: "#FFFFFF",
+          label: "흰색",
+          order: 7,
+        },
+        {
+          difficulty: "V9",
+          color: "#212121",
+          label: "검정",
+          order: 8,
+        },
+      ],
+      priceImageUrl:
+        "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/damjang/%E1%84%83%E1%85%A1%E1%86%B7%E1%84%8C%E1%85%A1%E1%86%BC_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
+      difficultyImageUrl:
+        "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/damjang/%E1%84%83%E1%85%A1%E1%86%B7%E1%84%8C%E1%85%A1%E1%86%BC_%E1%84%82%E1%85%A1%E1%86%AB%E1%84%8B%E1%85%B5%E1%84%83%E1%85%A9%E1%84%91%E1%85%AD.png",
+      website: "",
+      list: [
+        {
+          key: "euljiro_damjang",
+          name: "을지로 담장",
+          address: "서울 중구 마른내로 63-3 2층",
+          region: "SEOUL",
+          phone: "0507-1493-2855",
+          latitude: 37.5644996570774,
+          longitude: 126.995050103853,
+          visitorCapacity: 100,
+          description:
+            "❤️95% 만족도, 함께 극복하는 클테기 강습🔥\n❤️2주마다 ALL세팅, 지루할 틈 없는 새로운 루트\n❤️자연 바위 볼더링 입문 OK, 몸만 오세요!",
+          instagramId: "euljiro_damjang",
+          notice: "",
+          settingScheduleMemo: "인스타 참고",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/damjang/%E1%84%83%E1%85%A1%E1%86%B7%E1%84%8C%E1%85%A1%E1%86%BC_%E1%84%8B%E1%85%B3%E1%86%AF%E1%84%8C%E1%85%B5%E1%84%85%E1%85%A9.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/damjang/%E1%84%83%E1%85%A1%E1%86%B7%E1%84%8C%E1%85%A1%E1%86%BC_%E1%84%8B%E1%85%B3%E1%86%AF%E1%84%8C%E1%85%B5%E1%84%85%E1%85%A9_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 20000,
+            monthly: 130000,
+            threeMonths: 330000,
+            fiveSession: 90000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "11:00",
+              close: "23:00",
+            },
+            {
+              dayType: "TUE",
+              open: "11:00",
+              close: "23:00",
+            },
+            {
+              dayType: "WED",
+              open: "11:00",
+              close: "23:00",
+            },
+            {
+              dayType: "THU",
+              open: "11:00",
+              close: "23:00",
+            },
+            {
+              dayType: "FRI",
+              open: "11:00",
+              close: "23:00",
+            },
+            {
+              dayType: "SAT",
+              open: "10:00",
+              close: "18:00",
+            },
+            {
+              dayType: "SUN",
+              open: "10:00",
+              close: "18:00",
+            },
+          ],
+          facilities: ["PARKING", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+        {
+          key: "sinchon_damjang",
+          name: "신촌 담장",
+          address: "서울 서대문구 신촌역로 10 5층",
+          region: "SEOUL",
+          phone: "02-313-1003",
+          latitude: 37.5575632795384,
+          longitude: 126.9431790319,
+          visitorCapacity: 100,
+          description: "이대역 도보 5분 이내 실내 클라이밍 센터",
+          instagramId: "sinchon_damjang",
+          notice: "",
+          settingScheduleMemo: "인스타 참고",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/damjang/%E1%84%83%E1%85%A1%E1%86%B7%E1%84%8C%E1%85%A1%E1%86%BC_%E1%84%89%E1%85%B5%E1%86%AB%E1%84%8E%E1%85%A9%E1%86%AB.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/damjang/%E1%84%83%E1%85%A1%E1%86%B7%E1%84%8C%E1%85%A1%E1%86%BC_%E1%84%89%E1%85%B5%E1%86%AB%E1%84%8E%E1%85%A9%E1%86%AB_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 20000,
+            monthly: 130000,
+            threeMonths: 330000,
+            fiveSession: 90000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "11:00",
+              close: "23:00",
+            },
+            {
+              dayType: "TUE",
+              open: "11:00",
+              close: "23:00",
+            },
+            {
+              dayType: "WED",
+              open: "11:00",
+              close: "23:00",
+            },
+            {
+              dayType: "THU",
+              open: "11:00",
+              close: "23:00",
+            },
+            {
+              dayType: "FRI",
+              open: "11:00",
+              close: "23:00",
+            },
+            {
+              dayType: "SAT",
+              open: "10:00",
+              close: "21:00",
+            },
+            {
+              dayType: "SUN",
+              open: "10:00",
+              close: "20:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+      ],
+    },
+    b_bloc: {
+      membershipBrand: "B_BLOC",
+      difficultyColors: [
+        {
+          difficulty: "V1",
+          color: "#FFFFFF",
+          label: "흰색",
+          order: 0,
+        },
+        {
+          difficulty: "V2",
+          color: "#F5D800",
+          label: "노랑",
+          order: 1,
+        },
+        {
+          difficulty: "V3",
+          color: "#FF7F00",
+          label: "주황",
+          order: 2,
+        },
+        {
+          difficulty: "V4",
+          color: "#E91E8C",
+          label: "분홍",
+          order: 3,
+        },
+        {
+          difficulty: "V5",
+          color: "#2196F3",
+          label: "하늘색",
+          order: 4,
+        },
+        {
+          difficulty: "V6",
+          color: "#9E9E9E",
+          label: "회색",
+          order: 5,
+        },
+        {
+          difficulty: "V7",
+          color: "#4CAF50",
+          label: "초록",
+          order: 6,
+        },
+        {
+          difficulty: "V8",
+          color: "#E53935",
+          label: "빨강",
+          order: 7,
+        },
+        {
+          difficulty: "V9",
+          color: "#1A237E",
+          label: "남색",
+          order: 8,
+        },
+        {
+          difficulty: "V10",
+          color: "#212121",
+          label: "검정",
+          order: 9,
+        },
+      ],
+      priceImageUrl:
+        "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/b_bloc/%E1%84%87%E1%85%B5%E1%84%87%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A5%E1%86%A8%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.jpeg",
+      difficultyImageUrl:
+        "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/b_bloc/%E1%84%87%E1%85%B5%E1%84%87%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A5%E1%86%A8%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%82%E1%85%A1%E1%86%AB%E1%84%8B%E1%85%B5%E1%84%83%E1%85%A9%E1%84%91%E1%85%AD.jpg",
+      website: "",
+      list: [
+        {
+          key: "b.bloc_songdo",
+          name: "비블럭클라이밍 송도",
+          address: "인천 연수구 송도과학로16번길 13-39 107호 비블럭클라이밍",
+          region: "INCHEON",
+          phone: "032-716-5837",
+          latitude: 37.3803225157686,
+          longitude: 126.663628280971,
+          visitorCapacity: 100,
+          description: "",
+          instagramId: "b.bloc_songdo",
+          notice: "",
+          settingScheduleMemo: "인스타 참고",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/b_bloc/%E1%84%87%E1%85%B5%E1%84%87%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A5%E1%86%A8%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%89%E1%85%A9%E1%86%BC%E1%84%83%E1%85%A9.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/b_bloc/%E1%84%87%E1%85%B5%E1%84%87%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A5%E1%86%A8%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%89%E1%85%A9%E1%86%BC%E1%84%83%E1%85%A9_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 20000,
+            monthly: 130000,
+            threeMonths: 350000,
+            sixMonths: 600000,
+            fiveSession: 90000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "10:30",
+              close: "22:30",
+            },
+            {
+              dayType: "TUE",
+              open: "10:30",
+              close: "22:30",
+            },
+            {
+              dayType: "WED",
+              open: "10:30",
+              close: "22:30",
+            },
+            {
+              dayType: "THU",
+              open: "10:30",
+              close: "22:30",
+            },
+            {
+              dayType: "FRI",
+              open: "10:30",
+              close: "22:30",
+            },
+            {
+              dayType: "SAT",
+              open: "10:30",
+              close: "20:00",
+            },
+            {
+              dayType: "SUN",
+              open: "10:30",
+              close: "20:00",
+            },
+          ],
+          facilities: ["PARKING", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+        {
+          key: "b.bloc_yeongjong",
+          name: "비블럭클라이밍 영종하늘도시",
+          address: "인천 중구 하늘중앙로195번길 18 6층 601-604호",
+          region: "INCHEON",
+          phone: "032-751-5837",
+          latitude: 37.4888761715958,
+          longitude: 126.561187668967,
+          visitorCapacity: 100,
+          description: "",
+          instagramId: "b.bloc_yeongjong",
+          notice: "",
+          settingScheduleMemo: "인스타 참고",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/b_bloc/%E1%84%87%E1%85%B5%E1%84%87%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A5%E1%86%A8%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%8B%E1%85%A7%E1%86%BC%E1%84%8C%E1%85%A9%E1%86%BC%E1%84%92%E1%85%A1%E1%84%82%E1%85%B3%E1%86%AF%E1%84%83%E1%85%A9%E1%84%89%E1%85%B5.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/b_bloc/%E1%84%87%E1%85%B5%E1%84%87%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A5%E1%86%A8%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%8B%E1%85%A7%E1%86%BC%E1%84%8C%E1%85%A9%E1%86%BC%E1%84%92%E1%85%A1%E1%84%82%E1%85%B3%E1%86%AF%E1%84%83%E1%85%A9%E1%84%89%E1%85%B5_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 20000,
+            monthly: 130000,
+            threeMonths: 350000,
+            sixMonths: 600000,
+            fiveSession: 90000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "10:30",
+              close: "22:30",
+            },
+            {
+              dayType: "TUE",
+              open: "10:30",
+              close: "22:30",
+            },
+            {
+              dayType: "WED",
+              open: "10:30",
+              close: "22:30",
+            },
+            {
+              dayType: "THU",
+              open: "10:30",
+              close: "22:30",
+            },
+            {
+              dayType: "FRI",
+              open: "10:30",
+              close: "22:30",
+            },
+            {
+              dayType: "SAT",
+              open: "10:30",
+              close: "20:00",
+            },
+            {
+              dayType: "SUN",
+              open: "10:30",
+              close: "20:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+      ],
+    },
+    allez: {
+      membershipBrand: "ALLEZ",
+      difficultyColors: [
+        {
+          difficulty: "V1",
+          color: "#FFFFFF",
+          label: "흰색",
+          order: 0,
+        },
+        {
+          difficulty: "V2",
+          color: "#F5D800",
+          label: "노랑",
+          order: 1,
+        },
+        {
+          difficulty: "V3",
+          color: "#8BC34A",
+          label: "연",
+          order: 2,
+        },
+        {
+          difficulty: "V4",
+          color: "#4CAF50",
+          label: "초록",
+          order: 3,
+        },
+        {
+          difficulty: "V5",
+          color: "#2196F3",
+          label: "파랑",
+          order: 4,
+        },
+        {
+          difficulty: "V6",
+          color: "#E53935",
+          label: "빨강",
+          order: 5,
+        },
+        {
+          difficulty: "V7",
+          color: "#9E9E9E",
+          label: "회색",
+          order: 6,
+        },
+        {
+          difficulty: "V8",
+          color: "#795548",
+          label: "갈색",
+          order: 7,
+        },
+        {
+          difficulty: "V9",
+          color: "#E91E8C",
+          label: "분홍",
+          order: 8,
+        },
+      ],
+      priceImageUrl:
+        "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/allez_climb/%E1%84%8B%E1%85%A1%E1%86%AF%E1%84%85%E1%85%A6%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.jpeg",
+      difficultyImageUrl:
+        "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/allez_climb/%E1%84%8B%E1%85%A1%E1%86%AF%E1%84%85%E1%85%A6%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%82%E1%85%A1%E1%86%AB%E1%84%8B%E1%85%B5%E1%84%83%E1%85%A9%E1%84%91%E1%85%AD.jpeg",
+      website: "",
+      list: [
+        {
+          key: "allez_climb",
+          name: "알레클라임 영동포",
+          address: "서울 영등포구 영등포로33길 14",
+          region: "SEOUL",
+          phone: "0507-1364-2018",
+          latitude: 37.5215466406887,
+          longitude: 126.902851854546,
+          visitorCapacity: 100,
+          description: "✨️회원권 하나로 전 지점 이용 가능",
+          instagramId: "allez_climb",
+          notice: "",
+          settingScheduleMemo: "인스타 참고",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/allez_climb/%E1%84%8B%E1%85%A1%E1%86%AF%E1%84%85%E1%85%A6%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%8B%E1%85%A7%E1%86%BC%E1%84%83%E1%85%B3%E1%86%BC%E1%84%91%E1%85%A9.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/allez_climb/%E1%84%8B%E1%85%A1%E1%86%AF%E1%84%85%E1%85%A6%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%8B%E1%85%A7%E1%86%BC%E1%84%83%E1%85%B3%E1%86%BC%E1%84%91%E1%85%A9_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 20000,
+            monthly: 130000,
+            threeMonths: 330000,
+            sixMonths: 600000,
+            fiveSession: 90000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "15:00",
+              close: "23:00",
+            },
+            {
+              dayType: "TUE",
+              open: "14:00",
+              close: "23:00",
+            },
+            {
+              dayType: "WED",
+              open: "14:00",
+              close: "23:00",
+            },
+            {
+              dayType: "THU",
+              open: "14:00",
+              close: "23:00",
+            },
+            {
+              dayType: "FRI",
+              open: "14:00",
+              close: "23:00",
+            },
+            {
+              dayType: "SAT",
+              open: "12:00",
+              close: "19:00",
+            },
+            {
+              dayType: "SUN",
+              open: "12:00",
+              close: "19:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+        {
+          key: "allez_climb_hyehwa",
+          name: "알레클라임 혜화",
+          address: "서울 종로구 창경궁로34길 18-5 토가빌딩 B2층",
+          region: "SEOUL",
+          phone: "0507-1377-2035",
+          latitude: 37.584120180365,
+          longitude: 127.000806442921,
+          visitorCapacity: 100,
+          description: "✨️회원권 하나로 전 지점 이용 가능",
+          instagramId: "allez_climb_hyehwa",
+          notice: "",
+          settingScheduleMemo: "인스타 참고",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/allez_climb/%E1%84%8B%E1%85%A1%E1%86%AF%E1%84%85%E1%85%A6%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%92%E1%85%A8%E1%84%92%E1%85%AA.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/allez_climb/%E1%84%8B%E1%85%A1%E1%86%AF%E1%84%85%E1%85%A6%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%92%E1%85%A8%E1%84%92%E1%85%AA_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 20000,
+            monthly: 130000,
+            threeMonths: 330000,
+            sixMonths: 600000,
+            fiveSession: 90000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "11:00",
+              close: "23:00",
+            },
+            {
+              dayType: "TUE",
+              open: "11:00",
+              close: "23:00",
+            },
+            {
+              dayType: "WED",
+              open: "11:00",
+              close: "23:00",
+            },
+            {
+              dayType: "THU",
+              open: "11:00",
+              close: "23:00",
+            },
+            {
+              dayType: "FRI",
+              open: "11:00",
+              close: "23:00",
+            },
+            {
+              dayType: "SAT",
+              open: "10:00",
+              close: "22:00",
+            },
+            {
+              dayType: "SUN",
+              open: "10:00",
+              close: "22:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+        {
+          key: "allez_climb_gangdong",
+          name: "알레클라임 강동",
+          address: "서울 강동구 천호대로177길 39 지하 2층",
+          region: "SEOUL",
+          phone: "0507-1321-2027",
+          latitude: 37.5364161906704,
+          longitude: 127.137844474164,
+          visitorCapacity: 100,
+          description:
+            "강동 최대 규모 클라이밍 센터\n✨️회원권 하나로 전 지점 이용 가능",
+          instagramId: "allez_climb_gangdong",
+          notice: "",
+          settingScheduleMemo: "인스타 참고",
+          coverImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/allez_climb/%E1%84%8B%E1%85%A1%E1%86%AF%E1%84%85%E1%85%A6%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%86%BC%E1%84%83%E1%85%A9%E1%86%BC.jpeg",
+          logoImageUrl:
+            "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/allez_climb/%E1%84%8B%E1%85%A1%E1%86%AF%E1%84%85%E1%85%A6%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%86%BC%E1%84%83%E1%85%A9%E1%86%BC_%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9.jpg",
+          legacyPrices: {
+            daily: 20000,
+            monthly: 130000,
+            threeMonths: 330000,
+            sixMonths: 600000,
+            fiveSession: 90000,
+            tenSession: 170000,
+          },
+          openHours: [
+            {
+              dayType: "MON",
+              open: "11:00",
+              close: "23:00",
+            },
+            {
+              dayType: "TUE",
+              open: "11:00",
+              close: "23:00",
+            },
+            {
+              dayType: "WED",
+              open: "11:00",
+              close: "23:00",
+            },
+            {
+              dayType: "THU",
+              open: "11:00",
+              close: "23:00",
+            },
+            {
+              dayType: "FRI",
+              open: "11:00",
+              close: "23:00",
+            },
+            {
+              dayType: "SAT",
+              open: "10:00",
+              close: "22:00",
+            },
+            {
+              dayType: "SUN",
+              open: "10:00",
+              close: "22:00",
+            },
+          ],
+          facilities: ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
+        },
+      ],
+    },
+  },
+};
+
+export async function seedGyms(prisma: PrismaClient): Promise<TGymSeedResult> {
   const gymMap: Record<string, Gym> = {};
+  const difficultyColorsByKey: Record<string, IDifficultyColorSeed[]> = {};
 
-  const THECLIMB_PRICE_IMAGE_URL =
-    "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png";
-  const SEOULFOREST_PRICE_IMAGE_URL =
-    "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png";
-  const CLIMBINGPARK_PRICE_IMAGE_URL =
-    "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.jpeg";
+  for (const brandBlock of Object.values(GYMS_SEED_ROOT.brands)) {
+    const membershipBrand = normalizeMembershipBrand(
+      brandBlock.membershipBrand,
+    );
+    const brandWebsite =
+      typeof brandBlock.website === "string" && brandBlock.website.trim()
+        ? brandBlock.website.trim()
+        : undefined;
 
-  const priceImageUrlFromKey = (key: string) => {
-    if (key.startsWith("theclimb_")) return THECLIMB_PRICE_IMAGE_URL;
-    if (key.startsWith("seoulforest_")) return SEOULFOREST_PRICE_IMAGE_URL;
-    if (key.startsWith("climbingpark_")) return CLIMBINGPARK_PRICE_IMAGE_URL;
-    return null;
-  };
+    for (const item of brandBlock.list) {
+      const { key, ...rest } = item;
+      if (gymMap[key]) {
+        throw new Error(`중복 암장 key: ${key}`);
+      }
 
-  const membershipBrandFromKey = (key: string): GymMembershipBrand => {
-    if (key.startsWith("theclimb_")) return "THE_CLIMB";
-    if (key.startsWith("seoulforest_")) return "SEOULFOREST";
-    if (key.startsWith("climbingpark_")) return "CLIMBINGPARK";
-    return "STANDALONE";
-  };
+      const website =
+        typeof rest.website === "string" && rest.website.trim()
+          ? rest.website.trim()
+          : brandWebsite;
 
-  for (const gymData of GYMS_DATA) {
-    const { key, ...rest } = gymData;
-    const gym = await prisma.gym.create({
-      data: {
-        name: rest.name,
-        address: rest.address,
-        region: rest.region as never,
-        phone: rest.phone,
-        latitude: rest.latitude,
-        longitude: rest.longitude,
-        visitorCapacity: rest.visitorCapacity,
-        description: rest.description,
-        website: rest.website,
-        instagramId: rest.instagramId,
-        thumbnailUrl: rest.thumbnailUrl,
-        notice: rest.notice,
-        facilities: rest.facilities,
-        avgRating: 0,
-        reviewCount: 0,
-        membershipBrand: membershipBrandFromKey(key),
-      },
-    });
+      const gym = await prisma.gym.create({
+        data: {
+          name: rest.name,
+          address: rest.address,
+          region: rest.region as Region,
+          phone: rest.phone,
+          latitude: rest.latitude,
+          longitude: rest.longitude,
+          visitorCapacity: rest.visitorCapacity,
+          description: rest.description,
+          website: website ?? undefined,
+          instagramId: rest.instagramId,
+          coverImageUrl: rest.coverImageUrl,
+          logoImageUrl: rest.logoImageUrl,
+          difficultyImageUrl:
+            rest.difficultyImageUrl ?? brandBlock.difficultyImageUrl ?? null,
+          settingScheduleMemo: rest.settingScheduleMemo,
+          notice: rest.notice,
+          facilities: rest.facilities as GymFacilityType[],
+          avgRating: 0,
+          reviewCount: 0,
+          membershipBrand,
+        },
+      });
 
-    await prisma.gymMembershipPlan.createMany({
-      data: buildMembershipPlanRows(gym.id, rest.legacyPrices),
-    });
+      await prisma.gymMembershipPlan.createMany({
+        data: buildMembershipPlanRows(gym.id, rest.legacyPrices),
+      });
 
-    // 가격표(또는 대체 이미지) 1장 필수 생성: 화면에서 images가 빈 배열이면 안 됨
-    const imageUrl =
-      priceImageUrlFromKey(key) ??
-      rest.priceImageUrl ??
-      rest.thumbnailUrl ??
-      null;
-    if (imageUrl) {
+      const priceImageUrl =
+        rest.priceImageUrl ?? brandBlock.priceImageUrl ?? rest.coverImageUrl;
+
       await prisma.gymImage.create({
         data: {
           gymId: gym.id,
-          url: imageUrl,
+          url: priceImageUrl,
           order: 0,
         },
       });
-    }
 
-    const hours = OPEN_HOURS[key];
-    if (hours) {
       await prisma.gymOpenHour.createMany({
-        data: hours.map(({ dayType, open, close }) => ({
+        data: rest.openHours.map(({ dayType, open, close }) => ({
           gymId: gym.id,
-          dayType,
+          dayType: dayType as DayType,
           open,
           close,
         })),
       });
-    }
 
-    gymMap[key] = gym;
+      difficultyColorsByKey[key] = brandBlock.difficultyColors.map((row) => ({
+        difficulty: row.difficulty as Difficulty,
+        color: row.color,
+        label: row.label,
+        order: row.order,
+      }));
+
+      gymMap[key] = gym;
+    }
   }
 
   console.log(`  ✅ ${Object.keys(gymMap).length}개의 암장 생성`);
-  return gymMap;
+  return { gymMap, difficultyColorsByKey };
 }

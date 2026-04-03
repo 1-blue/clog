@@ -19,9 +19,9 @@ const FrequentGymRow: React.FC<IProps> = ({ gym }) => {
     >
       <div className="flex min-w-0 flex-1 items-center gap-4">
         <div className="size-12 shrink-0 overflow-hidden rounded-full border-2 border-outline-variant bg-surface-container-high">
-          {gym.thumbnailUrl ? (
+          {gym.coverImageUrl ? (
             <img
-              src={gym.thumbnailUrl}
+              src={gym.coverImageUrl}
               alt=""
               className="size-full object-cover"
             />

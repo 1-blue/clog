@@ -20,8 +20,18 @@ import { extractApiToastAsync } from "#web/libs/api/extractApiToast";
 import { membershipPlanCodeLabel } from "#web/libs/membership/planLabels";
 
 type TGymListItem = components["schemas"]["GymListItem"];
-type TGymPick = Pick<TGymListItem, "id" | "name">;
+type TGymPick = Pick<TGymListItem, "id" | "name" | "address">;
 type TGymPlan = components["schemas"]["GymMembershipPlan"];
+
+const filterGymPicksByQuery = (items: TGymPick[], q: string): TGymPick[] => {
+  const needle = q.trim().toLowerCase();
+  if (!needle) return items;
+  return items.filter(
+    (g) =>
+      g.name.toLowerCase().includes(needle) ||
+      (g.address?.toLowerCase().includes(needle) ?? false),
+  );
+};
 
 const MembershipNewMain = () => {
   const router = useRouter();
@@ -67,16 +77,26 @@ const MembershipNewMain = () => {
 
   const apiItems: TGymPick[] = useMemo(() => {
     const raw = gymsRes?.payload?.items ?? [];
-    return raw.map((g) => ({ id: g.id, name: g.name }));
+    return raw.map((g) => ({
+      id: g.id,
+      name: g.name,
+      address: g.address,
+    }));
   }, [gymsRes?.payload?.items]);
+
+  const filteredItems = useMemo(() => {
+    if (isPendingDebounce) return [];
+    if (!debounced) return apiItems;
+    return filterGymPicksByQuery(apiItems, debounced);
+  }, [apiItems, debounced, isPendingDebounce]);
 
   const [gym, setGym] = useState<TGymPick | null>(null);
   const mergedItems = useMemo(() => {
     if (isPendingDebounce) return [];
-    if (!gym) return apiItems;
-    if (apiItems.some((i) => i.id === gym.id)) return apiItems;
-    return [gym, ...apiItems];
-  }, [apiItems, gym, isPendingDebounce]);
+    if (!gym) return filteredItems;
+    if (filteredItems.some((i) => i.id === gym.id)) return filteredItems;
+    return [gym, ...filteredItems];
+  }, [filteredItems, gym, isPendingDebounce]);
 
   const { data: plans = [] } = openapi.useQuery(
     "get",

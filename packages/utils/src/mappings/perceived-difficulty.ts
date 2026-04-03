@@ -6,6 +6,8 @@ export const perceivedDifficultyToKoreanMap: Record<
   string
 > = {
   EASY: "쉬움",
+  EASY_NORMAL: "쉬움~보통",
   NORMAL: "보통",
+  NORMAL_HARD: "보통~어려움",
   HARD: "어려움",
 };

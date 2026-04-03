@@ -14,6 +14,16 @@ type TGymPick = {
   address: string | null;
 };
 
+const filterHomeGymsByQuery = (items: TGymPick[], q: string): TGymPick[] => {
+  const needle = q.trim().toLowerCase();
+  if (!needle) return items;
+  return items.filter(
+    (g) =>
+      g.name.toLowerCase().includes(needle) ||
+      (g.address?.toLowerCase().includes(needle) ?? false),
+  );
+};
+
 const ProfileEditHomeGymField = () => {
   const { control, setValue } = useFormContext<TProfileEditFormData>();
   const homeGymId = useWatch({ control, name: "homeGymId" });
@@ -75,6 +85,12 @@ const ProfileEditHomeGymField = () => {
     }));
   }, [gymsRes?.payload?.items]);
 
+  const filteredItems = useMemo(() => {
+    if (isPendingDebounce) return [];
+    if (!debounced) return apiItems;
+    return filterHomeGymsByQuery(apiItems, debounced);
+  }, [apiItems, debounced, isPendingDebounce]);
+
   const selected = useMemo((): TGymPick | null => {
     if (!homeGymId || !homeGymName) return null;
     return { id: homeGymId, name: homeGymName, address: null };
@@ -82,10 +98,10 @@ const ProfileEditHomeGymField = () => {
 
   const mergedItems = useMemo(() => {
     if (isPendingDebounce) return [];
-    if (!selected) return apiItems;
-    if (apiItems.some((i) => i.id === selected.id)) return apiItems;
-    return [selected, ...apiItems];
-  }, [apiItems, isPendingDebounce, selected]);
+    if (!selected) return filteredItems;
+    if (filteredItems.some((i) => i.id === selected.id)) return filteredItems;
+    return [selected, ...filteredItems];
+  }, [filteredItems, isPendingDebounce, selected]);
 
   const emptyContent = isPendingDebounce
     ? "검색 중…"

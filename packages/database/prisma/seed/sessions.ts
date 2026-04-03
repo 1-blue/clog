@@ -1,4 +1,9 @@
-import type { Gym, PrismaClient, User } from "@prisma/client";
+import {
+  GymPerceivedDifficulty,
+  type Gym,
+  type PrismaClient,
+  type User,
+} from "@prisma/client";
 
 import {
   normalizeSessionTimeRange,
@@ -7,7 +12,13 @@ import {
   SESSION_MINUTE_OPTIONS,
 } from "@clog/utils";
 
-const PERCEIVED_DIFFICULTIES = ["EASY", "NORMAL", "HARD"] as const;
+const PERCEIVED_POOL: GymPerceivedDifficulty[] = [
+  GymPerceivedDifficulty.EASY,
+  GymPerceivedDifficulty.EASY_NORMAL,
+  GymPerceivedDifficulty.NORMAL,
+  GymPerceivedDifficulty.NORMAL_HARD,
+  GymPerceivedDifficulty.HARD,
+];
 
 export async function seedClimbingSessions(
   prisma: PrismaClient,
@@ -29,7 +40,7 @@ export async function seedClimbingSessions(
 
   for (let i = 0; i < 30; i++) {
     const userIdx = i % 5;
-    const gymIdx = i % 22;
+    const gymIdx = i % gyms.length;
     const date = new Date();
     date.setDate(date.getDate() - Math.floor(Math.random() * 60));
     date.setHours(0, 0, 0, 0);
@@ -102,9 +113,9 @@ export async function seedClimbingSessions(
             attempts: 1 + Math.floor(Math.random() * 3),
             perceivedDifficulty:
               Math.random() > 0.5
-                ? PERCEIVED_DIFFICULTIES[
-                    Math.floor(Math.random() * PERCEIVED_DIFFICULTIES.length)
-                  ]
+                ? PERCEIVED_POOL[
+                    Math.floor(Math.random() * PERCEIVED_POOL.length)
+                  ]!
                 : undefined,
             order: j,
           })),

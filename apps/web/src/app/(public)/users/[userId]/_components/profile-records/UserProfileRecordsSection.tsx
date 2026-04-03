@@ -59,7 +59,7 @@ const UserProfileRecordsSection = ({ userId, selectedYmd }: IProps) => {
       >
         <div className="grid grid-cols-2 gap-2">
           {records.map((rec) => {
-            const thumb = rec.imageUrls[0];
+            const thumb = rec.imageUrls[0] ?? rec.gym.logoImageUrl ?? undefined;
             const dateLabel = format(new Date(rec.date), "yyyy.MM.dd", {
               locale: ko,
             });

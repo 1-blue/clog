@@ -39,15 +39,16 @@ interface IProps {
 }
 
 const GymHeroSection: React.FC<IProps> = ({ gym }) => {
-  const thumbnailUrl = gym.thumbnailUrl ?? null;
+  const coverUrl = gym.coverImageUrl;
+  const logoUrl = gym.logoImageUrl;
   const openStatus = getGymOpenNowStatus(gym.openHours);
   const badge = getBadge(openStatus);
 
   return (
     <section className="relative -mx-2.5 -mt-14 h-[min(440px,55vh)] w-[calc(100%+1.25rem)] overflow-hidden bg-surface-container-high">
-      {thumbnailUrl ? (
+      {coverUrl ? (
         <img
-          src={thumbnailUrl}
+          src={coverUrl}
           alt={gym.name}
           className="size-full object-cover"
         />
@@ -68,11 +69,11 @@ const GymHeroSection: React.FC<IProps> = ({ gym }) => {
             {gym.name}
           </h1>
         </div>
-        {thumbnailUrl ? (
+        {logoUrl ? (
           <div className="size-16 shrink-0 overflow-hidden rounded-2xl border border-white/20 bg-surface-container-highest/50 shadow-2xl backdrop-blur-md">
             <img
-              src={thumbnailUrl}
-              alt={gym.name}
+              src={logoUrl}
+              alt={`${gym.name} 로고`}
               className="size-full object-cover"
             />
           </div>

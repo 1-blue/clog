@@ -9,6 +9,7 @@ import {
   refundMembershipOnSessionDelete,
   sessionDateForValidation,
 } from "#web/libs/membership/sessionMembership";
+import { resolveSessionImageUrlsForDb } from "#web/libs/record/resolveSessionImageUrls";
 import { recomputeUserMaxDifficulty } from "#web/libs/user/updateUserMaxDifficulty";
 
 const membershipErrorMessage = (e: unknown): string | null => {
@@ -140,6 +141,11 @@ export const PATCH = async (
         await tx.climbingRoute.deleteMany({ where: { sessionId: recordId } });
       }
 
+      const nextImageUrls =
+        data.imageUrls !== undefined
+          ? await resolveSessionImageUrlsForDb(tx, existing.gymId, data.imageUrls)
+          : undefined;
+
       return tx.climbingSession.update({
         where: { id: recordId },
         data: {
@@ -162,7 +168,7 @@ export const PATCH = async (
               })),
             },
           }),
-          ...(data.imageUrls && { imageUrls: data.imageUrls }),
+          ...(nextImageUrls !== undefined && { imageUrls: nextImageUrls }),
         },
         include: { routes: true },
       });

@@ -23,25 +23,12 @@ enum Role {
   GUEST /// 일반 유저 (기본값)
 }
 
-/// 지역 (17개 시도)
+/// 지역 (시드·앱에서 사용하는 시도만)
 enum Region {
   SEOUL /// 서울
   GYEONGGI /// 경기
   INCHEON /// 인천
   BUSAN /// 부산
-  DAEGU /// 대구
-  DAEJEON /// 대전
-  GWANGJU /// 광주
-  ULSAN /// 울산
-  SEJONG /// 세종
-  GANGWON /// 강원
-  CHUNGBUK /// 충북
-  CHUNGNAM /// 충남
-  JEONBUK /// 전북
-  JEONNAM /// 전남
-  GYEONGBUK /// 경북
-  GYEONGNAM /// 경남
-  JEJU /// 제주
 }
 
 /// 난이도
@@ -98,7 +85,9 @@ enum GymReviewFeature {
 /// 체감 난이도
 enum GymPerceivedDifficulty {
   EASY /// 쉬움
+  EASY_NORMAL /// 쉬움~보통
   NORMAL /// 보통
+  NORMAL_HARD /// 보통~어려움
   HARD /// 어려움
 }
 
@@ -142,7 +131,7 @@ enum MembershipPlanCode {
   PERIOD_3M /// 정기 3개월
   PERIOD_6M /// 정기 6개월
   PERIOD_12M /// 정기 12개월
-  COUNT_DAY /// 일일권 (1회, 유효 12개월)
+  COUNT_DAY /// 일일권 (1회)
   COUNT_3 /// 3회권
   COUNT_5 /// 5회권
   COUNT_10 /// 10회권
@@ -150,9 +139,16 @@ enum MembershipPlanCode {
 
 /// 암장 회원권 브랜드(체인). 동일 브랜드 내 타 지점 회원권 공유 시 사용
 enum GymMembershipBrand {
-  THE_CLIMB /// 더클라임 계열
-  SEOULFOREST /// 서울숲클라이밍 계열
-  CLIMBINGPARK /// 클라이밍파크 계열
+  THE_CLIMB /// 더클라임
+  SEOULFOREST /// 서울숲클라이밍
+  CLIMBINGPARK /// 클라이밍파크
+  SONCLIMB /// 손클라임
+  PEAKERS /// 피커스
+  WAVEROCK /// 웨이브락
+  CLIMB_US /// 클라임어스
+  DAMJANG /// 담장
+  B_BLOC /// 비블럭
+  ALLEZ /// 알레클라임
   STANDALONE /// 단독 암장(체인 없음 — 구매 지점 = 세션 지점만 허용)
 }
 
@@ -336,8 +332,14 @@ model Gym {
   description     String
   /// 웹사이트 URL
   website         String?
-  /// 썸네일 이미지 URL
-  thumbnailUrl    String?  @map("thumbnail_url")
+  /// 세팅 주기·일정 안내 자유 텍스트 (예: "매주 월·목 세팅", "격주 화요일")
+  settingScheduleMemo String? @map("setting_schedule_memo")
+  /// 목록·히어로용 커버 이미지 URL
+  coverImageUrl   String   @map("cover_image_url")
+  /// 로고 이미지 URL
+  logoImageUrl    String   @map("logo_image_url")
+  /// 난이도표 이미지 URL (체인 기본값·지점별 오버라이드)
+  difficultyImageUrl String? @map("difficulty_image_url")
   /// 인스타그램 아이디
   instagramId     String?  @map("instagram_id")
   /// 평균 평점
@@ -363,8 +365,6 @@ model Gym {
   difficultyColors GymDifficultyColor[]
   /// 암장 북마크 목록
   bookmarks        GymBookmark[]
-  /// 세팅 일정
-  settingSchedule  GymSettingSchedule?
   /// 클라이밍 세션 목록
   sessions         ClimbingSession[]
   /// 리뷰 목록
@@ -565,31 +565,6 @@ model GymBookmark {
 
   @@unique([userId, gymId])
   @@map("gym_bookmarks")
-}
-
-/// 암장 세팅 일정
-model GymSettingSchedule {
-  /// 고유 ID
-  id              String    @id @default(uuid()) @db.Uuid
-  /// 암장 ID
-  gymId           String    @unique @map("gym_id") @db.Uuid
-  /// 세팅 주기 (일 단위, 예: 14 = 2주)
-  intervalDays    Int?      @map("interval_days")
-  /// 마지막 세팅일
-  lastSettingDate DateTime? @map("last_setting_date") @db.Date
-  /// 다음 세팅 예정일
-  nextSettingDate DateTime? @map("next_setting_date") @db.Date
-  /// 세팅 관련 메모 (예: "매월 첫째 주 월요일")
-  memo            String?
-  /// 생성일
-  createdAt       DateTime  @default(now()) @map("created_at")
-  /// 수정일
-  updatedAt       DateTime  @updatedAt @map("updated_at")
-
-  /// 암장
-  gym Gym @relation(fields: [gymId], references: [id], onDelete: Cascade)
-
-  @@map("gym_setting_schedules")
 }
 
 /// 암장 리뷰

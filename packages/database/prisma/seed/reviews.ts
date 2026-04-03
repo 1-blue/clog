@@ -8,7 +8,9 @@ import {
 
 const PERCEIVED_ROTATION: GymPerceivedDifficulty[] = [
   GymPerceivedDifficulty.EASY,
+  GymPerceivedDifficulty.EASY_NORMAL,
   GymPerceivedDifficulty.NORMAL,
+  GymPerceivedDifficulty.NORMAL_HARD,
   GymPerceivedDifficulty.HARD,
 ];
 
@@ -37,7 +39,7 @@ export async function seedReviews(
   let reviewCount = 0;
   for (let i = 0; i < 5; i++) {
     for (let j = 0; j < 4; j++) {
-      const gymIdx = (i * 2 + j) % 22;
+      const gymIdx = (i * 2 + j) % gyms.length;
       const count = 1 + Math.floor(Math.random() * 3);
       const shuffled = [...FEATURE_POOL].sort(() => Math.random() - 0.5);
       const features = shuffled.slice(0, count);
