@@ -31,7 +31,7 @@ export const GET = async (
       take: query.limit + 1,
       ...(query.cursor && { cursor: { id: query.cursor }, skip: 1 }),
       include: {
-        gym: { select: { id: true, name: true } },
+        gym: { select: { id: true, name: true, logoImageUrl: true } },
         routes: { orderBy: { order: "asc" } },
       },
     });

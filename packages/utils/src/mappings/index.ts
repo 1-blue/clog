@@ -6,3 +6,6 @@ export { facilityTypeToKoreanMap } from "./facility";
 export { gymReviewFeatureToKoreanMap } from "./gym-review-feature";
 export { perceivedDifficultyToKoreanMap } from "./perceived-difficulty";
 export { regionToKoreanMap } from "./region";
+export {
+  gymMembershipBrandToKoreanMap,
+} from "./gym-membership-brand";

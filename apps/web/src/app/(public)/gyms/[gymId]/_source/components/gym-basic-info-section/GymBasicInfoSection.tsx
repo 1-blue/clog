@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  CalendarDays,
   Clock,
   Globe,
   Instagram,
@@ -61,6 +62,7 @@ const GymBasicInfoSection: React.FC<IProps> = ({ gym }) => {
   };
 
   const apiNotice = gym.notice?.trim();
+  const settingScheduleMemo = gym.settingScheduleMemo?.trim();
 
   return (
     <section className="flex flex-col gap-4">
@@ -173,6 +175,22 @@ const GymBasicInfoSection: React.FC<IProps> = ({ gym }) => {
           </div>
         </div>
       )}
+
+      {settingScheduleMemo ? (
+        <div className="flex items-start gap-4">
+          <div className="flex size-11 shrink-0 items-center justify-center rounded-full bg-surface-container text-primary">
+            <CalendarDays className="size-5" strokeWidth={2} aria-hidden />
+          </div>
+          <div className="min-w-0 pt-0.5">
+            <p className="mb-1 text-sm font-medium text-on-surface-variant">
+              세팅 주기
+            </p>
+            <p className="text-base leading-relaxed whitespace-pre-wrap font-semibold text-on-surface">
+              {settingScheduleMemo}
+            </p>
+          </div>
+        </div>
+      ) : null}
 
       {hasHours && (
         <div className="flex items-start gap-4">

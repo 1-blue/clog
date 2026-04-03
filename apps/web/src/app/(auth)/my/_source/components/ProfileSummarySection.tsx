@@ -7,6 +7,7 @@ import {
   Instagram,
   MapPin,
   Settings,
+  Ticket,
   User,
   Youtube,
 } from "lucide-react";
@@ -18,6 +19,7 @@ import { difficultyToKoreanMap, type Difficulty } from "@clog/utils";
 
 import { openapi } from "#web/apis/openapi";
 import TopBar from "#web/components/layout/TopBar";
+import { useNotificationPanel } from "#web/components/notifications/NotificationPanelProvider";
 import ImageLightboxDialog from "#web/components/shared/image-carousel-lightbox/ImageLightboxDialog";
 import { ROUTES } from "#web/constants";
 import { formatProfileCount } from "#web/libs/format/formatProfileCount";
@@ -27,6 +29,7 @@ import ProfileSummarySkeleton from "./skeleton/ProfileSummarySkeleton";
 
 const ProfileSummarySection = () => {
   const router = useRouter();
+  const notificationPanel = useNotificationPanel();
   const { data: me } = openapi.useSuspenseQuery(
     "get",
     "/api/v1/users/me",
@@ -68,19 +71,37 @@ const ProfileSummarySection = () => {
               <BarChart3 className="size-6" strokeWidth={1.75} />
             </Link>
             <Link
+              href={ROUTES.MY.MEMBERSHIPS.path}
+              className="text-primary transition-opacity hover:opacity-80 active:scale-95"
+              aria-label="회원권"
+            >
+              <Ticket className="size-6" strokeWidth={1.75} />
+            </Link>
+            <Link
               href={ROUTES.MY.SETTINGS.path}
               className="text-primary transition-opacity hover:opacity-80 active:scale-95"
               aria-label="설정"
             >
               <Settings className="size-6" strokeWidth={1.75} />
             </Link>
-            <Link
-              href={ROUTES.NOTIFICATIONS.path}
-              className="text-primary transition-opacity hover:opacity-80 active:scale-95"
-              aria-label="알림"
-            >
-              <Bell className="size-6" strokeWidth={1.75} />
-            </Link>
+            {notificationPanel ? (
+              <button
+                type="button"
+                onClick={() => notificationPanel.open()}
+                className="text-primary transition-opacity hover:opacity-80 active:scale-95"
+                aria-label="알림"
+              >
+                <Bell className="size-6" strokeWidth={1.75} />
+              </button>
+            ) : (
+              <Link
+                href={ROUTES.NOTIFICATIONS.path}
+                className="text-primary transition-opacity hover:opacity-80 active:scale-95"
+                aria-label="알림"
+              >
+                <Bell className="size-6" strokeWidth={1.75} />
+              </Link>
+            )}
           </div>
         }
       />

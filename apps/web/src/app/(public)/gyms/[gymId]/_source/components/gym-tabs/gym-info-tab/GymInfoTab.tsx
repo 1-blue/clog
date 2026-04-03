@@ -8,7 +8,7 @@ import type { components } from "#web/@types/openapi";
 import FacilityChip from "#web/components/gym/FacilityChip";
 import GymMapActionBar from "#web/components/gym/GymMapActionBar";
 import KakaoMapEmbed from "#web/components/gym/KakaoMapEmbed";
-import { formatGymPriceInfoLines } from "#web/libs/gym/priceInfo";
+import { membershipPlanCodeLabel } from "#web/libs/membership/planLabels";
 
 type TGymDetail = components["schemas"]["GymDetail"];
 
@@ -19,10 +19,12 @@ interface IProps {
   gym: TGymDetail;
 }
 
+const formatWon = (n: number) => `${n.toLocaleString("ko-KR")}원`;
+
 const GymInfoTab: React.FC<IProps> = ({ gym }) => {
   const hasCoords = gym.latitude != null && gym.longitude != null;
-  const priceLines = formatGymPriceInfoLines(
-    gym.priceInfo as Record<string, unknown> | null | undefined,
+  const plans = [...(gym.membershipPlans ?? [])].sort(
+    (a, b) => a.sortOrder - b.sortOrder || a.code.localeCompare(b.code),
   );
   const createdLabel = format(new Date(gym.createdAt), "yyyy.MM.dd", {
     locale: ko,
@@ -60,17 +62,21 @@ const GymInfoTab: React.FC<IProps> = ({ gym }) => {
         </div>
       ) : null}
 
-      {priceLines.length > 0 ? (
+      {plans.length > 0 ? (
         <div>
           <h5 className={sectionTitleClass}>요금</h5>
           <ul className="space-y-2 rounded-2xl border border-white/5 bg-surface-container-low p-4">
-            {priceLines.map(({ label, value }, i) => (
+            {plans.map((row) => (
               <li
-                key={`${label}-${i}`}
+                key={row.id}
                 className="flex items-center justify-between gap-4 text-sm"
               >
-                <span className="text-on-surface-variant">{label}</span>
-                <span className="font-semibold text-on-surface">{value}</span>
+                <span className="text-on-surface-variant">
+                  {membershipPlanCodeLabel(row.code)}
+                </span>
+                <span className="font-semibold text-on-surface">
+                  {formatWon(row.priceWon)}
+                </span>
               </li>
             ))}
           </ul>

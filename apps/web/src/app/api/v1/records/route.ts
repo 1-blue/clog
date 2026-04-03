@@ -9,7 +9,26 @@ import {
   requireAuth,
 } from "#web/libs/api";
 import { catchApiError } from "#web/libs/api/errorCatch";
+import {
+  applyMembershipOnSessionCreate,
+  sessionDateForValidation,
+} from "#web/libs/membership/sessionMembership";
+import { resolveSessionImageUrlsForDb } from "#web/libs/record/resolveSessionImageUrls";
 import { bumpUserMaxDifficultyFromRoutes } from "#web/libs/user/updateUserMaxDifficulty";
+
+const membershipErrorMessage = (e: unknown): string | null => {
+  if (!(e instanceof Error)) return null;
+  switch (e.message) {
+    case "MEMBERSHIP_NOT_FOUND":
+      return "선택한 회원권을 찾을 수 없습니다.";
+    case "MEMBERSHIP_DATE_INVALID":
+      return "방문일이 회원권 유효 기간 안이 아니에요.";
+    case "MEMBERSHIP_USES_EXHAUSTED":
+      return "회원권 잔여 횟수가 없어요.";
+    default:
+      return null;
+  }
+};
 
 /** 기록 목록 (무한스크롤) */
 export const GET = async (request: Request) => {
@@ -45,6 +64,7 @@ export const GET = async (request: Request) => {
           select: {
             id: true,
             name: true,
+            logoImageUrl: true,
             difficultyColors: { orderBy: { order: "asc" } },
           },
         },
@@ -73,35 +93,61 @@ export const POST = async (request: Request) => {
     const body = await request.json();
     const data = createSessionSchema.parse(body);
 
-    const session = await prisma.climbingSession.create({
-      data: {
-        userId: userId!,
-        gymId: data.gymId,
-        date: data.date,
-        startTime: data.startTime,
-        endTime: data.endTime,
-        memo: data.memo,
-        isPublic: data.isPublic,
-        routes: {
-          create: data.routes.map((r, i) => ({
-            difficulty: r.difficulty,
-            result: r.result,
-            attempts: r.attempts,
-            memo: r.memo,
-            order: i,
-          })),
+    const session = await prisma.$transaction(async (tx) => {
+      let linkedId: string | null = null;
+      try {
+        linkedId = await applyMembershipOnSessionCreate(tx, {
+          userId: userId!,
+          gymId: data.gymId,
+          sessionDate: sessionDateForValidation(data.date),
+          userMembershipId: data.userMembershipId ?? null,
+        });
+      } catch (me) {
+        const msg = membershipErrorMessage(me);
+        if (msg) throw new Error(msg);
+        throw me;
+      }
+
+      const imageUrls = await resolveSessionImageUrlsForDb(
+        tx,
+        data.gymId,
+        data.imageUrls ?? [],
+      );
+
+      return tx.climbingSession.create({
+        data: {
+          userId: userId!,
+          gymId: data.gymId,
+          date: data.date,
+          startTime: data.startTime,
+          endTime: data.endTime,
+          memo: data.memo,
+          isPublic: data.isPublic,
+          userMembershipId: linkedId,
+          routes: {
+            create: data.routes.map((r, i) => ({
+              difficulty: r.difficulty,
+              result: r.result,
+              attempts: r.attempts,
+              memo: r.memo,
+              order: i,
+            })),
+          },
+          imageUrls,
         },
-        imageUrls: data.imageUrls ?? [],
-      },
-      include: {
-        routes: true,
-      },
+        include: {
+          routes: true,
+        },
+      });
     });
 
     await bumpUserMaxDifficultyFromRoutes(userId!, session.routes);
 
     return jsonWithToast(session, "기록이 저장되었습니다.", 201);
   } catch (error) {
+    if (error instanceof Error && error.message.includes("회원권")) {
+      return errorResponse(error.message, 400);
+    }
     return catchApiError(request, error, "기록 저장에 실패했습니다.", {
       userId: userId!,
     });

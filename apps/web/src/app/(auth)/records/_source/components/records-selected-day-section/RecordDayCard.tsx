@@ -50,7 +50,8 @@ const RecordDayCard: React.FC<IProps> = ({ record }) => {
   );
   const totalRoutes = record.routes.length;
 
-  const heroImage = record.imageUrls[0];
+  const heroImage =
+    record.imageUrls[0] ?? record.gym.logoImageUrl ?? undefined;
 
   const difficultyDotColor = useMemo(() => {
     const colors = record.gym.difficultyColors;

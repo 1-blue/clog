@@ -63,10 +63,9 @@ const LoginPage: React.FC = () => {
 
       <div className="flex w-full max-w-sm flex-col gap-3">
         <Button
-          variant="ghost"
           size="lg"
           onClick={() => void signInWithKakao()}
-          className="h-12 w-full gap-2 rounded-2xl bg-yellow-400 font-medium text-neutral-900 hover:bg-yellow-400/90 hover:text-neutral-900"
+          className="h-12 w-full cursor-pointer gap-2 rounded-2xl bg-yellow-400 font-medium text-neutral-900 hover:bg-yellow-400/90 hover:text-neutral-900"
         >
           <svg viewBox="0 0 24 24" className="size-5" fill="#191919">
             <path d="M12 3C6.48 3 2 6.36 2 10.44c0 2.62 1.74 4.92 4.36 6.24-.14.52-.9 3.36-.93 3.58 0 0-.02.16.08.22.1.06.22.02.22.02.3-.04 3.44-2.26 3.98-2.64.74.1 1.52.16 2.3.16 5.52 0 10-3.36 10-7.58C22 6.36 17.52 3 12 3" />
@@ -78,7 +77,7 @@ const LoginPage: React.FC = () => {
           variant="outline"
           size="lg"
           onClick={() => void signInWithGoogle()}
-          className="h-12 w-full gap-2 rounded-2xl font-medium"
+          className="h-12 w-full cursor-pointer gap-2 rounded-2xl font-medium"
         >
           <svg viewBox="0 0 24 24" className="size-5">
             <path

@@ -6,12 +6,18 @@ type TGymImage = components["schemas"]["GymImage"];
 interface IProps {
   images: TGymImage[];
   gymName: string;
+  difficultyImageUrl?: string | null;
 }
 
-const GymPhotoTab: React.FC<IProps> = ({ images, gymName }) => {
-  const urls = [...images]
-    .sort((a, b) => a.order - b.order)
-    .map((img) => img.url);
+const GymPhotoTab: React.FC<IProps> = ({
+  images,
+  gymName,
+  difficultyImageUrl,
+}) => {
+  const sortedImages = [...images].sort((a, b) => a.order - b.order);
+  const urls = difficultyImageUrl
+    ? [difficultyImageUrl, ...sortedImages.map((img) => img.url)]
+    : sortedImages.map((img) => img.url);
 
   if (urls.length === 0) {
     return (

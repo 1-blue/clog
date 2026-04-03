@@ -1,9 +1,11 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 import { revalidateTagForServer } from "#web/actions/revalidateForServer";
 import { openapi } from "#web/apis/openapi";
 import { ROUTES } from "#web/constants";
+import { extractApiToastAsync } from "#web/libs/api/extractApiToast";
 
 const useRecordMutations = () => {
   const router = useRouter();
@@ -15,8 +17,16 @@ const useRecordMutations = () => {
   const recordCreateMutation = openapi.useMutation("post", "/api/v1/records", {
     onSuccess() {
       queryClient.invalidateQueries({ queryKey });
+      queryClient.invalidateQueries({
+        queryKey: ["get", "/api/v1/users/me/memberships"],
+      });
       revalidateTagForServer([path]);
       router.replace(ROUTES.MY.path);
+    },
+    async onError(err) {
+      const msg =
+        (await extractApiToastAsync(err)) ?? "기록 저장에 실패했습니다.";
+      toast.error(msg);
     },
   });
 
@@ -33,7 +43,15 @@ const useRecordMutations = () => {
             params: { path: { recordId: rid } },
           }).queryKey,
         });
+        queryClient.invalidateQueries({
+          queryKey: ["get", "/api/v1/users/me/memberships"],
+        });
         router.replace(ROUTES.RECORDS.DETAIL.path(rid));
+      },
+      async onError(err) {
+        const msg =
+          (await extractApiToastAsync(err)) ?? "기록 수정에 실패했습니다.";
+        toast.error(msg);
       },
     },
   );
@@ -44,6 +62,9 @@ const useRecordMutations = () => {
     {
       onSuccess() {
         queryClient.invalidateQueries({ queryKey });
+        queryClient.invalidateQueries({
+          queryKey: ["get", "/api/v1/users/me/memberships"],
+        });
         revalidateTagForServer([path]);
         router.replace(ROUTES.MY.path);
       },

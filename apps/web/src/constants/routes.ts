@@ -116,6 +116,23 @@ export const ROUTES = {
       path: "/my/settings",
       label: "설정",
     },
+    /** 마이페이지 > 회원권 목록 */
+    MEMBERSHIPS: {
+      path: "/my/memberships",
+      label: "회원권",
+      NEW: {
+        path: "/my/memberships/new",
+        label: "회원권 등록",
+      },
+      DETAIL: {
+        path: (id: string) => `/my/memberships/${id}`,
+        label: "회원권 상세",
+      },
+      EDIT: {
+        path: (id: string) => `/my/memberships/${id}/edit`,
+        label: "회원권 수정",
+      },
+    },
   },
 
   /** =============================================== 유저 =============================================== */

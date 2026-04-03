@@ -23,9 +23,20 @@ type TGymPerceivedDifficulty = components["schemas"]["GymPerceivedDifficulty"];
 const difficultyBadgeProps = (
   d: TGymPerceivedDifficulty,
 ): { variant: "outline"; color: TBadgeColor } => {
-  if (d === "EASY") return { variant: "outline", color: "secondary" };
-  if (d === "NORMAL") return { variant: "outline", color: "tertiary" };
-  return { variant: "outline", color: "danger" };
+  switch (d) {
+    case "EASY":
+      return { variant: "outline", color: "secondary" };
+    case "EASY_NORMAL":
+      return { variant: "outline", color: "primaryContainer" };
+    case "NORMAL":
+      return { variant: "outline", color: "tertiary" };
+    case "NORMAL_HARD":
+      return { variant: "outline", color: "primary" };
+    case "HARD":
+      return { variant: "outline", color: "danger" };
+    default:
+      return { variant: "outline", color: "tertiary" };
+  }
 };
 
 interface IProps {

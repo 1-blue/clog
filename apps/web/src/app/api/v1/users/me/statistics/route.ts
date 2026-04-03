@@ -84,7 +84,7 @@ export const GET = async (request: Request) => {
               id: true,
               name: true,
               address: true,
-              thumbnailUrl: true,
+              coverImageUrl: true,
             },
           },
           routes: { select: { difficulty: true, result: true } },
@@ -193,7 +193,7 @@ export const GET = async (request: Request) => {
           id: string;
           name: string;
           address: string;
-          thumbnailUrl: string | null;
+          coverImageUrl: string;
         };
       }
     >();
@@ -213,7 +213,7 @@ export const GET = async (request: Request) => {
         gymId: gym.id,
         name: gym.name,
         address: gym.address,
-        thumbnailUrl: gym.thumbnailUrl,
+        coverImageUrl: gym.coverImageUrl,
         visitCount: count,
       }));
 

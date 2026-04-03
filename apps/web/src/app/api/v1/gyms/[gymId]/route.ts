@@ -21,6 +21,10 @@ export const GET = async (
         images: { orderBy: { order: "asc" } },
         openHours: { orderBy: { dayType: "asc" } },
         difficultyColors: { orderBy: { order: "asc" } },
+        membershipPlans: {
+          where: { isActive: true },
+          orderBy: [{ sortOrder: "asc" }, { code: "asc" }],
+        },
       },
     });
 

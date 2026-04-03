@@ -1,8 +1,9 @@
 import { prisma } from "@clog/db";
+import { NotificationType } from "@prisma/client";
 import { commentQuerySchema, createCommentSchema } from "@clog/utils";
 
+import { ROUTES } from "#web/constants";
 import {
-  errorResponse,
   getSearchParams,
   jsonWithToast,
   paginatedJson,
@@ -79,6 +80,46 @@ export const POST = async (
       where: { id: postId },
       data: { commentCount: { increment: 1 } },
     });
+
+    const post = await prisma.post.findUnique({
+      where: { id: postId },
+      select: { authorId: true },
+    });
+
+    if (post) {
+      const link = ROUTES.COMMUNITY.DETAIL.path(postId);
+      const nickname = comment.author.nickname;
+
+      if (data.parentId) {
+        const parent = await prisma.postComment.findFirst({
+          where: { id: data.parentId, postId },
+          select: { authorId: true },
+        });
+        if (parent && parent.authorId !== userId) {
+          await prisma.notification.create({
+            data: {
+              userId: parent.authorId,
+              type: NotificationType.COMMENT_REPLY,
+              title: "내 댓글에 답글",
+              message: `${nickname}님이 답글을 남겼습니다.`,
+              link,
+              commentId: comment.id,
+            },
+          });
+        }
+      } else if (post.authorId !== userId) {
+        await prisma.notification.create({
+          data: {
+            userId: post.authorId,
+            type: NotificationType.POST_COMMENT,
+            title: "게시글에 댓글",
+            message: `${nickname}님이 댓글을 남겼습니다.`,
+            link,
+            commentId: comment.id,
+          },
+        });
+      }
+    }
 
     return jsonWithToast(comment, "댓글이 등록되었습니다.", 201);
   } catch (error) {

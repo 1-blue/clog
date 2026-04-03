@@ -15,8 +15,8 @@ export async function seedNotifications(
   const notifications = [
     {
       userId: user1.id,
-      type: "COMMENT" as const,
-      title: "새 댓글",
+      type: "POST_COMMENT" as const,
+      title: "게시글에 댓글",
       message: "볼더링마스터님이 댓글을 남겼습니다.",
     },
     {
@@ -57,9 +57,15 @@ export async function seedNotifications(
     },
     {
       userId: user1.id,
-      type: "COMMENT" as const,
-      title: "답글",
+      type: "COMMENT_REPLY" as const,
+      title: "내 댓글에 답글",
       message: "손가락힘왕님이 답글을 남겼습니다.",
+    },
+    {
+      userId: user1.id,
+      type: "AUTO_CHECKOUT" as const,
+      title: "자동 체크아웃",
+      message: "더클라임 강남점에서 체크인 시간이 종료되어 자동 체크아웃되었습니다.",
     },
   ];
 

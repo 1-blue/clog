@@ -5,6 +5,7 @@ import { openapi } from "#web/apis/openapi";
 import { getExerciseTimeSummary } from "#web/app/(auth)/records/(created-and-edit)/_source/utils/record-detail-utils";
 import RecordDetailAuthorFooter from "#web/app/(auth)/records/(created-and-edit)/[recordId]/_source/components/record-detail/blocks/RecordDetailAuthorFooter";
 import RecordDetailEditEntry from "#web/app/(auth)/records/(created-and-edit)/[recordId]/_source/components/record-detail/blocks/RecordDetailEditEntry";
+import RecordDetailMembershipBlock from "#web/app/(auth)/records/(created-and-edit)/[recordId]/_source/components/record-detail/blocks/RecordDetailMembershipBlock";
 import RecordDetailMemoBlock from "#web/app/(auth)/records/(created-and-edit)/[recordId]/_source/components/record-detail/blocks/RecordDetailMemoBlock";
 import RecordDetailShareRow from "#web/app/(auth)/records/(created-and-edit)/[recordId]/_source/components/record-detail/blocks/RecordDetailShareRow";
 import RecordDetailGymDifficultySection from "#web/app/(auth)/records/(created-and-edit)/[recordId]/_source/components/record-detail/difficulty/RecordDetailGymDifficultySection";
@@ -41,7 +42,10 @@ const RecordDetailLoaded = ({ recordId, record }: IContentProps) => {
         title="클라이밍 기록 상세"
       />
 
-      <RecordDetailHeroCarousel imageUrls={record.imageUrls} />
+      <RecordDetailHeroCarousel
+        imageUrls={record.imageUrls}
+        fallbackImageUrl={record.gym.logoImageUrl}
+      />
 
       <div className="relative z-10 -mt-6 flex flex-col gap-10">
         <RecordDetailEditEntry
@@ -50,6 +54,8 @@ const RecordDetailLoaded = ({ recordId, record }: IContentProps) => {
         />
 
         <RecordDetailSessionCard record={record} exercise={exercise} />
+
+        <RecordDetailMembershipBlock record={record} />
 
         <RecordDetailGymDifficultySection difficultyColors={difficultyColors} />
 

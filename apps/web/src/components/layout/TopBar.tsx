@@ -5,7 +5,10 @@ import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+import { openapi } from "#web/apis/openapi";
+import { useNotificationPanel } from "#web/components/notifications/NotificationPanelProvider";
 import { ROUTES } from "#web/constants";
+import useMe from "#web/hooks/useMe";
 import { cn } from "#web/libs/utils";
 
 interface IProps {
@@ -23,11 +26,24 @@ interface IProps {
 const TopBar: React.FC<IProps> = ({
   left,
   right,
-  showNotification = false,
+  showNotification = true,
   className,
   title,
 }) => {
   const router = useRouter();
+  const notificationPanel = useNotificationPanel();
+  const { me } = useMe();
+  const { data: unreadCount = 0 } = openapi.useQuery(
+    "get",
+    "/api/v1/notifications/unread-count",
+    undefined,
+    {
+      enabled: Boolean(me),
+      select: (d) => d.payload.count,
+      staleTime: 30_000,
+    },
+  );
+  const hasUnread = unreadCount > 0;
 
   const defaultLeft = (
     <div className="flex items-center gap-2">
@@ -63,13 +79,36 @@ const TopBar: React.FC<IProps> = ({
   ) : null;
 
   const defaultRight = showNotification ? (
-    <Link href={ROUTES.NOTIFICATIONS.path} aria-label="알림">
-      <Bell
-        className="size-6 text-on-surface-variant"
-        strokeWidth={2}
-        aria-hidden
-      />
-    </Link>
+    notificationPanel ? (
+      <button
+        type="button"
+        onClick={() => notificationPanel.open()}
+        className="relative text-on-surface-variant"
+        aria-label={hasUnread ? "알림, 읽지 않은 알림 있음" : "알림"}
+      >
+        <Bell className="size-6" strokeWidth={2} aria-hidden />
+        {hasUnread ? (
+          <span
+            className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-primary ring-2 ring-background"
+            aria-hidden
+          />
+        ) : null}
+      </button>
+    ) : (
+      <Link
+        href={ROUTES.NOTIFICATIONS.path}
+        className="relative inline-flex text-on-surface-variant"
+        aria-label={hasUnread ? "알림, 읽지 않은 알림 있음" : "알림"}
+      >
+        <Bell className="size-6" strokeWidth={2} aria-hidden />
+        {hasUnread ? (
+          <span
+            className="absolute -top-0.5 -right-0.5 size-1.5 rounded-full bg-primary ring-2 ring-background"
+            aria-hidden
+          />
+        ) : null}
+      </Link>
+    )
   ) : null;
 
   return (

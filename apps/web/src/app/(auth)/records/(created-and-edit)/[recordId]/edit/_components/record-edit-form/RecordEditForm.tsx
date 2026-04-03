@@ -12,6 +12,7 @@ import RecordFormSaveBar from "#web/app/(auth)/records/(created-and-edit)/_sourc
 import RecordGallerySection from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordGallerySection";
 import RecordGymDifficultyLegend from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordGymDifficultyLegend";
 import RecordGymReadonlyCard from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordGymReadonlyCard";
+import RecordMembershipField from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordMembershipField";
 import RecordMemoField from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordMemoField";
 import RecordPublicToggleCard from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordPublicToggleCard";
 import RecordRoutesSection from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordRoutesSection";
@@ -55,6 +56,7 @@ const RecordEditForm: React.FC<IProps> = ({ recordId, record }) => {
         attempts,
       })),
       imageUrls: record.imageUrls,
+      userMembershipId: record.userMembershipId ?? "",
     },
   });
 
@@ -99,6 +101,9 @@ const RecordEditForm: React.FC<IProps> = ({ recordId, record }) => {
           attempts,
         })),
         imageUrls: data.imageUrls ?? [],
+        userMembershipId: data.userMembershipId
+          ? data.userMembershipId
+          : null,
       },
     });
   };
@@ -123,6 +128,9 @@ const RecordEditForm: React.FC<IProps> = ({ recordId, record }) => {
             <RecordGymReadonlyCard
               name={record.gym.name}
               address={record.gym.address}
+            />
+            <RecordMembershipField
+              initialUserMembershipId={record.userMembershipId}
             />
             <RecordGymDifficultyLegend difficultyColors={difficultyColors} />
             <RecordDurationField />

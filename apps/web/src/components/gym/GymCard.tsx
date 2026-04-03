@@ -28,11 +28,11 @@ const GymCard: React.FC<IProps> = ({ gym }) => {
       href={ROUTES.GYMS.DETAIL.path(gym.id)}
       className="flex gap-3 rounded-2xl bg-surface-container-low p-3 transition-colors hover:bg-surface-container"
     >
-      {/* 썸네일 */}
+      {/* 커버 이미지 */}
       <div className="size-20 shrink-0 overflow-hidden rounded-sm bg-surface-container-high">
-        {gym.thumbnailUrl ? (
+        {gym.coverImageUrl ? (
           <img
-            src={gym.thumbnailUrl}
+            src={gym.coverImageUrl}
             alt={gym.name}
             className="size-full object-cover"
           />

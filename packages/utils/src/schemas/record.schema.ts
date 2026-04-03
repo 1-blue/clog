@@ -21,6 +21,7 @@ export const createSessionSchema = z.object({
   isPublic: z.boolean().optional().default(true),
   routes: z.array(createRouteSchema).min(1),
   imageUrls: z.array(z.string().url()).optional(),
+  userMembershipId: schemas.uuid.optional().nullable(),
 });
 
 /** 기록(세션) 수정 */
@@ -32,6 +33,7 @@ export const updateSessionSchema = z.object({
   isPublic: z.boolean().optional(),
   routes: z.array(createRouteSchema).optional(),
   imageUrls: z.array(z.string().url()).optional(),
+  userMembershipId: schemas.uuid.optional().nullable(),
 });
 
 /** 기록 목록 조회 쿼리 */

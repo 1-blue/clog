@@ -74,6 +74,33 @@ paths:
                   payload:
                     $ref: "#/components/schemas/GymDetail"
 
+  /api/v1/gyms/{gymId}/membership-plans:
+    get:
+      operationId: getGymMembershipPlans
+      summary: 암장 회원권 요금표 (활성 행만)
+      tags: [Gyms]
+      parameters:
+        - {
+            name: gymId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    type: array
+                    items: { $ref: "#/components/schemas/GymMembershipPlan" }
+        "404":
+          description: Not Found
+
   /api/v1/gyms/{gymId}/check-in:
     post:
       operationId: checkInGym
@@ -799,6 +826,252 @@ paths:
                   toast: { type: string }
                   payload: { nullable: true }
 
+  /api/v1/users/me/memberships:
+    get:
+      operationId: getMyMemberships
+      summary: 내 회원권 목록
+      tags: [Users]
+      parameters:
+        - { name: gymId, in: query, schema: { type: string, format: uuid } }
+        - {
+            name: activeOnly,
+            in: query,
+            schema: { type: string, enum: ["true", "false"] },
+          }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    type: array
+                    items: { $ref: "#/components/schemas/UserMembership" }
+        "401":
+          description: Unauthorized
+    post:
+      operationId: createMyMembership
+      summary: 내 회원권 등록
+      tags: [Users]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateUserMembershipBody" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [toast, payload]
+                properties:
+                  toast: { type: string }
+                  payload: { $ref: "#/components/schemas/UserMembership" }
+
+  /api/v1/users/me/memberships/{userMembershipId}:
+    get:
+      operationId: getMyMembershipById
+      summary: 내 회원권 상세
+      tags: [Users]
+      parameters:
+        - {
+            name: userMembershipId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload: { $ref: "#/components/schemas/UserMembership" }
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+    patch:
+      operationId: patchMyMembership
+      summary: 내 회원권 수정
+      tags: [Users]
+      parameters:
+        - {
+            name: userMembershipId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PatchUserMembershipBody" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [toast, payload]
+                properties:
+                  toast: { type: string }
+                  payload: { $ref: "#/components/schemas/UserMembership" }
+    delete:
+      operationId: deleteMyMembership
+      summary: 내 회원권 삭제
+      tags: [Users]
+      parameters:
+        - {
+            name: userMembershipId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [toast, payload]
+                properties:
+                  toast: { type: string }
+                  payload:
+                    type: object
+                    required: [ok]
+                    properties:
+                      ok: { type: boolean }
+
+  /api/v1/users/me/memberships/{userMembershipId}/usage:
+    get:
+      operationId: getMyMembershipUsage
+      summary: 회원권 사용 내역·통계
+      tags: [Users]
+      parameters:
+        - {
+            name: userMembershipId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload: { $ref: "#/components/schemas/UserMembershipUsagePayload" }
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+
+  /api/v1/users/me/memberships/{userMembershipId}/pauses:
+    post:
+      operationId: createMembershipPause
+      summary: 회원권 일시정지 추가
+      tags: [Users]
+      parameters:
+        - {
+            name: userMembershipId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateMembershipPauseBody" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [toast, payload]
+                properties:
+                  toast: { type: string }
+                  payload: { $ref: "#/components/schemas/UserMembership" }
+
+  /api/v1/users/me/memberships/{userMembershipId}/pauses/{pauseId}:
+    patch:
+      operationId: patchMembershipPause
+      summary: 회원권 일시정지 수정
+      tags: [Users]
+      parameters:
+        - {
+            name: userMembershipId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
+        - {
+            name: pauseId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PatchMembershipPauseBody" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [toast, payload]
+                properties:
+                  toast: { type: string }
+                  payload: { $ref: "#/components/schemas/UserMembership" }
+    delete:
+      operationId: deleteMembershipPause
+      summary: 회원권 일시정지 삭제
+      tags: [Users]
+      parameters:
+        - {
+            name: userMembershipId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
+        - {
+            name: pauseId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [toast, payload]
+                properties:
+                  toast: { type: string }
+                  payload: { $ref: "#/components/schemas/UserMembership" }
+
   /api/v1/users/me/nickname-availability:
     get:
       operationId: getMyNicknameAvailability
@@ -1170,6 +1443,79 @@ paths:
                   toast: { type: string }
                   payload: { type: "null" }
 
+  /api/v1/notifications/unread-count:
+    get:
+      operationId: getNotificationsUnreadCount
+      summary: 미읽음 알림 개수
+      tags: [Notifications]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    type: object
+                    required: [count]
+                    properties:
+                      count: { type: integer, minimum: 0 }
+        "401": { description: Unauthorized }
+
+  /api/v1/notifications/{id}:
+    parameters:
+      - {
+          name: id,
+          in: path,
+          required: true,
+          schema: { type: string, format: uuid },
+        }
+    patch:
+      operationId: patchNotification
+      summary: 알림 단건 읽음
+      tags: [Notifications]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [isRead]
+              properties:
+                isRead: { type: boolean, enum: [true] }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [toast, payload]
+                properties:
+                  toast: { type: string }
+                  payload: { $ref: "#/components/schemas/Notification" }
+        "401": { description: Unauthorized }
+        "404": { description: Not Found }
+    delete:
+      operationId: deleteNotification
+      summary: 알림 단건 삭제 (영구)
+      tags: [Notifications]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [toast, payload]
+                properties:
+                  toast: { type: string }
+                  payload: { type: "null" }
+        "401": { description: Unauthorized }
+        "404": { description: Not Found }
+
   # ── Upload ──
   /api/v1/upload/presigned:
     post:
@@ -1222,31 +1568,9 @@ components:
     # ── Enums (Prisma schema.prisma와 동기화) ──
     Region:
       description: |
-        지역 (17개 시도)
-        SEOUL 서울, GYEONGGI 경기, INCHEON 인천, BUSAN 부산, DAEGU 대구, DAEJEON 대전,
-        GWANGJU 광주, ULSAN 울산, SEJONG 세종, GANGWON 강원, CHUNGBUK 충북, CHUNGNAM 충남,
-        JEONBUK 전북, JEONNAM 전남, GYEONGBUK 경북, GYEONGNAM 경남, JEJU 제주
+        지역 (서울·경기·인천·부산)
       type: string
-      enum:
-        [
-          SEOUL,
-          GYEONGGI,
-          INCHEON,
-          BUSAN,
-          DAEGU,
-          DAEJEON,
-          GWANGJU,
-          ULSAN,
-          SEJONG,
-          GANGWON,
-          CHUNGBUK,
-          CHUNGNAM,
-          JEONBUK,
-          JEONNAM,
-          GYEONGBUK,
-          GYEONGNAM,
-          JEJU,
-        ]
+      enum: [SEOUL, GYEONGGI, INCHEON, BUSAN]
     Difficulty:
       description: |
         난이도 (V0~V10)
@@ -1258,9 +1582,10 @@ components:
       type: string
       enum: [MON, TUE, WED, THU, FRI, SAT, SUN]
     GymPerceivedDifficulty:
-      description: 체감 난이도 (EASY 쉬움, NORMAL 보통, HARD 어려움)
+      description: |
+        체감 난이도 (EASY 쉬움, EASY_NORMAL 쉬움~보통, NORMAL 보통, NORMAL_HARD 보통~어려움, HARD 어려움)
       type: string
-      enum: [EASY, NORMAL, HARD]
+      enum: [EASY, EASY_NORMAL, NORMAL, NORMAL_HARD, HARD]
     CommunityCategory:
       description: |
         게시글 카테고리 (FREE 자유, TIPS 팁/노하우, REVIEW 후기, MEETUP 모임, GEAR 장비)
@@ -1268,9 +1593,19 @@ components:
       enum: [FREE, TIPS, REVIEW, MEETUP, GEAR]
     NotificationType:
       description: |
-        알림 타입 (COMMENT 댓글, LIKE 좋아요, FOLLOW 팔로우, SYSTEM 시스템, GYM_UPDATE 암장 업데이트)
+        알림 타입 (POST_COMMENT 게시글 댓글, COMMENT_REPLY 답글, FOLLOW 팔로우, AUTO_CHECKOUT 자동 체크아웃 등)
       type: string
-      enum: [COMMENT, LIKE, FOLLOW, SYSTEM, GYM_UPDATE]
+      enum:
+        [
+          COMMENT,
+          POST_COMMENT,
+          COMMENT_REPLY,
+          LIKE,
+          FOLLOW,
+          SYSTEM,
+          GYM_UPDATE,
+          AUTO_CHECKOUT,
+        ]
     FacilityType:
       description: |
         암장 시설 타입 (PARKING 주차장, SHOWER 샤워실, LOCKER 락커, REST_AREA 휴식 공간, TRAINING 트레이닝 시설)
@@ -1390,12 +1725,12 @@ components:
           type: array
           items:
             type: object
-            required: [gymId, name, address, thumbnailUrl, visitCount]
+            required: [gymId, name, address, coverImageUrl, visitCount]
             properties:
               gymId: { type: string, format: uuid }
               name: { type: string }
               address: { type: string }
-              thumbnailUrl: { type: string, nullable: true }
+              coverImageUrl: { type: string }
               visitCount: { type: integer }
         insights:
           type: array
@@ -1442,6 +1777,22 @@ components:
         label: { type: string, description: 암장 자체 난이도 명칭 }
         order: { type: integer, description: 표시 순서 }
 
+    GymMembershipBrand:
+      type: string
+      description: 암장 회원권 브랜드(체인). STANDALONE은 구매·세션 지점 일치만 허용
+      enum:
+        - THE_CLIMB
+        - SEOULFOREST
+        - CLIMBINGPARK
+        - SONCLIMB
+        - PEAKERS
+        - WAVEROCK
+        - CLIMB_US
+        - DAMJANG
+        - B_BLOC
+        - ALLEZ
+        - STANDALONE
+
     GymListItem:
       description: 암장 (목록/상세 공통 필드; API는 Prisma Gym + 실시간 visitorCount 등)
       type: object
@@ -1461,8 +1812,11 @@ components:
           description,
           avgRating,
           reviewCount,
+          coverImageUrl,
+          logoImageUrl,
           createdAt,
           updatedAt,
+          membershipBrand,
           facilities,
           images,
         ]
@@ -1499,16 +1853,21 @@ components:
         avgRating: { type: number, description: 평균 평점 }
         reviewCount: { type: integer, description: 리뷰 수 }
         website: { type: string, nullable: true, description: 웹사이트 URL }
-        thumbnailUrl:
-          { type: string, nullable: true, description: 목록/카드용 썸네일 }
-        instagramId: { type: string, nullable: true, description: 인스타그램 아이디 }
-        priceInfo:
-          description: 가격 정보 (암장별 JSON 구조)
+        coverImageUrl:
+          { type: string, description: 목록·히어로용 커버 이미지 URL }
+        logoImageUrl: { type: string, description: 로고 이미지 URL }
+        difficultyImageUrl:
+          type: string
           nullable: true
-          type: object
-          additionalProperties: true
+          description: 난이도표 이미지 URL (브랜드 기본·지점별)
+        settingScheduleMemo:
+          type: string
+          nullable: true
+          description: 세팅 주기·일정 안내 텍스트
+        instagramId: { type: string, nullable: true, description: 인스타그램 아이디 }
         createdAt: { type: string, format: date-time, description: 생성일 }
         updatedAt: { type: string, format: date-time, description: 수정일 }
+        membershipBrand: { $ref: "#/components/schemas/GymMembershipBrand" }
         facilities:
           type: array
           description: 시설 목록 (스칼라 enum 배열)
@@ -1522,11 +1881,135 @@ components:
           description: 암장별 난이도표 (상세 GET 등에서 포함; 목록은 빈 배열 또는 생략)
           items: { $ref: "#/components/schemas/GymDifficultyColor" }
 
+    MembershipPlanCode:
+      type: string
+      enum:
+        - PERIOD_1M
+        - PERIOD_3M
+        - PERIOD_6M
+        - PERIOD_12M
+        - COUNT_DAY
+        - COUNT_3
+        - COUNT_5
+        - COUNT_10
+
+    GymMembershipPlan:
+      description: 암장별 회원권 요금표 행
+      type: object
+      required:
+        [id, gymId, code, priceWon, sortOrder, isActive, createdAt, updatedAt]
+      properties:
+        id: { type: string, format: uuid }
+        gymId: { type: string, format: uuid }
+        code: { $ref: "#/components/schemas/MembershipPlanCode" }
+        priceWon: { type: integer }
+        sortOrder: { type: integer }
+        isActive: { type: boolean }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    GymMembershipPlanSummary:
+      type: object
+      required: [id, code, priceWon, sortOrder, isActive]
+      properties:
+        id: { type: string, format: uuid }
+        code: { $ref: "#/components/schemas/MembershipPlanCode" }
+        priceWon: { type: integer }
+        sortOrder: { type: integer }
+        isActive: { type: boolean }
+
+    MembershipPauseItem:
+      type: object
+      required: [id, startDateYmd, endDateYmd, createdAt, updatedAt]
+      properties:
+        id: { type: string, format: uuid }
+        startDateYmd: { type: string }
+        endDateYmd: { type: string }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    UserMembership:
+      description: 유저 보유 회원권 (직렬화 응답)
+      type: object
+      required:
+        [
+          id,
+          userId,
+          gymId,
+          planId,
+          startedAt,
+          startedDateYmd,
+          createdAt,
+          updatedAt,
+          plan,
+          gym,
+          pauses,
+          effectiveEndAt,
+          lastValidDateYmd,
+          isActive,
+        ]
+      properties:
+        id: { type: string, format: uuid }
+        userId: { type: string, format: uuid }
+        gymId: { type: string, format: uuid }
+        planId: { type: string, format: uuid }
+        startedAt: { type: string, format: date-time }
+        startedDateYmd: { type: string }
+        remainingUses: { type: integer, nullable: true }
+        note: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        plan: { $ref: "#/components/schemas/GymMembershipPlanSummary" }
+        gym:
+          type: object
+          required: [id, name, membershipBrand]
+          properties:
+            id: { type: string, format: uuid }
+            name: { type: string }
+            membershipBrand: { $ref: "#/components/schemas/GymMembershipBrand" }
+        pauses:
+          type: array
+          items: { $ref: "#/components/schemas/MembershipPauseItem" }
+        effectiveEndAt: { type: string, format: date-time }
+        lastValidDateYmd: { type: string }
+        isActive: { type: boolean }
+
+    CreateUserMembershipBody:
+      type: object
+      required: [gymId, planId, startedDateYmd]
+      properties:
+        gymId: { type: string, format: uuid }
+        planId: { type: string, format: uuid }
+        startedDateYmd: { type: string }
+        note: { type: string, maxLength: 500 }
+
+    PatchUserMembershipBody:
+      type: object
+      properties:
+        note: { type: string, nullable: true, maxLength: 500 }
+        startedDateYmd: { type: string }
+
+    CreateMembershipPauseBody:
+      type: object
+      required: [startDateYmd, endDateYmd]
+      properties:
+        startDateYmd: { type: string }
+        endDateYmd: { type: string }
+
+    PatchMembershipPauseBody:
+      type: object
+      properties:
+        startDateYmd: { type: string }
+        endDateYmd: { type: string }
+
     GymDetail:
       allOf:
         - $ref: "#/components/schemas/GymListItem"
         - type: object
           properties:
+            membershipPlans:
+              type: array
+              items: { $ref: "#/components/schemas/GymMembershipPlan" }
             myCheckIn:
               type: object
               nullable: true
@@ -1666,6 +2149,10 @@ components:
       properties:
         id: { type: string, format: uuid }
         name: { type: string }
+        logoImageUrl:
+          type: string
+          nullable: true
+          description: 암장 로고 URL (기록 썸네일 폴백 등)
         difficultyColors:
           type: array
           description: 암장별 난이도 색상 (기록 목록 GET에서 포함)
@@ -1694,6 +2181,7 @@ components:
         id: { type: string, format: uuid }
         userId: { type: string, format: uuid }
         gymId: { type: string, format: uuid }
+        userMembershipId: { type: string, format: uuid, nullable: true }
         date: { type: string, format: date-time }
         startTime: { type: string, format: date-time, nullable: true }
         endTime: { type: string, format: date-time, nullable: true }
@@ -1734,6 +2222,7 @@ components:
         id: { type: string, format: uuid }
         userId: { type: string, format: uuid }
         gymId: { type: string, format: uuid }
+        userMembershipId: { type: string, format: uuid, nullable: true }
         date: { type: string, format: date-time }
         startTime: { type: string, format: date-time, nullable: true }
         endTime: { type: string, format: date-time, nullable: true }
@@ -1748,6 +2237,10 @@ components:
             id: { type: string, format: uuid }
             name: { type: string }
             address: { type: string }
+            logoImageUrl:
+              type: string
+              nullable: true
+              description: 암장 로고 URL (기록 사진 없을 때 폴백)
         routes:
           type: array
           items: { $ref: "#/components/schemas/Route" }
@@ -1755,6 +2248,85 @@ components:
           type: array
           items: { type: string, format: uri }
         user: { $ref: "#/components/schemas/AuthorSummary" }
+        userMembership:
+          description: 작성자 본인 조회 시에만 포함 (타인 열람 시 null)
+          nullable: true
+          $ref: "#/components/schemas/RecordUserMembershipSummary"
+
+    RecordUserMembershipSummary:
+      type: object
+      required: [id, gym, plan]
+      properties:
+        id: { type: string, format: uuid }
+        gym:
+          type: object
+          required: [id, name]
+          properties:
+            id: { type: string, format: uuid }
+            name: { type: string }
+        plan:
+          type: object
+          required: [code]
+          properties:
+            code: { $ref: "#/components/schemas/MembershipPlanCode" }
+
+    UserMembershipUsagePayload:
+      type: object
+      required: [membership, stats, sessions]
+      properties:
+        membership:
+          type: object
+          required:
+            [
+              id,
+              gymId,
+              planCode,
+              startedDateYmd,
+              lastValidDateYmd,
+              remainingDays,
+              gym,
+            ]
+          properties:
+            id: { type: string, format: uuid }
+            gymId: { type: string, format: uuid }
+            planCode: { $ref: "#/components/schemas/MembershipPlanCode" }
+            startedDateYmd: { type: string }
+            lastValidDateYmd: { type: string }
+            remainingUses: { type: integer, nullable: true }
+            remainingDays: { type: integer }
+            gym:
+              type: object
+              required: [id, name, membershipBrand]
+              properties:
+                id: { type: string, format: uuid }
+                name: { type: string }
+                membershipBrand: { $ref: "#/components/schemas/GymMembershipBrand" }
+                logoImageUrl:
+                  type: string
+                  nullable: true
+                  description: 암장 로고 URL (사용 기록 썸네일 등)
+        stats:
+          type: object
+          required: [totalUsed, weeklyAverage]
+          properties:
+            totalUsed: { type: number }
+            weeklyAverage: { type: number }
+            usageRatePercent: { type: number, nullable: true }
+            initialCount: { type: integer, nullable: true }
+        sessions:
+          type: array
+          items:
+            type: object
+            required: [id, date, gymName, routeCount]
+            properties:
+              id: { type: string, format: uuid }
+              date: { type: string, format: date-time }
+              gymName: { type: string }
+              gymLogoImageUrl:
+                type: string
+                nullable: true
+                description: 해당 세션 암장 로고 URL
+              routeCount: { type: integer }
 
     PaginatedRecordListItem:
       type: object
@@ -1779,6 +2351,7 @@ components:
       required: [gymId, date, routes]
       properties:
         gymId: { type: string, format: uuid }
+        userMembershipId: { type: string, format: uuid, nullable: true }
         date: { type: string, format: date-time }
         startTime: { type: string, format: date-time }
         endTime: { type: string, format: date-time }
@@ -1796,6 +2369,7 @@ components:
       type: object
       properties:
         date: { type: string, format: date-time }
+        userMembershipId: { type: string, format: uuid, nullable: true }
         startTime: { type: string, format: date-time }
         endTime: { type: string, format: date-time }
         memo: { type: string, maxLength: 500, nullable: true }
@@ -2288,6 +2862,7 @@ components:
         message: { type: string }
         isRead: { type: boolean }
         link: { type: string, nullable: true }
+        commentId: { type: string, format: uuid, nullable: true }
         createdAt: { type: string, format: date-time }
 
     PaginatedNotification:
