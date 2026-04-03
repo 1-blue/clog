@@ -78,6 +78,7 @@ const RecordGymSearchField: React.FC<IProps> = ({ className }) => {
             setValue("gymId", "", { shouldValidate: true });
             setValue("gymName", "");
           }
+          setValue("userMembershipId", "");
         }}
         onInputValueChange={setDraft}
         itemToStringLabel={(g) => g.name}

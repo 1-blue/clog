@@ -28,6 +28,7 @@ export const recordCreateDraftSliceSchema = z.object({
   isPublic: z.boolean().optional(),
   routes: z.array(draftRouteSchema).optional(),
   imageUrls: z.array(z.string()).max(10).optional(),
+  userMembershipId: z.string().optional(),
 });
 
 export type TRecordCreateDraftSlice = z.infer<typeof recordCreateDraftSliceSchema>;
@@ -51,6 +52,7 @@ export const getDefaultRecordCreateFormValues = (
   isPublic: true,
   routes: [],
   imageUrls: [],
+  userMembershipId: "",
 });
 
 export const readRecordCreateDraftBucket = (): TRecordCreateDraftBucket | null => {
@@ -109,6 +111,7 @@ export const formValuesToDraftSlice = (
   isPublic: v.isPublic,
   routes: v.routes?.length ? v.routes : undefined,
   imageUrls: v.imageUrls?.length ? v.imageUrls : undefined,
+  userMembershipId: v.userMembershipId || undefined,
 });
 
 export const mergeDefaultsWithDraft = (
@@ -125,4 +128,5 @@ export const mergeDefaultsWithDraft = (
   isPublic: draft.isPublic ?? base.isPublic,
   routes: draft.routes ?? base.routes,
   imageUrls: draft.imageUrls ?? base.imageUrls ?? [],
+  userMembershipId: draft.userMembershipId ?? base.userMembershipId ?? "",
 });

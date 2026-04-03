@@ -36,6 +36,8 @@ const recordFormSchema = z.object({
   isPublic: z.boolean(),
   routes: z.array(routeFormSchema).min(1, "루트를 하나 이상 추가해주세요"),
   imageUrls: z.array(z.string()).max(10, "사진은 최대 10장까지 추가할 수 있어요").optional(),
+  /** 빈 문자열이면 미연결 */
+  userMembershipId: z.string().optional(),
 });
 
 export type TRecordFormData = z.infer<typeof recordFormSchema>;
@@ -57,6 +59,7 @@ const useRecordForm = (props?: Partial<UseFormProps<TRecordFormData>>) => {
       isPublic: true,
       routes: [],
       imageUrls: [],
+      userMembershipId: "",
       ...defaultValuesOverride,
     },
     mode: "onChange",

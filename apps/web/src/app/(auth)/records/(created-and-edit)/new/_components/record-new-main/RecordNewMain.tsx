@@ -15,6 +15,7 @@ import RecordFormSaveBar from "#web/app/(auth)/records/(created-and-edit)/_sourc
 import RecordGallerySection from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordGallerySection";
 import RecordGymDifficultyLegend from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordGymDifficultyLegend";
 import RecordGymSearchField from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordGymSearchField";
+import RecordMembershipField from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordMembershipField";
 import RecordMemoField from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordMemoField";
 import RecordPublicToggleCard from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordPublicToggleCard";
 import RecordRoutesSection from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordRoutesSection";
@@ -89,6 +90,9 @@ const RecordNewMain = () => {
             attempts,
           })),
           ...(data.imageUrls?.length ? { imageUrls: data.imageUrls } : {}),
+          ...(data.userMembershipId
+            ? { userMembershipId: data.userMembershipId }
+            : {}),
         },
       },
       {
@@ -119,6 +123,7 @@ const RecordNewMain = () => {
               onBeforeDateYmdChange={onBeforeDateYmdChange}
             />
             <RecordGymSearchField />
+            <RecordMembershipField />
             {gymId ? (
               <RecordGymDifficultyLegend difficultyColors={difficultyColors} />
             ) : null}

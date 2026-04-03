@@ -38,6 +38,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/gyms/{gymId}/membership-plans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 암장 회원권 요금표 (활성 행만) */
+        get: operations["getGymMembershipPlans"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/gyms/{gymId}/check-in": {
         parameters: {
             query?: never;
@@ -303,6 +320,95 @@ export interface paths {
         head?: never;
         /** 내 정보 수정 */
         patch: operations["updateMe"];
+        trace?: never;
+    };
+    "/api/v1/users/me/memberships": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 내 회원권 목록 */
+        get: operations["getMyMemberships"];
+        put?: never;
+        /** 내 회원권 등록 */
+        post: operations["createMyMembership"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/me/memberships/{userMembershipId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 내 회원권 상세 */
+        get: operations["getMyMembershipById"];
+        put?: never;
+        post?: never;
+        /** 내 회원권 삭제 */
+        delete: operations["deleteMyMembership"];
+        options?: never;
+        head?: never;
+        /** 내 회원권 수정 */
+        patch: operations["patchMyMembership"];
+        trace?: never;
+    };
+    "/api/v1/users/me/memberships/{userMembershipId}/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 회원권 사용 내역·통계 */
+        get: operations["getMyMembershipUsage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/me/memberships/{userMembershipId}/pauses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 회원권 일시정지 추가 */
+        post: operations["createMembershipPause"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/me/memberships/{userMembershipId}/pauses/{pauseId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** 회원권 일시정지 삭제 */
+        delete: operations["deleteMembershipPause"];
+        options?: never;
+        head?: never;
+        /** 회원권 일시정지 수정 */
+        patch: operations["patchMembershipPause"];
         trace?: never;
     };
     "/api/v1/users/me/nickname-availability": {
@@ -742,6 +848,11 @@ export interface components {
             /** @description 표시 순서 */
             order: number;
         };
+        /**
+         * @description 암장 회원권 브랜드(체인). STANDALONE은 구매·세션 지점 일치만 허용
+         * @enum {string}
+         */
+        GymMembershipBrand: "THE_CLIMB" | "SEOULFOREST" | "CLIMBINGPARK" | "STANDALONE";
         /** @description 암장 (목록/상세 공통 필드; API는 Prisma Gym + 실시간 visitorCount 등) */
         GymListItem: {
             /**
@@ -784,10 +895,6 @@ export interface components {
             thumbnailUrl?: string | null;
             /** @description 인스타그램 아이디 */
             instagramId?: string | null;
-            /** @description 가격 정보 (암장별 JSON 구조) */
-            priceInfo?: {
-                [key: string]: unknown;
-            } | null;
             /**
              * Format: date-time
              * @description 생성일
@@ -798,6 +905,7 @@ export interface components {
              * @description 수정일
              */
             updatedAt: string;
+            membershipBrand: components["schemas"]["GymMembershipBrand"];
             /** @description 시설 목록 (스칼라 enum 배열) */
             facilities: components["schemas"]["FacilityType"][];
             /** @description 이미지 목록 (목록 API는 take 1 등으로 제한될 수 있음) */
@@ -805,7 +913,95 @@ export interface components {
             /** @description 암장별 난이도표 (상세 GET 등에서 포함; 목록은 빈 배열 또는 생략) */
             difficultyColors?: components["schemas"]["GymDifficultyColor"][];
         };
+        /** @enum {string} */
+        MembershipPlanCode: "PERIOD_1M" | "PERIOD_3M" | "PERIOD_6M" | "PERIOD_12M" | "COUNT_DAY" | "COUNT_3" | "COUNT_5" | "COUNT_10";
+        /** @description 암장별 회원권 요금표 행 */
+        GymMembershipPlan: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            gymId: string;
+            code: components["schemas"]["MembershipPlanCode"];
+            priceWon: number;
+            sortOrder: number;
+            isActive: boolean;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        GymMembershipPlanSummary: {
+            /** Format: uuid */
+            id: string;
+            code: components["schemas"]["MembershipPlanCode"];
+            priceWon: number;
+            sortOrder: number;
+            isActive: boolean;
+        };
+        MembershipPauseItem: {
+            /** Format: uuid */
+            id: string;
+            startDateYmd: string;
+            endDateYmd: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        /** @description 유저 보유 회원권 (직렬화 응답) */
+        UserMembership: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            userId: string;
+            /** Format: uuid */
+            gymId: string;
+            /** Format: uuid */
+            planId: string;
+            /** Format: date-time */
+            startedAt: string;
+            startedDateYmd: string;
+            remainingUses?: number | null;
+            note?: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            plan: components["schemas"]["GymMembershipPlanSummary"];
+            gym: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+                membershipBrand: components["schemas"]["GymMembershipBrand"];
+            };
+            pauses: components["schemas"]["MembershipPauseItem"][];
+            /** Format: date-time */
+            effectiveEndAt: string;
+            lastValidDateYmd: string;
+            isActive: boolean;
+        };
+        CreateUserMembershipBody: {
+            /** Format: uuid */
+            gymId: string;
+            /** Format: uuid */
+            planId: string;
+            startedDateYmd: string;
+            note?: string;
+        };
+        PatchUserMembershipBody: {
+            note?: string | null;
+            startedDateYmd?: string;
+        };
+        CreateMembershipPauseBody: {
+            startDateYmd: string;
+            endDateYmd: string;
+        };
+        PatchMembershipPauseBody: {
+            startDateYmd?: string;
+            endDateYmd?: string;
+        };
         GymDetail: components["schemas"]["GymListItem"] & {
+            membershipPlans?: components["schemas"]["GymMembershipPlan"][];
             myCheckIn?: {
                 /** Format: date-time */
                 endsAt: string;
@@ -904,6 +1100,8 @@ export interface components {
             userId: string;
             /** Format: uuid */
             gymId: string;
+            /** Format: uuid */
+            userMembershipId?: string | null;
             /** Format: date-time */
             date: string;
             /** Format: date-time */
@@ -929,6 +1127,8 @@ export interface components {
             userId: string;
             /** Format: uuid */
             gymId: string;
+            /** Format: uuid */
+            userMembershipId?: string | null;
             /** Format: date-time */
             date: string;
             /** Format: date-time */
@@ -950,6 +1150,53 @@ export interface components {
             routes: components["schemas"]["Route"][];
             imageUrls: string[];
             user: components["schemas"]["AuthorSummary"];
+            /** @description 작성자 본인 조회 시에만 포함 (타인 열람 시 null) */
+            userMembership?: components["schemas"]["RecordUserMembershipSummary"];
+        };
+        RecordUserMembershipSummary: {
+            /** Format: uuid */
+            id: string;
+            gym: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+            };
+            plan: {
+                code: components["schemas"]["MembershipPlanCode"];
+            };
+        };
+        UserMembershipUsagePayload: {
+            membership: {
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                gymId: string;
+                planCode: components["schemas"]["MembershipPlanCode"];
+                startedDateYmd: string;
+                lastValidDateYmd: string;
+                remainingUses?: number | null;
+                remainingDays: number;
+                gym: {
+                    /** Format: uuid */
+                    id: string;
+                    name: string;
+                    membershipBrand: components["schemas"]["GymMembershipBrand"];
+                };
+            };
+            stats: {
+                totalUsed: number;
+                weeklyAverage: number;
+                usageRatePercent?: number | null;
+                initialCount?: number | null;
+            };
+            sessions: {
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                date: string;
+                gymName: string;
+                routeCount: number;
+            }[];
         };
         PaginatedRecordListItem: {
             items: components["schemas"]["RecordListItem"][];
@@ -965,6 +1212,8 @@ export interface components {
         CreateSessionBody: {
             /** Format: uuid */
             gymId: string;
+            /** Format: uuid */
+            userMembershipId?: string | null;
             /** Format: date-time */
             date: string;
             /** Format: date-time */
@@ -980,6 +1229,8 @@ export interface components {
         UpdateSessionBody: {
             /** Format: date-time */
             date?: string;
+            /** Format: uuid */
+            userMembershipId?: string | null;
             /** Format: date-time */
             startTime?: string;
             /** Format: date-time */
@@ -1332,6 +1583,37 @@ export interface operations {
                         payload: components["schemas"]["GymDetail"];
                     };
                 };
+            };
+        };
+    };
+    getGymMembershipPlans: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                gymId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payload: components["schemas"]["GymMembershipPlan"][];
+                    };
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -2068,6 +2350,282 @@ export interface operations {
                     "application/json": {
                         toast: string;
                         payload: components["schemas"]["User"];
+                    };
+                };
+            };
+        };
+    };
+    getMyMemberships: {
+        parameters: {
+            query?: {
+                gymId?: string;
+                activeOnly?: "true" | "false";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payload: components["schemas"]["UserMembership"][];
+                    };
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    createMyMembership: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateUserMembershipBody"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        toast: string;
+                        payload: components["schemas"]["UserMembership"];
+                    };
+                };
+            };
+        };
+    };
+    getMyMembershipById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userMembershipId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payload: components["schemas"]["UserMembership"];
+                    };
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    deleteMyMembership: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userMembershipId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        toast: string;
+                        payload: {
+                            ok: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    patchMyMembership: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userMembershipId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PatchUserMembershipBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        toast: string;
+                        payload: components["schemas"]["UserMembership"];
+                    };
+                };
+            };
+        };
+    };
+    getMyMembershipUsage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userMembershipId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payload: components["schemas"]["UserMembershipUsagePayload"];
+                    };
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    createMembershipPause: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userMembershipId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateMembershipPauseBody"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        toast: string;
+                        payload: components["schemas"]["UserMembership"];
+                    };
+                };
+            };
+        };
+    };
+    deleteMembershipPause: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userMembershipId: string;
+                pauseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        toast: string;
+                        payload: components["schemas"]["UserMembership"];
+                    };
+                };
+            };
+        };
+    };
+    patchMembershipPause: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userMembershipId: string;
+                pauseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PatchMembershipPauseBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        toast: string;
+                        payload: components["schemas"]["UserMembership"];
                     };
                 };
             };

@@ -7,6 +7,7 @@ import {
   Instagram,
   MapPin,
   Settings,
+  Ticket,
   User,
   Youtube,
 } from "lucide-react";
@@ -66,6 +67,13 @@ const ProfileSummarySection = () => {
               aria-label="통계"
             >
               <BarChart3 className="size-6" strokeWidth={1.75} />
+            </Link>
+            <Link
+              href={ROUTES.MY.MEMBERSHIPS.path}
+              className="text-primary transition-opacity hover:opacity-80 active:scale-95"
+              aria-label="회원권"
+            >
+              <Ticket className="size-6" strokeWidth={1.75} />
             </Link>
             <Link
               href={ROUTES.MY.SETTINGS.path}

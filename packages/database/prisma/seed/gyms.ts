@@ -2,6 +2,8 @@ import type {
   DayType,
   Gym,
   GymFacilityType,
+  GymMembershipBrand,
+  MembershipPlanCode,
   PrismaClient,
 } from "@prisma/client";
 
@@ -19,11 +21,16 @@ interface IGymSeed {
   instagramId?: string;
   thumbnailUrl?: string;
   priceImageUrl?: string;
-  priceInfo: {
+  /** 시드용 구 가격표 → GymMembershipPlan 행으로 변환 */
+  legacyPrices: {
     daily: number;
     monthly: number;
     threeMonths: number;
     tenSession: number;
+    /** 6개월 정기권 — 없으면 PERIOD_6M 행을 만들지 않음 */
+    sixMonths?: number;
+    /** 12개월 정기권 — 없으면 PERIOD_12M 행을 만들지 않음 */
+    twelveMonths?: number;
   };
   facilities: GymFacilityType[];
   notice?: string;
@@ -53,7 +60,7 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%8B%E1%85%A7%E1%86%AB%E1%84%82%E1%85%A1%E1%86%B7.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    priceInfo: {
+    legacyPrices: {
       daily: 22000,
       monthly: 140000,
       threeMonths: 330000,
@@ -78,7 +85,7 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%92%E1%85%A9%E1%86%BC%E1%84%83%E1%85%A2B.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.pngg",
-    priceInfo: {
+    legacyPrices: {
       daily: 22000,
       monthly: 140000,
       threeMonths: 330000,
@@ -102,7 +109,7 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%8B%E1%85%B5%E1%86%AF%E1%84%89%E1%85%A1%E1%86%AB.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    priceInfo: {
+    legacyPrices: {
       daily: 22000,
       monthly: 140000,
       threeMonths: 330000,
@@ -127,7 +134,7 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%86%E1%85%A1%E1%84%80%E1%85%A9%E1%86%A8.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    priceInfo: {
+    legacyPrices: {
       daily: 22000,
       monthly: 140000,
       threeMonths: 330000,
@@ -152,7 +159,7 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%8B%E1%85%A3%E1%86%BC%E1%84%8C%E1%85%A2.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    priceInfo: {
+    legacyPrices: {
       daily: 22000,
       monthly: 140000,
       threeMonths: 330000,
@@ -177,7 +184,7 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%89%E1%85%B5%E1%86%AB%E1%84%85%E1%85%B5%E1%86%B7.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    priceInfo: {
+    legacyPrices: {
       daily: 22000,
       monthly: 140000,
       threeMonths: 330000,
@@ -202,7 +209,7 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%86%BC%E1%84%82%E1%85%A1%E1%86%B7.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    priceInfo: {
+    legacyPrices: {
       daily: 22000,
       monthly: 140000,
       threeMonths: 330000,
@@ -227,7 +234,7 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%89%E1%85%A1%E1%84%83%E1%85%A1%E1%86%BC.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    priceInfo: {
+    legacyPrices: {
       daily: 22000,
       monthly: 140000,
       threeMonths: 330000,
@@ -252,7 +259,7 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%89%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A1.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    priceInfo: {
+    legacyPrices: {
       daily: 22000,
       monthly: 140000,
       threeMonths: 330000,
@@ -277,7 +284,7 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%82%E1%85%A9%E1%86%AB%E1%84%92%E1%85%A7%E1%86%AB.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    priceInfo: {
+    legacyPrices: {
       daily: 22000,
       monthly: 140000,
       threeMonths: 330000,
@@ -302,7 +309,7 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%86%E1%85%AE%E1%86%AB%E1%84%85%E1%85%A2.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    priceInfo: {
+    legacyPrices: {
       daily: 22000,
       monthly: 140000,
       threeMonths: 330000,
@@ -327,7 +334,7 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%8B%E1%85%B5%E1%84%89%E1%85%AE.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    priceInfo: {
+    legacyPrices: {
       daily: 22000,
       monthly: 140000,
       threeMonths: 330000,
@@ -352,7 +359,7 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%89%E1%85%A5%E1%86%BC%E1%84%89%E1%85%AE.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%83%E1%85%A5%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%86%B7_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    priceInfo: {
+    legacyPrices: {
       daily: 22000,
       monthly: 140000,
       threeMonths: 330000,
@@ -377,7 +384,7 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%8C%E1%85%A9%E1%86%BC%E1%84%85%E1%85%A9.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    priceInfo: {
+    legacyPrices: {
       daily: 20000,
       monthly: 130000,
       threeMonths: 330000,
@@ -401,7 +408,7 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%8C%E1%85%A1%E1%86%B7%E1%84%89%E1%85%B5%E1%86%AF.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.pngg",
-    priceInfo: {
+    legacyPrices: {
       daily: 20000,
       monthly: 130000,
       threeMonths: 330000,
@@ -425,7 +432,7 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%8B%E1%85%A7%E1%86%BC%E1%84%83%E1%85%B3%E1%86%BC%E1%84%91%E1%85%A9.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    priceInfo: {
+    legacyPrices: {
       daily: 20000,
       monthly: 130000,
       threeMonths: 330000,
@@ -448,7 +455,7 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%80%E1%85%AE%E1%84%85%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%B7.png",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%89%E1%85%A5%E1%84%8B%E1%85%AE%E1%86%AF%E1%84%89%E1%85%AE%E1%87%81%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.png",
-    priceInfo: {
+    legacyPrices: {
       daily: 20000,
       monthly: 130000,
       threeMonths: 330000,
@@ -473,7 +480,7 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%80%E1%85%A1%E1%86%BC%E1%84%82%E1%85%A1%E1%86%B7.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.jpegg",
-    priceInfo: {
+    legacyPrices: {
       daily: 22000,
       monthly: 130000,
       threeMonths: 330000,
@@ -497,7 +504,7 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%89%E1%85%B5%E1%86%AB%E1%84%82%E1%85%A9%E1%86%AB%E1%84%92%E1%85%A7%E1%86%AB.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.jpeg",
-    priceInfo: {
+    legacyPrices: {
       daily: 22000,
       monthly: 130000,
       threeMonths: 330000,
@@ -521,7 +528,7 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%92%E1%85%A1%E1%86%AB%E1%84%90%E1%85%B5.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.jpeg",
-    priceInfo: {
+    legacyPrices: {
       daily: 22000,
       monthly: 130000,
       threeMonths: 330000,
@@ -545,7 +552,7 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%89%E1%85%A5%E1%86%BC%E1%84%89%E1%85%AE.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.jpeg",
-    priceInfo: {
+    legacyPrices: {
       daily: 22000,
       monthly: 130000,
       threeMonths: 330000,
@@ -569,7 +576,7 @@ const GYMS_DATA: IGymSeed[] = [
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%8C%E1%85%A9%E1%86%BC%E1%84%85%E1%85%A9.jpeg",
     priceImageUrl:
       "https://climbing-log.s3.ap-northeast-2.amazonaws.com/seed/%E1%84%8F%E1%85%B3%E1%86%AF%E1%84%85%E1%85%A1%E1%84%8B%E1%85%B5%E1%84%86%E1%85%B5%E1%86%BC%E1%84%91%E1%85%A1%E1%84%8F%E1%85%B3_%E1%84%80%E1%85%A1%E1%84%80%E1%85%A7%E1%86%A8%E1%84%91%E1%85%AD.jpeg",
-    priceInfo: {
+    legacyPrices: {
       daily: 22000,
       monthly: 130000,
       threeMonths: 330000,
@@ -780,6 +787,43 @@ const OPEN_HOURS: Record<string, IOpenHourSeed[]> = {
   ],
 };
 
+/** 구 시드 가격 → 요금표 템플릿(활성). 6·12개월은 `legacyPrices`에 값이 있을 때만 행 생성 */
+const buildMembershipPlanRows = (
+  gymId: string,
+  p: IGymSeed["legacyPrices"],
+): Array<{
+  gymId: string;
+  code: MembershipPlanCode;
+  priceWon: number;
+  sortOrder: number;
+}> => {
+  const rows: Array<{
+    gymId: string;
+    code: MembershipPlanCode;
+    priceWon: number;
+    sortOrder: number;
+  }> = [
+    { gymId, code: "COUNT_DAY", priceWon: p.daily, sortOrder: 0 },
+    { gymId, code: "COUNT_3", priceWon: Math.round(p.daily * 2.5), sortOrder: 1 },
+    { gymId, code: "COUNT_5", priceWon: Math.round(p.daily * 4), sortOrder: 2 },
+    { gymId, code: "COUNT_10", priceWon: p.tenSession, sortOrder: 3 },
+    { gymId, code: "PERIOD_1M", priceWon: p.monthly, sortOrder: 10 },
+    { gymId, code: "PERIOD_3M", priceWon: p.threeMonths, sortOrder: 11 },
+  ];
+  if (typeof p.sixMonths === "number") {
+    rows.push({ gymId, code: "PERIOD_6M", priceWon: p.sixMonths, sortOrder: 12 });
+  }
+  if (typeof p.twelveMonths === "number") {
+    rows.push({
+      gymId,
+      code: "PERIOD_12M",
+      priceWon: p.twelveMonths,
+      sortOrder: 13,
+    });
+  }
+  return rows;
+};
+
 export async function seedGyms(
   prisma: PrismaClient,
 ): Promise<Record<string, Gym>> {
@@ -799,6 +843,13 @@ export async function seedGyms(
     return null;
   };
 
+  const membershipBrandFromKey = (key: string): GymMembershipBrand => {
+    if (key.startsWith("theclimb_")) return "THE_CLIMB";
+    if (key.startsWith("seoulforest_")) return "SEOULFOREST";
+    if (key.startsWith("climbingpark_")) return "CLIMBINGPARK";
+    return "STANDALONE";
+  };
+
   for (const gymData of GYMS_DATA) {
     const { key, ...rest } = gymData;
     const gym = await prisma.gym.create({
@@ -816,10 +867,14 @@ export async function seedGyms(
         thumbnailUrl: rest.thumbnailUrl,
         notice: rest.notice,
         facilities: rest.facilities,
-        priceInfo: rest.priceInfo,
         avgRating: 0,
         reviewCount: 0,
+        membershipBrand: membershipBrandFromKey(key),
       },
+    });
+
+    await prisma.gymMembershipPlan.createMany({
+      data: buildMembershipPlanRows(gym.id, rest.legacyPrices),
     });
 
     // 가격표(또는 대체 이미지) 1장 필수 생성: 화면에서 images가 빈 배열이면 안 됨

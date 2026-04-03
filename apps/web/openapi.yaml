@@ -74,6 +74,33 @@ paths:
                   payload:
                     $ref: "#/components/schemas/GymDetail"
 
+  /api/v1/gyms/{gymId}/membership-plans:
+    get:
+      operationId: getGymMembershipPlans
+      summary: 암장 회원권 요금표 (활성 행만)
+      tags: [Gyms]
+      parameters:
+        - {
+            name: gymId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    type: array
+                    items: { $ref: "#/components/schemas/GymMembershipPlan" }
+        "404":
+          description: Not Found
+
   /api/v1/gyms/{gymId}/check-in:
     post:
       operationId: checkInGym
@@ -799,6 +826,252 @@ paths:
                   toast: { type: string }
                   payload: { nullable: true }
 
+  /api/v1/users/me/memberships:
+    get:
+      operationId: getMyMemberships
+      summary: 내 회원권 목록
+      tags: [Users]
+      parameters:
+        - { name: gymId, in: query, schema: { type: string, format: uuid } }
+        - {
+            name: activeOnly,
+            in: query,
+            schema: { type: string, enum: ["true", "false"] },
+          }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    type: array
+                    items: { $ref: "#/components/schemas/UserMembership" }
+        "401":
+          description: Unauthorized
+    post:
+      operationId: createMyMembership
+      summary: 내 회원권 등록
+      tags: [Users]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateUserMembershipBody" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [toast, payload]
+                properties:
+                  toast: { type: string }
+                  payload: { $ref: "#/components/schemas/UserMembership" }
+
+  /api/v1/users/me/memberships/{userMembershipId}:
+    get:
+      operationId: getMyMembershipById
+      summary: 내 회원권 상세
+      tags: [Users]
+      parameters:
+        - {
+            name: userMembershipId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload: { $ref: "#/components/schemas/UserMembership" }
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+    patch:
+      operationId: patchMyMembership
+      summary: 내 회원권 수정
+      tags: [Users]
+      parameters:
+        - {
+            name: userMembershipId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PatchUserMembershipBody" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [toast, payload]
+                properties:
+                  toast: { type: string }
+                  payload: { $ref: "#/components/schemas/UserMembership" }
+    delete:
+      operationId: deleteMyMembership
+      summary: 내 회원권 삭제
+      tags: [Users]
+      parameters:
+        - {
+            name: userMembershipId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [toast, payload]
+                properties:
+                  toast: { type: string }
+                  payload:
+                    type: object
+                    required: [ok]
+                    properties:
+                      ok: { type: boolean }
+
+  /api/v1/users/me/memberships/{userMembershipId}/usage:
+    get:
+      operationId: getMyMembershipUsage
+      summary: 회원권 사용 내역·통계
+      tags: [Users]
+      parameters:
+        - {
+            name: userMembershipId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload: { $ref: "#/components/schemas/UserMembershipUsagePayload" }
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+
+  /api/v1/users/me/memberships/{userMembershipId}/pauses:
+    post:
+      operationId: createMembershipPause
+      summary: 회원권 일시정지 추가
+      tags: [Users]
+      parameters:
+        - {
+            name: userMembershipId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateMembershipPauseBody" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [toast, payload]
+                properties:
+                  toast: { type: string }
+                  payload: { $ref: "#/components/schemas/UserMembership" }
+
+  /api/v1/users/me/memberships/{userMembershipId}/pauses/{pauseId}:
+    patch:
+      operationId: patchMembershipPause
+      summary: 회원권 일시정지 수정
+      tags: [Users]
+      parameters:
+        - {
+            name: userMembershipId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
+        - {
+            name: pauseId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PatchMembershipPauseBody" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [toast, payload]
+                properties:
+                  toast: { type: string }
+                  payload: { $ref: "#/components/schemas/UserMembership" }
+    delete:
+      operationId: deleteMembershipPause
+      summary: 회원권 일시정지 삭제
+      tags: [Users]
+      parameters:
+        - {
+            name: userMembershipId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
+        - {
+            name: pauseId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [toast, payload]
+                properties:
+                  toast: { type: string }
+                  payload: { $ref: "#/components/schemas/UserMembership" }
+
   /api/v1/users/me/nickname-availability:
     get:
       operationId: getMyNicknameAvailability
@@ -1442,6 +1715,15 @@ components:
         label: { type: string, description: 암장 자체 난이도 명칭 }
         order: { type: integer, description: 표시 순서 }
 
+    GymMembershipBrand:
+      type: string
+      description: 암장 회원권 브랜드(체인). STANDALONE은 구매·세션 지점 일치만 허용
+      enum:
+        - THE_CLIMB
+        - SEOULFOREST
+        - CLIMBINGPARK
+        - STANDALONE
+
     GymListItem:
       description: 암장 (목록/상세 공통 필드; API는 Prisma Gym + 실시간 visitorCount 등)
       type: object
@@ -1463,6 +1745,7 @@ components:
           reviewCount,
           createdAt,
           updatedAt,
+          membershipBrand,
           facilities,
           images,
         ]
@@ -1502,13 +1785,9 @@ components:
         thumbnailUrl:
           { type: string, nullable: true, description: 목록/카드용 썸네일 }
         instagramId: { type: string, nullable: true, description: 인스타그램 아이디 }
-        priceInfo:
-          description: 가격 정보 (암장별 JSON 구조)
-          nullable: true
-          type: object
-          additionalProperties: true
         createdAt: { type: string, format: date-time, description: 생성일 }
         updatedAt: { type: string, format: date-time, description: 수정일 }
+        membershipBrand: { $ref: "#/components/schemas/GymMembershipBrand" }
         facilities:
           type: array
           description: 시설 목록 (스칼라 enum 배열)
@@ -1522,11 +1801,135 @@ components:
           description: 암장별 난이도표 (상세 GET 등에서 포함; 목록은 빈 배열 또는 생략)
           items: { $ref: "#/components/schemas/GymDifficultyColor" }
 
+    MembershipPlanCode:
+      type: string
+      enum:
+        - PERIOD_1M
+        - PERIOD_3M
+        - PERIOD_6M
+        - PERIOD_12M
+        - COUNT_DAY
+        - COUNT_3
+        - COUNT_5
+        - COUNT_10
+
+    GymMembershipPlan:
+      description: 암장별 회원권 요금표 행
+      type: object
+      required:
+        [id, gymId, code, priceWon, sortOrder, isActive, createdAt, updatedAt]
+      properties:
+        id: { type: string, format: uuid }
+        gymId: { type: string, format: uuid }
+        code: { $ref: "#/components/schemas/MembershipPlanCode" }
+        priceWon: { type: integer }
+        sortOrder: { type: integer }
+        isActive: { type: boolean }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    GymMembershipPlanSummary:
+      type: object
+      required: [id, code, priceWon, sortOrder, isActive]
+      properties:
+        id: { type: string, format: uuid }
+        code: { $ref: "#/components/schemas/MembershipPlanCode" }
+        priceWon: { type: integer }
+        sortOrder: { type: integer }
+        isActive: { type: boolean }
+
+    MembershipPauseItem:
+      type: object
+      required: [id, startDateYmd, endDateYmd, createdAt, updatedAt]
+      properties:
+        id: { type: string, format: uuid }
+        startDateYmd: { type: string }
+        endDateYmd: { type: string }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    UserMembership:
+      description: 유저 보유 회원권 (직렬화 응답)
+      type: object
+      required:
+        [
+          id,
+          userId,
+          gymId,
+          planId,
+          startedAt,
+          startedDateYmd,
+          createdAt,
+          updatedAt,
+          plan,
+          gym,
+          pauses,
+          effectiveEndAt,
+          lastValidDateYmd,
+          isActive,
+        ]
+      properties:
+        id: { type: string, format: uuid }
+        userId: { type: string, format: uuid }
+        gymId: { type: string, format: uuid }
+        planId: { type: string, format: uuid }
+        startedAt: { type: string, format: date-time }
+        startedDateYmd: { type: string }
+        remainingUses: { type: integer, nullable: true }
+        note: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        plan: { $ref: "#/components/schemas/GymMembershipPlanSummary" }
+        gym:
+          type: object
+          required: [id, name, membershipBrand]
+          properties:
+            id: { type: string, format: uuid }
+            name: { type: string }
+            membershipBrand: { $ref: "#/components/schemas/GymMembershipBrand" }
+        pauses:
+          type: array
+          items: { $ref: "#/components/schemas/MembershipPauseItem" }
+        effectiveEndAt: { type: string, format: date-time }
+        lastValidDateYmd: { type: string }
+        isActive: { type: boolean }
+
+    CreateUserMembershipBody:
+      type: object
+      required: [gymId, planId, startedDateYmd]
+      properties:
+        gymId: { type: string, format: uuid }
+        planId: { type: string, format: uuid }
+        startedDateYmd: { type: string }
+        note: { type: string, maxLength: 500 }
+
+    PatchUserMembershipBody:
+      type: object
+      properties:
+        note: { type: string, nullable: true, maxLength: 500 }
+        startedDateYmd: { type: string }
+
+    CreateMembershipPauseBody:
+      type: object
+      required: [startDateYmd, endDateYmd]
+      properties:
+        startDateYmd: { type: string }
+        endDateYmd: { type: string }
+
+    PatchMembershipPauseBody:
+      type: object
+      properties:
+        startDateYmd: { type: string }
+        endDateYmd: { type: string }
+
     GymDetail:
       allOf:
         - $ref: "#/components/schemas/GymListItem"
         - type: object
           properties:
+            membershipPlans:
+              type: array
+              items: { $ref: "#/components/schemas/GymMembershipPlan" }
             myCheckIn:
               type: object
               nullable: true
@@ -1694,6 +2097,7 @@ components:
         id: { type: string, format: uuid }
         userId: { type: string, format: uuid }
         gymId: { type: string, format: uuid }
+        userMembershipId: { type: string, format: uuid, nullable: true }
         date: { type: string, format: date-time }
         startTime: { type: string, format: date-time, nullable: true }
         endTime: { type: string, format: date-time, nullable: true }
@@ -1734,6 +2138,7 @@ components:
         id: { type: string, format: uuid }
         userId: { type: string, format: uuid }
         gymId: { type: string, format: uuid }
+        userMembershipId: { type: string, format: uuid, nullable: true }
         date: { type: string, format: date-time }
         startTime: { type: string, format: date-time, nullable: true }
         endTime: { type: string, format: date-time, nullable: true }
@@ -1755,6 +2160,77 @@ components:
           type: array
           items: { type: string, format: uri }
         user: { $ref: "#/components/schemas/AuthorSummary" }
+        userMembership:
+          description: 작성자 본인 조회 시에만 포함 (타인 열람 시 null)
+          nullable: true
+          $ref: "#/components/schemas/RecordUserMembershipSummary"
+
+    RecordUserMembershipSummary:
+      type: object
+      required: [id, gym, plan]
+      properties:
+        id: { type: string, format: uuid }
+        gym:
+          type: object
+          required: [id, name]
+          properties:
+            id: { type: string, format: uuid }
+            name: { type: string }
+        plan:
+          type: object
+          required: [code]
+          properties:
+            code: { $ref: "#/components/schemas/MembershipPlanCode" }
+
+    UserMembershipUsagePayload:
+      type: object
+      required: [membership, stats, sessions]
+      properties:
+        membership:
+          type: object
+          required:
+            [
+              id,
+              gymId,
+              planCode,
+              startedDateYmd,
+              lastValidDateYmd,
+              remainingDays,
+              gym,
+            ]
+          properties:
+            id: { type: string, format: uuid }
+            gymId: { type: string, format: uuid }
+            planCode: { $ref: "#/components/schemas/MembershipPlanCode" }
+            startedDateYmd: { type: string }
+            lastValidDateYmd: { type: string }
+            remainingUses: { type: integer, nullable: true }
+            remainingDays: { type: integer }
+            gym:
+              type: object
+              required: [id, name, membershipBrand]
+              properties:
+                id: { type: string, format: uuid }
+                name: { type: string }
+                membershipBrand: { $ref: "#/components/schemas/GymMembershipBrand" }
+        stats:
+          type: object
+          required: [totalUsed, weeklyAverage]
+          properties:
+            totalUsed: { type: number }
+            weeklyAverage: { type: number }
+            usageRatePercent: { type: number, nullable: true }
+            initialCount: { type: integer, nullable: true }
+        sessions:
+          type: array
+          items:
+            type: object
+            required: [id, date, gymName, routeCount]
+            properties:
+              id: { type: string, format: uuid }
+              date: { type: string, format: date-time }
+              gymName: { type: string }
+              routeCount: { type: integer }
 
     PaginatedRecordListItem:
       type: object
@@ -1779,6 +2255,7 @@ components:
       required: [gymId, date, routes]
       properties:
         gymId: { type: string, format: uuid }
+        userMembershipId: { type: string, format: uuid, nullable: true }
         date: { type: string, format: date-time }
         startTime: { type: string, format: date-time }
         endTime: { type: string, format: date-time }
@@ -1796,6 +2273,7 @@ components:
       type: object
       properties:
         date: { type: string, format: date-time }
+        userMembershipId: { type: string, format: uuid, nullable: true }
         startTime: { type: string, format: date-time }
         endTime: { type: string, format: date-time }
         memo: { type: string, maxLength: 500, nullable: true }

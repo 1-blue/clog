@@ -91,3 +91,12 @@ export const gymReviewFeatureEnum = z.enum([
   "GOOD_VENT",
 ]);
 export type GymReviewFeature = z.infer<typeof gymReviewFeatureEnum>;
+
+/** 암장 회원권 브랜드(체인) — Prisma `GymMembershipBrand`와 동일 */
+export const gymMembershipBrandEnum = z.enum([
+  "THE_CLIMB",
+  "SEOULFOREST",
+  "CLIMBINGPARK",
+  "STANDALONE",
+]);
+export type GymMembershipBrand = z.infer<typeof gymMembershipBrandEnum>;
