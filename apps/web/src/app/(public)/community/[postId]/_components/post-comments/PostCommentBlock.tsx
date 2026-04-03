@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 
 import type { components } from "#web/@types/openapi";
+import { Badge } from "#web/components/ui/badge";
 import { Button } from "#web/components/ui/button";
 import { Textarea } from "#web/components/ui/textarea";
 import { ROUTES } from "#web/constants";
@@ -65,6 +66,8 @@ const PostCommentBlock: React.FC<IProps> = ({
     setEditing(false);
   };
 
+  const isOwner = comment.authorId === postAuthorId;
+
   return (
     <div className="flex gap-4">
       <Link
@@ -88,74 +91,77 @@ const PostCommentBlock: React.FC<IProps> = ({
         )}
       </Link>
       <div className="flex min-w-0 flex-1 flex-col gap-2">
-        <div className="flex items-start justify-between gap-2">
-          <Link
-            href={ROUTES.USERS.PROFILE.path(comment.author.id)}
-            className={cn(
-              "min-w-0 truncate text-sm font-bold hover:underline",
-              comment.authorId === postAuthorId
-                ? "text-primary"
-                : "text-on-surface",
-            )}
-          >
-            {comment.author.nickname}
-          </Link>
-          <div className="flex shrink-0 items-center gap-1">
-            <span className="text-xs text-on-surface-variant">
-              {formatDistanceToNow(new Date(comment.createdAt), {
-                addSuffix: true,
-                locale: ko,
-              })}
-            </span>
-            <CommentOwnerMenu
-              postId={postId}
-              commentId={comment.id}
-              authorId={comment.authorId}
-              onEdit={() => {
-                setDraft(comment.content);
-                setEditing(true);
-              }}
-            />
-          </div>
-        </div>
-        {editing ? (
-          <div className="flex flex-col gap-2">
-            <Textarea
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              rows={4}
-              maxLength={1000}
-              className="min-h-0 resize-none rounded-xl bg-surface-container-high px-3 py-2 text-sm text-on-surface"
-            />
-            <div className="flex flex-wrap gap-2">
-              <Button
-                type="button"
-                size="sm"
-                onClick={handleSaveEdit}
-                disabled={
-                  updateCommentMutation.isPending ||
-                  draft.trim().length === 0 ||
-                  draft.trim() === comment.content
-                }
+        <div className="flex flex-col">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <Link
+                href={ROUTES.USERS.PROFILE.path(comment.author.id)}
+                className={cn(
+                  "min-w-0 truncate text-sm font-bold hover:underline",
+                  isOwner ? "text-primary" : "text-on-surface",
+                )}
               >
-                저장
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant="ghost"
-                onClick={handleCancelEdit}
-                disabled={updateCommentMutation.isPending}
-              >
-                취소
-              </Button>
+                {comment.author.nickname}
+              </Link>
+              {isOwner && <Badge color="primary">작성자</Badge>}
+            </div>
+            <div className="flex shrink-0 items-center gap-1">
+              <span className="text-xs text-on-surface-variant">
+                {formatDistanceToNow(new Date(comment.createdAt), {
+                  addSuffix: true,
+                  locale: ko,
+                })}
+              </span>
+              <CommentOwnerMenu
+                postId={postId}
+                commentId={comment.id}
+                authorId={comment.authorId}
+                onEdit={() => {
+                  setDraft(comment.content);
+                  setEditing(true);
+                }}
+              />
             </div>
           </div>
-        ) : (
-          <p className="text-sm leading-relaxed break-keep text-on-surface-variant">
-            {comment.content}
-          </p>
-        )}
+          {editing ? (
+            <div className="flex flex-col gap-2">
+              <Textarea
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                rows={4}
+                maxLength={1000}
+                className="min-h-0 resize-none rounded-xl bg-surface-container-high px-3 py-2 text-sm text-on-surface"
+              />
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={handleSaveEdit}
+                  disabled={
+                    updateCommentMutation.isPending ||
+                    draft.trim().length === 0 ||
+                    draft.trim() === comment.content
+                  }
+                >
+                  저장
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  onClick={handleCancelEdit}
+                  disabled={updateCommentMutation.isPending}
+                >
+                  취소
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm leading-relaxed break-keep text-on-surface-variant">
+              {comment.content}
+            </p>
+          )}
+        </div>
         <div className="flex flex-wrap items-center gap-3">
           {onReply ? (
             <button

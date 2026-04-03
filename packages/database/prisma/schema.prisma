@@ -118,11 +118,14 @@ enum PostCategory {
 
 /// 알림 타입
 enum NotificationType {
-  COMMENT /// 댓글
+  COMMENT /// 댓글 (레거시·시드)
+  POST_COMMENT /// 게시글에 댓글
+  COMMENT_REPLY /// 내 댓글에 답글
   LIKE /// 좋아요
   FOLLOW /// 팔로우
   SYSTEM /// 시스템
   GYM_UPDATE /// 암장 업데이트
+  AUTO_CHECKOUT /// 자동 체크아웃
 }
 
 /// 암장 회원권 요금표 상품 코드 (정기 N개월 / 횟수권)
@@ -778,6 +781,8 @@ model PostComment {
   parent  PostComment?  @relation("replies", fields: [parentId], references: [id], onDelete: Cascade)
   /// 대댓글 목록
   replies PostComment[] @relation("replies")
+  /// 댓글/답글 관련 알림 (댓글 삭제 시 CASCADE)
+  notifications Notification[]
 
   @@map("comments")
 }
@@ -802,11 +807,16 @@ model Notification {
   isRead    Boolean          @default(false) @map("is_read")
   /// 관련 링크
   link      String?
+  /// 연관 댓글 (POST_COMMENT / COMMENT_REPLY — 댓글 삭제 시 알림도 삭제)
+  commentId String?       @map("comment_id") @db.Uuid
   /// 생성일
   createdAt DateTime         @default(now()) @map("created_at")
 
   /// 수신자
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// 연관 댓글
+  comment PostComment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
 
+  @@index([commentId])
   @@map("notifications")
 }

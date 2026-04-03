@@ -649,6 +649,43 @@ export interface paths {
         patch: operations["markNotificationsRead"];
         trace?: never;
     };
+    "/api/v1/notifications/unread-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 미읽음 알림 개수 */
+        get: operations["getNotificationsUnreadCount"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** 알림 단건 삭제 (영구) */
+        delete: operations["deleteNotification"];
+        options?: never;
+        head?: never;
+        /** 알림 단건 읽음 */
+        patch: operations["patchNotification"];
+        trace?: never;
+    };
     "/api/v1/upload/presigned": {
         parameters: {
             query?: never;
@@ -696,10 +733,10 @@ export interface components {
          */
         CommunityCategory: "FREE" | "TIPS" | "REVIEW" | "MEETUP" | "GEAR";
         /**
-         * @description 알림 타입 (COMMENT 댓글, LIKE 좋아요, FOLLOW 팔로우, SYSTEM 시스템, GYM_UPDATE 암장 업데이트)
+         * @description 알림 타입 (POST_COMMENT 게시글 댓글, COMMENT_REPLY 답글, FOLLOW 팔로우, AUTO_CHECKOUT 자동 체크아웃 등)
          * @enum {string}
          */
-        NotificationType: "COMMENT" | "LIKE" | "FOLLOW" | "SYSTEM" | "GYM_UPDATE";
+        NotificationType: "COMMENT" | "POST_COMMENT" | "COMMENT_REPLY" | "LIKE" | "FOLLOW" | "SYSTEM" | "GYM_UPDATE" | "AUTO_CHECKOUT";
         /**
          * @description 암장 시설 타입 (PARKING 주차장, SHOWER 샤워실, LOCKER 락커, REST_AREA 휴식 공간, TRAINING 트레이닝 시설)
          * @enum {string}
@@ -1529,6 +1566,8 @@ export interface components {
             message: string;
             isRead: boolean;
             link?: string | null;
+            /** Format: uuid */
+            commentId?: string | null;
             /** Format: date-time */
             createdAt: string;
         };
@@ -3001,6 +3040,122 @@ export interface operations {
                         payload: null;
                     };
                 };
+            };
+        };
+    };
+    getNotificationsUnreadCount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payload: {
+                            count: number;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    deleteNotification: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        toast: string;
+                        payload: null;
+                    };
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    patchNotification: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {boolean} */
+                    isRead: true;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        toast: string;
+                        payload: components["schemas"]["Notification"];
+                    };
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

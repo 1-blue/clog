@@ -1443,6 +1443,79 @@ paths:
                   toast: { type: string }
                   payload: { type: "null" }
 
+  /api/v1/notifications/unread-count:
+    get:
+      operationId: getNotificationsUnreadCount
+      summary: 미읽음 알림 개수
+      tags: [Notifications]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    type: object
+                    required: [count]
+                    properties:
+                      count: { type: integer, minimum: 0 }
+        "401": { description: Unauthorized }
+
+  /api/v1/notifications/{id}:
+    parameters:
+      - {
+          name: id,
+          in: path,
+          required: true,
+          schema: { type: string, format: uuid },
+        }
+    patch:
+      operationId: patchNotification
+      summary: 알림 단건 읽음
+      tags: [Notifications]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [isRead]
+              properties:
+                isRead: { type: boolean, enum: [true] }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [toast, payload]
+                properties:
+                  toast: { type: string }
+                  payload: { $ref: "#/components/schemas/Notification" }
+        "401": { description: Unauthorized }
+        "404": { description: Not Found }
+    delete:
+      operationId: deleteNotification
+      summary: 알림 단건 삭제 (영구)
+      tags: [Notifications]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [toast, payload]
+                properties:
+                  toast: { type: string }
+                  payload: { type: "null" }
+        "401": { description: Unauthorized }
+        "404": { description: Not Found }
+
   # ── Upload ──
   /api/v1/upload/presigned:
     post:
@@ -1520,9 +1593,19 @@ components:
       enum: [FREE, TIPS, REVIEW, MEETUP, GEAR]
     NotificationType:
       description: |
-        알림 타입 (COMMENT 댓글, LIKE 좋아요, FOLLOW 팔로우, SYSTEM 시스템, GYM_UPDATE 암장 업데이트)
+        알림 타입 (POST_COMMENT 게시글 댓글, COMMENT_REPLY 답글, FOLLOW 팔로우, AUTO_CHECKOUT 자동 체크아웃 등)
       type: string
-      enum: [COMMENT, LIKE, FOLLOW, SYSTEM, GYM_UPDATE]
+      enum:
+        [
+          COMMENT,
+          POST_COMMENT,
+          COMMENT_REPLY,
+          LIKE,
+          FOLLOW,
+          SYSTEM,
+          GYM_UPDATE,
+          AUTO_CHECKOUT,
+        ]
     FacilityType:
       description: |
         암장 시설 타입 (PARKING 주차장, SHOWER 샤워실, LOCKER 락커, REST_AREA 휴식 공간, TRAINING 트레이닝 시설)
@@ -2779,6 +2862,7 @@ components:
         message: { type: string }
         isRead: { type: boolean }
         link: { type: string, nullable: true }
+        commentId: { type: string, format: uuid, nullable: true }
         createdAt: { type: string, format: date-time }
 
     PaginatedNotification:

@@ -1,5 +1,7 @@
 import { prisma } from "@clog/db";
+import { NotificationType } from "@prisma/client";
 
+import { ROUTES } from "#web/constants";
 import { errorResponse, json, requireAuth } from "#web/libs/api";
 import { catchApiError } from "#web/libs/api/errorCatch";
 
@@ -24,12 +26,39 @@ export const POST = async (
     });
 
     if (existing) {
-      await prisma.follow.delete({ where: { id: existing.id } });
+      await prisma.$transaction([
+        prisma.follow.delete({ where: { id: existing.id } }),
+        prisma.notification.deleteMany({
+          where: {
+            userId: targetId,
+            type: NotificationType.FOLLOW,
+            link: ROUTES.USERS.PROFILE.path(userId!),
+          },
+        }),
+      ]);
       return json({ following: false });
     } else {
+      const follower = await prisma.user.findUnique({
+        where: { id: userId! },
+        select: { nickname: true },
+      });
+
       await prisma.follow.create({
         data: { followerId: userId!, followingId: targetId },
       });
+
+      if (follower?.nickname) {
+        await prisma.notification.create({
+          data: {
+            userId: targetId,
+            type: NotificationType.FOLLOW,
+            title: "새 팔로워",
+            message: `${follower.nickname}님이 팔로우했습니다.`,
+            link: ROUTES.USERS.PROFILE.path(userId!),
+          },
+        });
+      }
+
       return json({ following: true });
     }
   } catch (error) {

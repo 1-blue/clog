@@ -31,7 +31,12 @@ const PostArticleMedia: React.FC<IProps> = ({ imageUrls }) => {
 
   return (
     <>
-      <div className="-mx-2.5 w-screen max-w-none sm:mx-0 sm:w-full">
+      <div
+        className={cn(
+          "relative left-1/2 w-screen max-w-[100vw] -translate-x-1/2",
+          "sm:relative sm:left-0 sm:w-full sm:max-w-none sm:translate-x-0",
+        )}
+      >
         <button
           type="button"
           onClick={() => openAt(0)}

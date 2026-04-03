@@ -12,6 +12,7 @@ import { catchApiError } from "#web/libs/api/errorCatch";
 import { linkedProvidersFromSupabase } from "#web/libs/auth/linkedProvidersFromSupabase";
 import { syncSupabaseUserToPrisma } from "#web/libs/auth/syncSupabaseUserToPrisma";
 import { createClient } from "#web/libs/supabase/server";
+import { closeExpiredCheckInsAndNotify } from "#web/libs/gym/closeExpiredCheckInsAndNotify";
 import { notifySlackUserWithdrawal } from "#web/libs/slack/notifications";
 import { getUserProfileStats } from "#web/libs/user/profileStats";
 
@@ -61,6 +62,8 @@ export const GET = async (request: Request) => {
       data: { user: authUser },
     } = await supabase.auth.getUser();
     const linkedProviders = linkedProvidersFromSupabase(authUser?.identities);
+
+    await closeExpiredCheckInsAndNotify(user.id);
 
     /** 활성 체크인 조회 */
     const now = new Date();

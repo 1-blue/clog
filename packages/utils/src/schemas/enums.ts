@@ -35,10 +35,13 @@ export type CommunityCategory = z.infer<typeof communityCategoryEnum>;
 
 export const notificationTypeEnum = z.enum([
   "COMMENT",
+  "POST_COMMENT",
+  "COMMENT_REPLY",
   "LIKE",
   "FOLLOW",
   "SYSTEM",
   "GYM_UPDATE",
+  "AUTO_CHECKOUT",
 ]);
 export type NotificationType = z.infer<typeof notificationTypeEnum>;
 

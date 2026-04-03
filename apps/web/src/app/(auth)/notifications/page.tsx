@@ -1,15 +1,22 @@
-import { Metadata, NextPage } from "next";
+"use client";
 
-import { getSharedMetadata } from "#web/libs/sharedMetadata";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-import NotificationListSection from "./_source/components/NotificationListSection";
+import { useNotificationPanel } from "#web/components/notifications/NotificationPanelProvider";
+import { ROUTES } from "#web/constants";
 
-export const metadata: Metadata = getSharedMetadata({
-  title: "알림",
-});
+/** `/notifications` 진입 시 알림 패널만 열고 마이페이지로 대체합니다. */
+const NotificationsRedirectPage = () => {
+  const router = useRouter();
+  const { open } = useNotificationPanel() ?? {};
 
-const NotificationsPage: NextPage = () => {
-  return <NotificationListSection />;
+  useEffect(() => {
+    open?.();
+    router.replace(ROUTES.MY.path);
+  }, [open, router]);
+
+  return null;
 };
 
-export default NotificationsPage;
+export default NotificationsRedirectPage;
