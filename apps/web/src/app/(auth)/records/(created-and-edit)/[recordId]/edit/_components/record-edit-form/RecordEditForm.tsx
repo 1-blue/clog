@@ -11,6 +11,7 @@ import RecordDurationField from "#web/app/(auth)/records/(created-and-edit)/_sou
 import RecordFormSaveBar from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordFormSaveBar";
 import RecordGallerySection from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordGallerySection";
 import RecordGymDifficultyLegend from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordGymDifficultyLegend";
+import RecordCheckInLinkField from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordCheckInLinkField";
 import RecordGymReadonlyCard from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordGymReadonlyCard";
 import RecordMembershipField from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordMembershipField";
 import RecordMemoField from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordMemoField";
@@ -57,6 +58,7 @@ const RecordEditForm: React.FC<IProps> = ({ recordId, record }) => {
       })),
       imageUrls: record.imageUrls,
       userMembershipId: record.userMembershipId ?? "",
+      gymCheckInId: record.gymCheckInId ?? "",
     },
   });
 
@@ -104,6 +106,7 @@ const RecordEditForm: React.FC<IProps> = ({ recordId, record }) => {
         userMembershipId: data.userMembershipId
           ? data.userMembershipId
           : null,
+        gymCheckInId: data.gymCheckInId ? data.gymCheckInId : null,
       },
     });
   };
@@ -129,6 +132,7 @@ const RecordEditForm: React.FC<IProps> = ({ recordId, record }) => {
               name={record.gym.name}
               address={record.gym.address}
             />
+            <RecordCheckInLinkField forSessionId={recordId} />
             <RecordMembershipField
               initialUserMembershipId={record.userMembershipId}
             />

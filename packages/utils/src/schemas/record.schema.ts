@@ -19,9 +19,12 @@ export const createSessionSchema = z.object({
   endTime: z.coerce.date().optional(),
   memo: z.string().max(500).optional(),
   isPublic: z.boolean().optional().default(true),
-  routes: z.array(createRouteSchema).min(1),
+  /** 비어 있으면 방문만 기록 (루트는 나중에 추가 가능) */
+  routes: z.array(createRouteSchema).default([]),
   imageUrls: z.array(z.string().url()).optional(),
   userMembershipId: schemas.uuid.optional().nullable(),
+  /** 종료된 체크인만, 30분 이상, 동일 암장 */
+  gymCheckInId: schemas.uuid.optional(),
 });
 
 /** 기록(세션) 수정 */
@@ -34,6 +37,7 @@ export const updateSessionSchema = z.object({
   routes: z.array(createRouteSchema).optional(),
   imageUrls: z.array(z.string().url()).optional(),
   userMembershipId: schemas.uuid.optional().nullable(),
+  gymCheckInId: schemas.uuid.nullable().optional(),
 });
 
 /** 기록 목록 조회 쿼리 */

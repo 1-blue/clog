@@ -29,6 +29,7 @@ export const recordCreateDraftSliceSchema = z.object({
   routes: z.array(draftRouteSchema).optional(),
   imageUrls: z.array(z.string()).max(10).optional(),
   userMembershipId: z.string().optional(),
+  gymCheckInId: z.string().optional(),
 });
 
 export type TRecordCreateDraftSlice = z.infer<typeof recordCreateDraftSliceSchema>;
@@ -53,6 +54,7 @@ export const getDefaultRecordCreateFormValues = (
   routes: [],
   imageUrls: [],
   userMembershipId: "",
+  gymCheckInId: "",
 });
 
 export const readRecordCreateDraftBucket = (): TRecordCreateDraftBucket | null => {
@@ -112,6 +114,7 @@ export const formValuesToDraftSlice = (
   routes: v.routes?.length ? v.routes : undefined,
   imageUrls: v.imageUrls?.length ? v.imageUrls : undefined,
   userMembershipId: v.userMembershipId || undefined,
+  gymCheckInId: v.gymCheckInId || undefined,
 });
 
 export const mergeDefaultsWithDraft = (
@@ -129,4 +132,5 @@ export const mergeDefaultsWithDraft = (
   routes: draft.routes ?? base.routes,
   imageUrls: draft.imageUrls ?? base.imageUrls ?? [],
   userMembershipId: draft.userMembershipId ?? base.userMembershipId ?? "",
+  gymCheckInId: draft.gymCheckInId ?? base.gymCheckInId ?? "",
 });

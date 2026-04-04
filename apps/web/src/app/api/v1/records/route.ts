@@ -13,6 +13,10 @@ import {
   applyMembershipOnSessionCreate,
   sessionDateForValidation,
 } from "#web/libs/membership/sessionMembership";
+import {
+  assertGymCheckInLinkable,
+  gymCheckInLinkErrorMessage,
+} from "#web/libs/record/sessionFromCheckIn";
 import { resolveSessionImageUrlsForDb } from "#web/libs/record/resolveSessionImageUrls";
 import { bumpUserMaxDifficultyFromRoutes } from "#web/libs/user/updateUserMaxDifficulty";
 
@@ -94,6 +98,14 @@ export const POST = async (request: Request) => {
     const data = createSessionSchema.parse(body);
 
     const session = await prisma.$transaction(async (tx) => {
+      if (data.gymCheckInId) {
+        await assertGymCheckInLinkable(tx, {
+          userId: userId!,
+          gymCheckInId: data.gymCheckInId,
+          gymId: data.gymId,
+        });
+      }
+
       let linkedId: string | null = null;
       try {
         linkedId = await applyMembershipOnSessionCreate(tx, {
@@ -124,15 +136,18 @@ export const POST = async (request: Request) => {
           memo: data.memo,
           isPublic: data.isPublic,
           userMembershipId: linkedId,
-          routes: {
-            create: data.routes.map((r, i) => ({
-              difficulty: r.difficulty,
-              result: r.result,
-              attempts: r.attempts,
-              memo: r.memo,
-              order: i,
-            })),
-          },
+          ...(data.gymCheckInId && { gymCheckInId: data.gymCheckInId }),
+          ...(data.routes.length > 0 && {
+            routes: {
+              create: data.routes.map((r, i) => ({
+                difficulty: r.difficulty,
+                result: r.result,
+                attempts: r.attempts,
+                memo: r.memo,
+                order: i,
+              })),
+            },
+          }),
           imageUrls,
         },
         include: {
@@ -145,6 +160,8 @@ export const POST = async (request: Request) => {
 
     return jsonWithToast(session, "기록이 저장되었습니다.", 201);
   } catch (error) {
+    const linkMsg = gymCheckInLinkErrorMessage(error);
+    if (linkMsg) return errorResponse(linkMsg, 400);
     if (error instanceof Error && error.message.includes("회원권")) {
       return errorResponse(error.message, 400);
     }

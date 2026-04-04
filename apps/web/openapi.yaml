@@ -826,6 +826,41 @@ paths:
                   toast: { type: string }
                   payload: { nullable: true }
 
+  /api/v1/users/me/check-ins:
+    get:
+      operationId: getMyCheckIns
+      summary: 내 체크인 목록 (linkableOnly=true면 30분 이상·미연결·종료된 체크인만)
+      tags: [Users]
+      parameters:
+        - name: linkableOnly
+          in: query
+          required: false
+          schema: { type: boolean, default: false }
+          description: true면 기록 폼에 연결 가능한 체크인만 반환
+        - name: forSessionId
+          in: query
+          required: false
+          schema: { type: string, format: uuid }
+          description: linkableOnly와 함께 사용. 해당 기록(세션)에만 연결된 체크인도 목록에 포함(수정 폼에서 재선택용)
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    type: object
+                    required: [items]
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: "#/components/schemas/MyCheckInItem" }
+        "401":
+          description: Unauthorized
+
   /api/v1/users/me/push-device:
     post:
       operationId: registerPushDevice
@@ -2075,6 +2110,26 @@ components:
       required: [ok]
       properties:
         ok: { type: boolean }
+        createdSessionId:
+          type: string
+          format: uuid
+          nullable: true
+          description: 체크인 30분 이상일 때 자동 생성된 기록(세션) ID, 없으면 null
+
+    MyCheckInItem:
+      type: object
+      required: [id, gymId, gymName, startedAt]
+      properties:
+        id: { type: string, format: uuid }
+        gymId: { type: string, format: uuid }
+        gymName: { type: string }
+        startedAt: { type: string, format: date-time }
+        endsAt: { type: string, format: date-time, description: 자동 체크아웃 예정 시각 }
+        endedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: linkableOnly 목록에서는 항상 포함(종료 시각)
 
     PaginatedGymListItem:
       type: object
@@ -2229,6 +2284,7 @@ components:
         userId: { type: string, format: uuid }
         gymId: { type: string, format: uuid }
         userMembershipId: { type: string, format: uuid, nullable: true }
+        gymCheckInId: { type: string, format: uuid, nullable: true }
         date: { type: string, format: date-time }
         startTime: { type: string, format: date-time, nullable: true }
         endTime: { type: string, format: date-time, nullable: true }
@@ -2270,6 +2326,7 @@ components:
         userId: { type: string, format: uuid }
         gymId: { type: string, format: uuid }
         userMembershipId: { type: string, format: uuid, nullable: true }
+        gymCheckInId: { type: string, format: uuid, nullable: true }
         date: { type: string, format: date-time }
         startTime: { type: string, format: date-time, nullable: true }
         endTime: { type: string, format: date-time, nullable: true }
@@ -2395,10 +2452,11 @@ components:
 
     CreateSessionBody:
       type: object
-      required: [gymId, date, routes]
+      required: [gymId, date]
       properties:
         gymId: { type: string, format: uuid }
         userMembershipId: { type: string, format: uuid, nullable: true }
+        gymCheckInId: { type: string, format: uuid, description: 종료된 체크인과 연결 }
         date: { type: string, format: date-time }
         startTime: { type: string, format: date-time }
         endTime: { type: string, format: date-time }
@@ -2406,7 +2464,7 @@ components:
         isPublic: { type: boolean, default: true }
         routes:
           type: array
-          minItems: 1
+          minItems: 0
           items: { $ref: "#/components/schemas/CreateRouteBody" }
         imageUrls:
           type: array
@@ -2415,6 +2473,11 @@ components:
     UpdateSessionBody:
       type: object
       properties:
+        gymCheckInId:
+          type: string
+          format: uuid
+          nullable: true
+          description: 체크인 연결(null이면 연결 해제)
         date: { type: string, format: date-time }
         userMembershipId: { type: string, format: uuid, nullable: true }
         startTime: { type: string, format: date-time }

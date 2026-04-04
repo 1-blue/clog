@@ -9,6 +9,10 @@ import {
   refundMembershipOnSessionDelete,
   sessionDateForValidation,
 } from "#web/libs/membership/sessionMembership";
+import {
+  assertGymCheckInLinkable,
+  gymCheckInLinkErrorMessage,
+} from "#web/libs/record/sessionFromCheckIn";
 import { resolveSessionImageUrlsForDb } from "#web/libs/record/resolveSessionImageUrls";
 import { recomputeUserMaxDifficulty } from "#web/libs/user/updateUserMaxDifficulty";
 
@@ -137,6 +141,19 @@ export const PATCH = async (
         throw me;
       }
 
+      if (data.gymCheckInId !== undefined) {
+        if (data.gymCheckInId === null) {
+          /* 연결 해제만 */
+        } else {
+          await assertGymCheckInLinkable(tx, {
+            userId: userId!,
+            gymCheckInId: data.gymCheckInId,
+            gymId: existing.gymId,
+            excludeSessionId: recordId,
+          });
+        }
+      }
+
       if (data.routes) {
         await tx.climbingRoute.deleteMany({ where: { sessionId: recordId } });
       }
@@ -156,6 +173,9 @@ export const PATCH = async (
           ...(data.isPublic !== undefined && { isPublic: data.isPublic }),
           ...(data.userMembershipId !== undefined && {
             userMembershipId: data.userMembershipId,
+          }),
+          ...(data.gymCheckInId !== undefined && {
+            gymCheckInId: data.gymCheckInId,
           }),
           ...(data.routes && {
             routes: {
@@ -180,6 +200,8 @@ export const PATCH = async (
 
     return jsonWithToast(session, "기록이 수정되었습니다.");
   } catch (error) {
+    const linkMsg = gymCheckInLinkErrorMessage(error);
+    if (linkMsg) return errorResponse(linkMsg, 400);
     if (error instanceof Error) {
       if (error.message === "NOT_FOUND") {
         return errorResponse("기록을 찾을 수 없습니다.", 404);
