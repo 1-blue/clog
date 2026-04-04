@@ -57,7 +57,7 @@ const useGymCheckInMutations = (options?: IOptions) => {
                   gymId,
                   gymName,
                   startedAt: now.toISOString(),
-                  endsAt: new Date(now.getTime() + 3 * 60 * 60_000).toISOString(),
+                  endsAt: new Date(now.getTime() + 240 * 60_000).toISOString(),
                 },
               },
             };

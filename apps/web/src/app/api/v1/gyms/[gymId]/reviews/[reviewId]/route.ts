@@ -12,13 +12,17 @@ import { normalizeReviewJsonBody } from "#web/libs/reviewBody";
 
 import { gymReviewListInclude } from "../_reviewInclude";
 
-const syncGymReviewStats = async (gymId: string) => {
-  const agg = await prisma.gymReview.aggregate({
+/** 트랜잭션 내에서 avgRating/reviewCount 동기화 */
+const syncGymReviewStatsInTx = async (
+  tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0],
+  gymId: string,
+) => {
+  const agg = await tx.gymReview.aggregate({
     where: { gymId },
     _avg: { rating: true },
     _count: true,
   });
-  await prisma.gym.update({
+  await tx.gym.update({
     where: { id: gymId },
     data: {
       avgRating: agg._avg.rating ?? 0,
@@ -49,6 +53,41 @@ export const GET = async (
     return json(review);
   } catch (error) {
     return catchApiError(_request, error, "리뷰를 불러올 수 없습니다.");
+  }
+};
+
+/** 리뷰 삭제 */
+export const DELETE = async (
+  request: Request,
+  {
+    params,
+  }: { params: Promise<{ gymId: string; reviewId: string }> },
+) => {
+  const { gymId, reviewId } = await params;
+  const { userId, error } = await requireAuth();
+  if (error) return error;
+
+  try {
+    const existing = await prisma.gymReview.findFirst({
+      where: { id: reviewId, gymId },
+    });
+    if (!existing) {
+      return errorResponse("리뷰를 찾을 수 없습니다.", 404);
+    }
+    if (existing.userId !== userId) {
+      return errorResponse("권한이 없습니다.", 403);
+    }
+
+    await prisma.$transaction(async (tx) => {
+      await tx.gymReview.delete({ where: { id: reviewId } });
+      await syncGymReviewStatsInTx(tx, gymId);
+    });
+
+    return jsonWithToast(null, "리뷰가 삭제되었습니다.");
+  } catch (error) {
+    return catchApiError(request, error, "리뷰 삭제에 실패했습니다.", {
+      userId: userId!,
+    });
   }
 };
 
@@ -87,18 +126,20 @@ export const PATCH = async (
       return errorResponse("권한이 없습니다.", 403);
     }
 
-    const review = await prisma.gymReview.update({
-      where: { id: reviewId },
-      data: {
-        rating: data.rating,
-        content: data.content,
-        perceivedDifficulty: data.perceivedDifficulty ?? null,
-        features: data.features ?? [],
-        imageUrls: data.imageUrls ?? [],
-      },
+    const review = await prisma.$transaction(async (tx) => {
+      const updated = await tx.gymReview.update({
+        where: { id: reviewId },
+        data: {
+          rating: data.rating,
+          content: data.content,
+          perceivedDifficulty: data.perceivedDifficulty ?? null,
+          features: data.features ?? [],
+          imageUrls: data.imageUrls ?? [],
+        },
+      });
+      await syncGymReviewStatsInTx(tx, gymId);
+      return updated;
     });
-
-    await syncGymReviewStats(gymId);
 
     return jsonWithToast(review, "리뷰가 수정되었습니다.");
   } catch (error) {

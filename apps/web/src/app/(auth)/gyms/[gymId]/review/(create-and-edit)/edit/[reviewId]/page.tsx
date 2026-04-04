@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { fetchClient, openapi } from "#web/apis/openapi";
 import { getQueryClient } from "#web/libs/getQueryClient";
 import { getSharedMetadata } from "#web/libs/sharedMetadata";
+import { requireAuth } from "#web/libs/api";
 
 import GymReviewSkeleton from "../../_source/components/gym-review/skeleton/GymReviewSkeleton";
 import GymReviewEditMain from "./_source/components/GymReviewEditMain";
@@ -24,6 +25,22 @@ const getGymMeta = cache(async (gymId: string) => {
   if (error || response.status !== 200 || !data?.payload) return null;
   return data.payload;
 });
+
+/** 리뷰 소유권 확인 (서버측 IDOR 방지) */
+const verifyReviewOwnership = cache(
+  async (gymId: string, reviewId: string) => {
+    const { userId } = await requireAuth();
+    if (!userId) return false;
+
+    const { data, error } = await fetchClient.GET(
+      "/api/v1/gyms/{gymId}/reviews/{reviewId}",
+      { params: { path: { gymId, reviewId } } },
+    );
+    if (error || !data?.payload) return false;
+
+    return (data.payload as { userId?: string }).userId === userId;
+  },
+);
 
 export const generateMetadata = async ({
   params,
@@ -44,6 +61,9 @@ const GymReviewEditPage: NextPage<IProps> = async (props) => {
 
   const exists = await getGymMeta(gymId);
   if (!exists) notFound();
+
+  const isOwner = await verifyReviewOwnership(gymId, reviewId);
+  if (!isOwner) notFound();
 
   const queryClient = getQueryClient();
   await queryClient.prefetchQuery(
