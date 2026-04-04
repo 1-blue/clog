@@ -31,16 +31,17 @@ export const GET = async (request: Request) => {
   }
 
   try {
+    const supabase = await createClient();
+    const {
+      data: { user: authUser },
+    } = await supabase.auth.getUser();
+
     let user = await prisma.user.findUnique({
       where: { id: userId },
       include: meInclude,
     });
 
     if (!user) {
-      const supabase = await createClient();
-      const {
-        data: { user: authUser },
-      } = await supabase.auth.getUser();
       if (authUser?.id === userId) {
         await syncSupabaseUserToPrisma(authUser);
         user = await prisma.user.findUnique({
@@ -57,10 +58,6 @@ export const GET = async (request: Request) => {
       "owner",
     );
 
-    const supabase = await createClient();
-    const {
-      data: { user: authUser },
-    } = await supabase.auth.getUser();
     const linkedProviders = linkedProvidersFromSupabase(authUser?.identities);
 
     await closeExpiredCheckInsAndNotify(user.id);

@@ -64,22 +64,26 @@ export const POST = async (
     const body = await request.json();
     const data = createCommentSchema.parse(body);
 
-    const comment = await prisma.postComment.create({
-      data: {
-        postId,
-        authorId: userId!,
-        content: data.content,
-        parentId: data.parentId,
-      },
-      include: {
-        author: { select: { id: true, nickname: true, profileImage: true } },
-      },
-    });
+    const comment = await prisma.$transaction(async (tx) => {
+      const created = await tx.postComment.create({
+        data: {
+          postId,
+          authorId: userId!,
+          content: data.content,
+          parentId: data.parentId,
+        },
+        include: {
+          author: { select: { id: true, nickname: true, profileImage: true } },
+        },
+      });
 
-    // 댓글 수 업데이트
-    await prisma.post.update({
-      where: { id: postId },
-      data: { commentCount: { increment: 1 } },
+      const count = await tx.postComment.count({ where: { postId } });
+      await tx.post.update({
+        where: { id: postId },
+        data: { commentCount: count },
+      });
+
+      return created;
     });
 
     const post = await prisma.post.findUnique({

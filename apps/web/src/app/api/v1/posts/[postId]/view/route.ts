@@ -1,14 +1,16 @@
 import { prisma } from "@clog/db";
 
-import { json } from "#web/libs/api";
+import { json, requireAuth } from "#web/libs/api";
 import { catchApiError } from "#web/libs/api/errorCatch";
 
-/** 조회수 1회 증가 (클라이언트에서 세션당 1회 호출) */
+/** 조회수 1회 증가 (로그인 사용자만, 클라이언트에서 세션당 1회 호출) */
 export const POST = async (
   request: Request,
   { params }: { params: Promise<{ postId: string }> },
 ) => {
   const { postId } = await params;
+  const { error } = await requireAuth();
+  if (error) return error;
 
   try {
     const post = await prisma.post.update({

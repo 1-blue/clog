@@ -330,6 +330,7 @@ model Follow {
   following User @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
 
   @@unique([followerId, followingId])
+  @@index([followingId])
   @@map("follows")
 }
 
@@ -632,6 +633,7 @@ model GymReview {
   imageUrls String[] @default([]) @map("image_urls")
 
   @@unique([userId, gymId])
+  @@index([gymId])
   @@map("reviews")
 }
 
@@ -677,6 +679,8 @@ model ClimbingSession {
   gymCheckInId     String?         @unique @map("gym_check_in_id") @db.Uuid
   gymCheckIn       GymCheckIn?     @relation(fields: [gymCheckInId], references: [id], onDelete: SetNull)
 
+  @@index([userId])
+  @@index([gymId])
   @@index([userMembershipId])
   @@map("climbing_sessions")
 }
@@ -705,6 +709,7 @@ model ClimbingRoute {
   /// 세션
   session ClimbingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
+  @@index([sessionId])
   @@map("routes")
 }
 
@@ -749,6 +754,7 @@ model Post {
   /// 댓글 목록
   comments  PostComment[]
 
+  @@index([authorId])
   @@map("posts")
 }
 
@@ -820,6 +826,7 @@ model PostComment {
   /// 댓글/답글 관련 알림 (댓글 삭제 시 CASCADE)
   notifications Notification[]
 
+  @@index([postId])
   @@map("comments")
 }
 
@@ -853,6 +860,7 @@ model Notification {
   /// 연관 댓글
   comment PostComment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
   @@index([commentId])
   @@map("notifications")
 }

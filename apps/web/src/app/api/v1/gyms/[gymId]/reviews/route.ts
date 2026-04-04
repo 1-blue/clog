@@ -62,30 +62,34 @@ export const POST = async (
     });
     if (existing) return errorResponse("이미 리뷰를 작성하셨습니다.");
 
-    const review = await prisma.gymReview.create({
-      data: {
-        userId: userId!,
-        gymId,
-        rating: data.rating,
-        content: data.content,
-        perceivedDifficulty: data.perceivedDifficulty ?? null,
-        features: data.features ?? [],
-        imageUrls: data.imageUrls ?? [],
-      },
-    });
+    const review = await prisma.$transaction(async (tx) => {
+      const created = await tx.gymReview.create({
+        data: {
+          userId: userId!,
+          gymId,
+          rating: data.rating,
+          content: data.content,
+          perceivedDifficulty: data.perceivedDifficulty ?? null,
+          features: data.features ?? [],
+          imageUrls: data.imageUrls ?? [],
+        },
+      });
 
-    // 평균 평점 + 리뷰 수 업데이트
-    const agg = await prisma.gymReview.aggregate({
-      where: { gymId },
-      _avg: { rating: true },
-      _count: true,
-    });
-    await prisma.gym.update({
-      where: { id: gymId },
-      data: {
-        avgRating: agg._avg.rating ?? 0,
-        reviewCount: agg._count,
-      },
+      // 평균 평점 + 리뷰 수 업데이트 (트랜잭션 내)
+      const agg = await tx.gymReview.aggregate({
+        where: { gymId },
+        _avg: { rating: true },
+        _count: true,
+      });
+      await tx.gym.update({
+        where: { id: gymId },
+        data: {
+          avgRating: agg._avg.rating ?? 0,
+          reviewCount: agg._count,
+        },
+      });
+
+      return created;
     });
 
     return jsonWithToast(review, "리뷰가 등록되었습니다.", 201);
