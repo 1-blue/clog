@@ -16,6 +16,22 @@ export const updateUserSchema = z.object({
   checkInAutoDurationMinutes: z.number().int().min(30).max(720).optional(),
   /** 홈짐(암장) ID — null이면 해제 */
   homeGymId: z.string().uuid().nullable().optional(),
+  /** 푸시 알림 수신 허용 */
+  pushNotificationsEnabled: z.boolean().optional(),
+});
+
+/** Expo 푸시 등록 플랫폼 */
+export const pushPlatformSchema = z.enum(["ANDROID"]);
+
+/** POST /users/me/push-device */
+export const registerPushDeviceSchema = z.object({
+  token: z.string().min(1).max(512),
+  platform: pushPlatformSchema,
+});
+
+/** DELETE /users/me/push-device — 쿼리 */
+export const deletePushDeviceQuerySchema = z.object({
+  token: z.string().min(1),
 });
 
 /** GET /users/me/nickname-availability 쿼리 */

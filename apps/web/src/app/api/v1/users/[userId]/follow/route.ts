@@ -1,9 +1,11 @@
-import { prisma } from "@clog/db";
 import { NotificationType } from "@prisma/client";
+
+import { prisma } from "@clog/db";
 
 import { ROUTES } from "#web/constants";
 import { errorResponse, json, requireAuth } from "#web/libs/api";
 import { catchApiError } from "#web/libs/api/errorCatch";
+import { sendExpoPush } from "#web/libs/expo/sendExpoPush";
 
 /** 팔로우 토글 */
 export const POST = async (
@@ -48,13 +50,25 @@ export const POST = async (
       });
 
       if (follower?.nickname) {
-        await prisma.notification.create({
+        const link = ROUTES.USERS.PROFILE.path(userId!);
+        const notif = await prisma.notification.create({
           data: {
             userId: targetId,
             type: NotificationType.FOLLOW,
             title: "새 팔로워",
             message: `${follower.nickname}님이 팔로우했습니다.`,
-            link: ROUTES.USERS.PROFILE.path(userId!),
+            link,
+          },
+        });
+
+        await sendExpoPush({
+          recipientUserId: targetId,
+          title: notif.title,
+          body: notif.message,
+          data: {
+            type: notif.type,
+            link: notif.link ?? undefined,
+            notificationId: notif.id,
           },
         });
       }

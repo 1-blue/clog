@@ -1,4 +1,5 @@
 import { useFocusEffect } from "expo-router";
+import * as Notifications from "expo-notifications";
 import * as SplashScreen from "expo-splash-screen";
 import {
   BackHandler,
@@ -9,9 +10,13 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { WebView, type WebViewNavigation } from "react-native-webview";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { WEB_URL } from "../../constants";
+import {
+  ensurePushNotificationHandler,
+  registerForPushNotificationsOnce,
+} from "../../libs/pushNotifications";
 import LoadingOverlay from "./LoadingOverlay";
 import OfflineView from "./OfflineView";
 
@@ -25,6 +30,8 @@ interface IProps {
   path?: string;
   authCallbackUrl?: string;
 }
+
+const isAndroid = Platform.OS === "android";
 
 const WebViewScreen: React.FC<IProps> = ({ path = "", authCallbackUrl }) => {
   const webViewRef = useRef<WebView>(null);
@@ -48,6 +55,114 @@ const WebViewScreen: React.FC<IProps> = ({ path = "", authCallbackUrl }) => {
   // 재시도 시 WebView 리마운트용 키
   const [webviewKey, setWebviewKey] = useState(0);
 
+  /** Android Expo 푸시 — WebView 쿠키로 서버 등록 */
+  const [expoPushToken, setExpoPushToken] = useState<string | null>(null);
+  const [webLoadedOnce, setWebLoadedOnce] = useState(false);
+
+  /** WebView 실제 origin과 네이티브 WEB_URL 불일치 시 쿠키가 안 붙어 401 나는 경우 방지 */
+  const injectRegisterPushToken = useCallback((token: string) => {
+    const wv = webViewRef.current;
+    if (!wv) return;
+    const script = `
+(function(){
+  var t = ${JSON.stringify(token)};
+  var url = window.location.origin + '/api/v1/users/me/push-device';
+  fetch(url, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token: t, platform: 'ANDROID' })
+  })
+    .then(function (r) { return r.text(); })
+    .catch(function () {});
+})();
+true;
+`;
+    wv.injectJavaScript(script);
+  }, []);
+
+  /** 네비 핸들러·디바운스에서 최신 토큰/주입 함수 참조 */
+  const expoPushTokenRef = useRef<string | null>(null);
+  const injectRegisterPushTokenRef = useRef(injectRegisterPushToken);
+  expoPushTokenRef.current = expoPushToken;
+  injectRegisterPushTokenRef.current = injectRegisterPushToken;
+
+  const pushRegisterDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
+
+  const webOriginPrefix = useMemo(
+    () => WEB_URL.replace(/\/$/, ""),
+    [],
+  );
+
+  useEffect(() => {
+    if (!isAndroid) return;
+    ensurePushNotificationHandler();
+    void registerForPushNotificationsOnce().then((result) => {
+      if (result.ok) setExpoPushToken(result.expoPushToken);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!isAndroid || !expoPushToken || !webLoadedOnce) return;
+    injectRegisterPushToken(expoPushToken);
+  }, [expoPushToken, webLoadedOnce, injectRegisterPushToken]);
+
+  useEffect(() => {
+    setWebLoadedOnce(false);
+  }, [webviewKey]);
+
+  useEffect(() => {
+    if (pushRegisterDebounceRef.current) {
+      clearTimeout(pushRegisterDebounceRef.current);
+      pushRegisterDebounceRef.current = null;
+    }
+  }, [webviewKey]);
+
+  useEffect(
+    () => () => {
+      if (pushRegisterDebounceRef.current) {
+        clearTimeout(pushRegisterDebounceRef.current);
+      }
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (!isAndroid) return;
+
+    const navigateFromPayload = (data: Record<string, unknown> | undefined) => {
+      const link = typeof data?.link === "string" ? data.link : null;
+      if (
+        !link ||
+        (!link.startsWith("http://") && !link.startsWith("https://"))
+      ) {
+        return;
+      }
+      webViewRef.current?.injectJavaScript(
+        `window.location.href = ${JSON.stringify(link)}; true;`,
+      );
+    };
+
+    const sub = Notifications.addNotificationResponseReceivedListener(
+      (response) => {
+        const data = response.notification.request.content
+          .data as Record<string, unknown> | undefined;
+        navigateFromPayload(data);
+      },
+    );
+
+    void Notifications.getLastNotificationResponseAsync().then((response) => {
+      if (!response) return;
+      const data = response.notification.request.content
+        .data as Record<string, unknown> | undefined;
+      navigateFromPayload(data);
+    });
+
+    return () => sub.remove();
+  }, []);
+
   const hideSplash = () => {
     if (!hasHiddenSplashRef.current) {
       hasHiddenSplashRef.current = true;
@@ -63,6 +178,21 @@ const WebViewScreen: React.FC<IProps> = ({ path = "", authCallbackUrl }) => {
     ) {
       lastHttpUrlRef.current = navState.url;
     }
+
+    // 로그인 등 클라이언트 라우팅 후에도 onLoadEnd가 다시 안 뜨는 경우가 있어,
+    // 페이지 전환(로드 완료)마다 토큰 등록을 디바운스로 재시도한다.
+    if (!isAndroid || navState.loading) return;
+    const token = expoPushTokenRef.current;
+    if (!token) return;
+    if (!navState.url.startsWith(webOriginPrefix)) return;
+
+    if (pushRegisterDebounceRef.current) {
+      clearTimeout(pushRegisterDebounceRef.current);
+    }
+    pushRegisterDebounceRef.current = setTimeout(() => {
+      pushRegisterDebounceRef.current = null;
+      injectRegisterPushTokenRef.current(token);
+    }, 700);
   };
 
   const onShouldStartLoadWithRequest = (event: any) => {
@@ -229,10 +359,12 @@ const WebViewScreen: React.FC<IProps> = ({ path = "", authCallbackUrl }) => {
           originWhitelist={["*"]}
           javaScriptEnabled
           domStorageEnabled
+          thirdPartyCookiesEnabled
           pullToRefreshEnabled
           refreshControlLightMode
           onLoadEnd={() => {
             setIsInitialLoading(false);
+            setWebLoadedOnce(true);
             hideSplash();
           }}
           onError={() => {

@@ -26,7 +26,8 @@
         "foregroundImage": "./assets/logo.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "blog.clog"
+      "package": "com.oneblue.clog",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/favicon.ico"
@@ -36,6 +37,6 @@
         "projectId": "d39d6c86-8f47-4104-b4aa-4fb4b467d40f"
       }
     },
-    "plugins": ["expo-router"]
+    "plugins": ["expo-router", "expo-notifications"]
   }
 }

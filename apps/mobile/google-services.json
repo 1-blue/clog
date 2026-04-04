@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "852009947659",
+    "project_id": "clog-27749",
+    "storage_bucket": "clog-27749.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:852009947659:android:f70ceaadb80cd48e1e6d0e",
+        "android_client_info": {
+          "package_name": "com.oneblue.clog"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_oym4hn3qgWNaWxbR1C_pEqw1CYcV5WE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

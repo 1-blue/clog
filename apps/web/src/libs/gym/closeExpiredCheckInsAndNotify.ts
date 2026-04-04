@@ -1,7 +1,8 @@
-import { NotificationType } from "@prisma/client";
+import { NotificationType, type Notification } from "@prisma/client";
 import { prisma } from "@clog/db";
 
 import { ROUTES } from "#web/constants";
+import { sendExpoPush } from "#web/libs/expo/sendExpoPush";
 
 /** 만료된 체크인을 종료하고 AUTO_CHECKOUT 알림을 생성합니다. */
 export const closeExpiredCheckInsAndNotify = async (userId: string) => {
@@ -17,13 +18,15 @@ export const closeExpiredCheckInsAndNotify = async (userId: string) => {
 
   if (expired.length === 0) return;
 
+  const createdNotifications: Notification[] = [];
+
   await prisma.$transaction(async (tx) => {
     for (const checkIn of expired) {
       await tx.gymCheckIn.update({
         where: { id: checkIn.id },
         data: { endedAt: now },
       });
-      await tx.notification.create({
+      const notif = await tx.notification.create({
         data: {
           userId,
           type: NotificationType.AUTO_CHECKOUT,
@@ -32,6 +35,20 @@ export const closeExpiredCheckInsAndNotify = async (userId: string) => {
           link: ROUTES.GYMS.DETAIL.path(checkIn.gymId),
         },
       });
+      createdNotifications.push(notif);
     }
   });
+
+  for (const notif of createdNotifications) {
+    await sendExpoPush({
+      recipientUserId: userId,
+      title: notif.title,
+      body: notif.message,
+      data: {
+        type: notif.type,
+        link: notif.link ?? undefined,
+        notificationId: notif.id,
+      },
+    });
+  }
 };
