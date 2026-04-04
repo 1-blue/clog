@@ -3,6 +3,7 @@ import { NotificationType } from "@prisma/client";
 import { commentQuerySchema, createCommentSchema } from "@clog/utils";
 
 import { ROUTES } from "#web/constants";
+import { sendExpoPush } from "#web/libs/expo/sendExpoPush";
 import {
   getSearchParams,
   jsonWithToast,
@@ -96,7 +97,7 @@ export const POST = async (
           select: { authorId: true },
         });
         if (parent && parent.authorId !== userId) {
-          await prisma.notification.create({
+          const notif = await prisma.notification.create({
             data: {
               userId: parent.authorId,
               type: NotificationType.COMMENT_REPLY,
@@ -106,9 +107,20 @@ export const POST = async (
               commentId: comment.id,
             },
           });
+          await sendExpoPush({
+            recipientUserId: parent.authorId,
+            title: notif.title,
+            body: notif.message,
+            data: {
+              type: notif.type,
+              link: notif.link ?? undefined,
+              notificationId: notif.id,
+              postId,
+            },
+          });
         }
       } else if (post.authorId !== userId) {
-        await prisma.notification.create({
+        const notif = await prisma.notification.create({
           data: {
             userId: post.authorId,
             type: NotificationType.POST_COMMENT,
@@ -116,6 +128,17 @@ export const POST = async (
             message: `${nickname}님이 댓글을 남겼습니다.`,
             link,
             commentId: comment.id,
+          },
+        });
+        await sendExpoPush({
+          recipientUserId: post.authorId,
+          title: notif.title,
+          body: notif.message,
+          data: {
+            type: notif.type,
+            link: notif.link ?? undefined,
+            notificationId: notif.id,
+            postId,
           },
         });
       }

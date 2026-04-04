@@ -185,6 +185,8 @@ model User {
   role                       Role        @default(GUEST)
   /// 체크인 후 자동 체크아웃까지 시간(분). 기본 240(4시간)
   checkInAutoDurationMinutes Int         @default(240) @map("check_in_auto_duration_minutes")
+  /// 푸시 알림 수신 허용 (서버 발송 기준)
+  pushNotificationsEnabled   Boolean     @default(true) @map("push_notifications_enabled")
   /// 생성일
   createdAt                  DateTime    @default(now()) @map("created_at")
   /// 수정일
@@ -220,8 +222,37 @@ model User {
   apiErrorLogs    ApiErrorLog[]
   /// 보유 회원권
   userMemberships UserMembership[]
+  /// Expo 푸시 등록 기기
+  pushDevices     UserPushDevice[]
 
   @@map("users")
+}
+
+/// 푸시 클라이언트 플랫폼 (확장 시 IOS 등 추가)
+enum PushPlatform {
+  ANDROID
+}
+
+/// 사용자별 Expo 푸시 토큰 (기기 단위)
+model UserPushDevice {
+  /// 레코드 ID
+  id            String       @id @default(uuid()) @db.Uuid
+  /// 유저 ID
+  userId        String       @map("user_id") @db.Uuid
+  /// Expo Push Token (ExponentPushToken[...])
+  expoPushToken String       @map("expo_push_token")
+  /// 플랫폼
+  platform      PushPlatform
+  /// 생성일
+  createdAt     DateTime     @default(now()) @map("created_at")
+  /// 수정일
+  updatedAt     DateTime     @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, expoPushToken])
+  @@index([userId])
+  @@map("user_push_devices")
 }
 
 /// API Route Handler에서 catch된 오류 로그

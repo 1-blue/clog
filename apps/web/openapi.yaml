@@ -826,6 +826,53 @@ paths:
                   toast: { type: string }
                   payload: { nullable: true }
 
+  /api/v1/users/me/push-device:
+    post:
+      operationId: registerPushDevice
+      summary: Expo 푸시 토큰 등록·갱신
+      tags: [Users]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterPushDeviceBody"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload:
+                    $ref: "#/components/schemas/UserPushDevice"
+        "401":
+          description: Unauthorized
+    delete:
+      operationId: deletePushDevice
+      summary: Expo 푸시 토큰 삭제
+      tags: [Users]
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema: { type: string }
+          description: 삭제할 Expo Push Token
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload]
+                properties:
+                  payload: { type: object, nullable: true }
+        "401":
+          description: Unauthorized
+
   /api/v1/users/me/memberships:
     get:
       operationId: getMyMemberships
@@ -2653,6 +2700,7 @@ components:
           maxDifficulty,
           role,
           checkInAutoDurationMinutes,
+          pushNotificationsEnabled,
           createdAt,
           updatedAt,
           homeGym,
@@ -2679,6 +2727,9 @@ components:
           minimum: 30
           maximum: 720
           description: "체크인 후 자동 체크아웃까지 분 (기본 240)"
+        pushNotificationsEnabled:
+          type: boolean
+          description: "푸시 알림 수신 허용"
         createdAt: { type: string, format: date-time }
         updatedAt: { type: string, format: date-time }
 
@@ -2727,6 +2778,7 @@ components:
           visitCount,
           sendCount,
           checkInAutoDurationMinutes,
+          pushNotificationsEnabled,
           linkedProviders,
           activeCheckIn,
           homeGym,
@@ -2758,6 +2810,9 @@ components:
           minimum: 30
           maximum: 720
           description: "체크인 후 자동 체크아웃까지 분 (기본 240)"
+        pushNotificationsEnabled:
+          type: boolean
+          description: "푸시 알림 수신 허용"
         linkedProviders:
           type: array
           description: "Supabase에 연결된 소셜 로그인 (카카오·구글)"
@@ -2849,6 +2904,31 @@ components:
           format: uuid
           nullable: true
           description: "홈짐 설정 — null이면 해제"
+        pushNotificationsEnabled:
+          type: boolean
+          description: "푸시 알림 수신 허용"
+
+    PushPlatform:
+      type: string
+      enum: [ANDROID]
+
+    RegisterPushDeviceBody:
+      type: object
+      required: [token, platform]
+      properties:
+        token: { type: string, minLength: 1 }
+        platform: { $ref: "#/components/schemas/PushPlatform" }
+
+    UserPushDevice:
+      type: object
+      required: [id, userId, expoPushToken, platform, createdAt, updatedAt]
+      properties:
+        id: { type: string, format: uuid }
+        userId: { type: string, format: uuid }
+        expoPushToken: { type: string }
+        platform: { $ref: "#/components/schemas/PushPlatform" }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
 
     # ── Notification ──
     Notification:

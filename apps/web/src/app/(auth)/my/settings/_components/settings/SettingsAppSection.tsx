@@ -27,26 +27,6 @@ type UserMe = components["schemas"]["UserMe"];
 
 const PUSH_PREF_EVENT = "clog:settings-push-pref";
 
-const getPushPreferenceSnapshot = (): boolean => {
-  try {
-    const raw = localStorage.getItem(SETTINGS_PUSH_STORAGE_KEY);
-    if (raw === null) return true;
-    return raw === "true";
-  } catch {
-    return true;
-  }
-};
-
-const subscribePushPreference = (onStoreChange: () => void) => {
-  const onCustom = () => onStoreChange();
-  window.addEventListener(PUSH_PREF_EVENT, onCustom);
-  window.addEventListener("storage", onCustom);
-  return () => {
-    window.removeEventListener(PUSH_PREF_EVENT, onCustom);
-    window.removeEventListener("storage", onCustom);
-  };
-};
-
 /** SSR false / 클라 true — next-themes와 동일한 마운트 가드 */
 const subscribeMounted = () => () => {};
 const getMountedSnapshot = () => true;
@@ -64,21 +44,24 @@ const SettingsAppSection = ({ me }: IProps) => {
     getMountedSnapshot,
     getMountedServerSnapshot,
   );
-  const pushOn = useSyncExternalStore(
-    subscribePushPreference,
-    getPushPreferenceSnapshot,
-    () => true,
-  );
-
   const darkOn = mounted && (resolvedTheme === "dark" || theme === "dark");
 
+  const pushOn = me.pushNotificationsEnabled;
+
   const onPushChange = (v: boolean) => {
-    try {
-      localStorage.setItem(SETTINGS_PUSH_STORAGE_KEY, String(v));
-    } catch {
-      /* ignore */
-    }
-    window.dispatchEvent(new Event(PUSH_PREF_EVENT));
+    updateMeMutation.mutate(
+      { body: { pushNotificationsEnabled: v } },
+      {
+        onSuccess: () => {
+          try {
+            localStorage.setItem(SETTINGS_PUSH_STORAGE_KEY, String(v));
+          } catch {
+            /* ignore */
+          }
+          window.dispatchEvent(new Event(PUSH_PREF_EVENT));
+        },
+      },
+    );
   };
 
   const onDarkChange = (v: boolean) => {
@@ -93,9 +76,10 @@ const SettingsAppSection = ({ me }: IProps) => {
           id="settings-push"
           icon={Bell}
           label="푸시 알림"
-          description="댓글, 좋아요, 팔로우 알림"
+          description="댓글, 팔로우, 체크아웃 등 알림 (앱)"
           checked={pushOn}
           onCheckedChange={onPushChange}
+          disabled={updateMeMutation.isPending}
         />
         {mounted ? (
           <SettingsSwitchRow

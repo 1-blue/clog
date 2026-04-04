@@ -35,5 +35,8 @@ declare namespace NodeJS {
 
     /** GET /api/v1/health 에러 알림 테스트용 비밀값 (미설정 시 테스트 분기 비활성) */
     HEALTH_ERROR_TEST_SECRET?: string;
+
+    /** Expo Access Token */
+    EXPO_ACCESS_TOKEN?: string;
   }
 }

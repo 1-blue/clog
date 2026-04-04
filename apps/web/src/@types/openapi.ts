@@ -322,6 +322,24 @@ export interface paths {
         patch: operations["updateMe"];
         trace?: never;
     };
+    "/api/v1/users/me/push-device": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Expo 푸시 토큰 등록·갱신 */
+        post: operations["registerPushDevice"];
+        /** Expo 푸시 토큰 삭제 */
+        delete: operations["deletePushDevice"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/users/me/memberships": {
         parameters: {
             query?: never;
@@ -1451,6 +1469,8 @@ export interface components {
             role: components["schemas"]["Role"];
             /** @description 체크인 후 자동 체크아웃까지 분 (기본 240) */
             checkInAutoDurationMinutes: number;
+            /** @description 푸시 알림 수신 허용 */
+            pushNotificationsEnabled: boolean;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -1504,6 +1524,8 @@ export interface components {
             sendCount: number;
             /** @description 체크인 후 자동 체크아웃까지 분 (기본 240) */
             checkInAutoDurationMinutes: number;
+            /** @description 푸시 알림 수신 허용 */
+            pushNotificationsEnabled: boolean;
             /** @description Supabase에 연결된 소셜 로그인 (카카오·구글) */
             linkedProviders: ("KAKAO" | "GOOGLE")[];
             activeCheckIn: components["schemas"]["ActiveCheckIn"] | null;
@@ -1555,6 +1577,26 @@ export interface components {
              * @description 홈짐 설정 — null이면 해제
              */
             homeGymId?: string | null;
+            /** @description 푸시 알림 수신 허용 */
+            pushNotificationsEnabled?: boolean;
+        };
+        /** @enum {string} */
+        PushPlatform: "ANDROID";
+        RegisterPushDeviceBody: {
+            token: string;
+            platform: components["schemas"]["PushPlatform"];
+        };
+        UserPushDevice: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            userId: string;
+            expoPushToken: string;
+            platform: components["schemas"]["PushPlatform"];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
         };
         Notification: {
             /** Format: uuid */
@@ -2402,6 +2444,71 @@ export interface operations {
                         payload: components["schemas"]["User"];
                     };
                 };
+            };
+        };
+    };
+    registerPushDevice: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RegisterPushDeviceBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payload: components["schemas"]["UserPushDevice"];
+                    };
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    deletePushDevice: {
+        parameters: {
+            query: {
+                /** @description 삭제할 Expo Push Token */
+                token: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payload: Record<string, never> | null;
+                    };
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
