@@ -3,6 +3,7 @@ import { prisma } from "@clog/db";
 
 import { ROUTES } from "#web/constants";
 import { sendExpoPush } from "#web/libs/expo/sendExpoPush";
+import { createSessionFromCheckInIfEligible } from "#web/libs/record/sessionFromCheckIn";
 
 /** 만료된 체크인을 종료하고 AUTO_CHECKOUT 알림을 생성합니다. */
 export const closeExpiredCheckInsAndNotify = async (userId: string) => {
@@ -22,9 +23,16 @@ export const closeExpiredCheckInsAndNotify = async (userId: string) => {
 
   await prisma.$transaction(async (tx) => {
     for (const checkIn of expired) {
-      await tx.gymCheckIn.update({
+      const updated = await tx.gymCheckIn.update({
         where: { id: checkIn.id },
         data: { endedAt: now },
+      });
+      await createSessionFromCheckInIfEligible(tx, {
+        checkInId: updated.id,
+        userId: updated.userId,
+        gymId: updated.gymId,
+        startedAt: updated.startedAt,
+        endedAt: updated.endedAt!,
       });
       const notif = await tx.notification.create({
         data: {

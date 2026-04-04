@@ -25,3 +25,16 @@ export function initialSessionMinutesFromRecord(
   }
   return normalizeSessionTimeRange(10 * 60 + 30, 14 * 60);
 }
+
+/** 체크인 시작·종료 ISO → DurationField용 분 */
+export function initialSessionMinutesFromCheckIn(
+  startedAt: string,
+  endedAt: string,
+): { startMinutes: number; endMinutes: number } {
+  const s = isoToWallMinutes(startedAt);
+  const e = isoToWallMinutes(endedAt);
+  if (s != null && e != null) {
+    return normalizeSessionTimeRange(s, e);
+  }
+  return normalizeSessionTimeRange(10 * 60 + 30, 14 * 60);
+}

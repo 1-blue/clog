@@ -1,9 +1,12 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { openapi } from "#web/apis/openapi";
+import { ROUTES } from "#web/constants";
+import { extractCheckoutCreatedSessionId } from "#web/libs/api/extractCheckoutCreatedSessionId";
 
 interface IOptions {
   onCheckInSuccess?: () => void;
@@ -11,6 +14,7 @@ interface IOptions {
 
 const useGymCheckInMutations = (options?: IOptions) => {
   const queryClient = useQueryClient();
+  const router = useRouter();
   const { queryKey: meQueryKey } = openapi.queryOptions("get", "/api/v1/users/me");
 
   /** 혼잡도 랭킹·암장 목록 등 visitorCount 반영 */
@@ -95,10 +99,21 @@ const useGymCheckInMutations = (options?: IOptions) => {
         }
         toast.error("체크아웃에 실패했습니다.");
       },
-      onSuccess: () => {
+      onSuccess: (data) => {
         void queryClient.invalidateQueries({ queryKey: meQueryKey });
         invalidateGymListQueries();
-        toast.success("체크아웃했어요.");
+        const createdId = extractCheckoutCreatedSessionId(data);
+        if (createdId) {
+          toast.success("체크아웃했어요", {
+            description: "방문 기록이 만들어졌어요.",
+            action: {
+              label: "기록 수정",
+              onClick: () => router.push(ROUTES.RECORDS.DETAIL.EDIT.path(createdId)),
+            },
+          });
+        } else {
+          toast.success("체크아웃했어요.");
+        }
       },
     },
   );

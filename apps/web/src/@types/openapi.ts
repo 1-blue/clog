@@ -322,6 +322,23 @@ export interface paths {
         patch: operations["updateMe"];
         trace?: never;
     };
+    "/api/v1/users/me/check-ins": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 내 체크인 목록 (linkableOnly=true면 30분 이상·미연결·종료된 체크인만) */
+        get: operations["getMyCheckIns"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/users/me/push-device": {
         parameters: {
             query?: never;
@@ -1071,6 +1088,30 @@ export interface components {
         };
         CheckOutResult: {
             ok: boolean;
+            /**
+             * Format: uuid
+             * @description 체크인 30분 이상일 때 자동 생성된 기록(세션) ID, 없으면 null
+             */
+            createdSessionId?: string | null;
+        };
+        MyCheckInItem: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            gymId: string;
+            gymName: string;
+            /** Format: date-time */
+            startedAt: string;
+            /**
+             * Format: date-time
+             * @description 자동 체크아웃 예정 시각
+             */
+            endsAt?: string;
+            /**
+             * Format: date-time
+             * @description linkableOnly 목록에서는 항상 포함(종료 시각)
+             */
+            endedAt?: string | null;
         };
         PaginatedGymListItem: {
             items: components["schemas"]["GymListItem"][];
@@ -1162,6 +1203,8 @@ export interface components {
             gymId: string;
             /** Format: uuid */
             userMembershipId?: string | null;
+            /** Format: uuid */
+            gymCheckInId?: string | null;
             /** Format: date-time */
             date: string;
             /** Format: date-time */
@@ -1189,6 +1232,8 @@ export interface components {
             gymId: string;
             /** Format: uuid */
             userMembershipId?: string | null;
+            /** Format: uuid */
+            gymCheckInId?: string | null;
             /** Format: date-time */
             date: string;
             /** Format: date-time */
@@ -1280,6 +1325,11 @@ export interface components {
             gymId: string;
             /** Format: uuid */
             userMembershipId?: string | null;
+            /**
+             * Format: uuid
+             * @description 종료된 체크인과 연결
+             */
+            gymCheckInId?: string;
             /** Format: date-time */
             date: string;
             /** Format: date-time */
@@ -1289,10 +1339,15 @@ export interface components {
             memo?: string;
             /** @default true */
             isPublic: boolean;
-            routes: components["schemas"]["CreateRouteBody"][];
+            routes?: components["schemas"]["CreateRouteBody"][];
             imageUrls?: string[];
         };
         UpdateSessionBody: {
+            /**
+             * Format: uuid
+             * @description 체크인 연결(null이면 연결 해제)
+             */
+            gymCheckInId?: string | null;
             /** Format: date-time */
             date?: string;
             /** Format: uuid */
@@ -2444,6 +2499,42 @@ export interface operations {
                         payload: components["schemas"]["User"];
                     };
                 };
+            };
+        };
+    };
+    getMyCheckIns: {
+        parameters: {
+            query?: {
+                /** @description true면 기록 폼에 연결 가능한 체크인만 반환 */
+                linkableOnly?: boolean;
+                /** @description linkableOnly와 함께 사용. 해당 기록(세션)에만 연결된 체크인도 목록에 포함(수정 폼에서 재선택용) */
+                forSessionId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payload: {
+                            items: components["schemas"]["MyCheckInItem"][];
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

@@ -26,13 +26,19 @@ const RecordDetailRoutesSection: React.FC<IProps> = ({
       </span>
     </div>
     <div className="flex flex-col gap-2.5">
-      {routes.map((route) => (
-        <RecordDetailRouteRow
-          key={route.id}
-          route={route}
-          difficultyColors={difficultyColors}
-        />
-      ))}
+      {routes.length === 0 ? (
+        <p className="rounded-2xl border border-dashed border-outline-variant/50 bg-surface-container-low/80 px-4 py-6 text-center text-sm text-on-surface-variant">
+          이번 세션에 기록된 루트가 없어요. 방문만 한 날일 수 있어요.
+        </p>
+      ) : (
+        routes.map((route) => (
+          <RecordDetailRouteRow
+            key={route.id}
+            route={route}
+            difficultyColors={difficultyColors}
+          />
+        ))
+      )}
     </div>
   </section>
 );

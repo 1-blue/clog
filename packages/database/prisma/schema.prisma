@@ -514,6 +514,8 @@ model GymCheckIn {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   /// 암장
   gym  Gym  @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  /// 이 체크인으로 생성·연결된 클라이밍 기록 (최대 1건)
+  linkedSession ClimbingSession?
 
   @@index([gymId, endedAt, endsAt])
   @@index([userId, endedAt, endsAt])
@@ -671,6 +673,9 @@ model ClimbingSession {
   /// 연결 회원권 (선택)
   userMembershipId String?         @map("user_membership_id") @db.Uuid
   userMembership   UserMembership? @relation(fields: [userMembershipId], references: [id], onDelete: SetNull)
+  /// 연결된 암장 체크인 (동일 체크인에 세션 1건)
+  gymCheckInId     String?         @unique @map("gym_check_in_id") @db.Uuid
+  gymCheckIn       GymCheckIn?     @relation(fields: [gymCheckInId], references: [id], onDelete: SetNull)
 
   @@index([userMembershipId])
   @@map("climbing_sessions")

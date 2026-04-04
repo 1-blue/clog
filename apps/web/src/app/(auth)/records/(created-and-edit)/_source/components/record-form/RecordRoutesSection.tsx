@@ -66,6 +66,12 @@ const RecordRoutesSection = ({ className, difficultyColors }: IProps) => {
         </span>
       </div>
 
+      {canEditRoutes && routes.length === 0 ? (
+        <p className="text-xs text-on-surface-variant">
+          루트 없이 방문만 기록할 수 있어요. 아래에서 난이도를 추가할 수도 있어요.
+        </p>
+      ) : null}
+
       {!canEditRoutes && (
         <p className="text-xs text-on-surface-variant">
           암장을 먼저 선택하면 난이도를 추가할 수 있어요

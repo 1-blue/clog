@@ -7,6 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 
 import { openapi } from "#web/apis/openapi";
 import { ROUTES } from "#web/constants";
+import { extractCheckoutCreatedSessionId } from "#web/libs/api/extractCheckoutCreatedSessionId";
 import useMe from "#web/hooks/useMe";
 import { createClient } from "#web/libs/supabase/client";
 import { cn } from "#web/libs/utils";
@@ -67,9 +68,21 @@ const GymCheckInBar: React.FC<IProps> = ({
     "post",
     "/api/v1/gyms/{gymId}/check-out",
     {
-      onSuccess: () => {
+      onSuccess: (data) => {
         invalidateAfterCheckInOut();
         router.refresh();
+        const createdId = extractCheckoutCreatedSessionId(data);
+        if (createdId) {
+          toast.success("체크아웃했어요", {
+            description: "방문 기록이 만들어졌어요.",
+            action: {
+              label: "기록 수정",
+              onClick: () => router.push(ROUTES.RECORDS.DETAIL.EDIT.path(createdId)),
+            },
+          });
+        } else {
+          toast.success("체크아웃했어요.");
+        }
       },
     },
   );

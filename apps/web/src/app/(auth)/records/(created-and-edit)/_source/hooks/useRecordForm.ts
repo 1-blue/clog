@@ -34,10 +34,12 @@ const recordFormSchema = z.object({
     .max(SESSION_MAX_MINUTES),
   memo: z.string().max(500).optional(),
   isPublic: z.boolean(),
-  routes: z.array(routeFormSchema).min(1, "루트를 하나 이상 추가해주세요"),
+  routes: z.array(routeFormSchema).min(0),
   imageUrls: z.array(z.string()).max(10, "사진은 최대 10장까지 추가할 수 있어요").optional(),
   /** 빈 문자열이면 미연결 */
   userMembershipId: z.string().optional(),
+  /** 빈 문자열이면 체크인 미연결 */
+  gymCheckInId: z.string().optional(),
 });
 
 export type TRecordFormData = z.infer<typeof recordFormSchema>;
@@ -60,6 +62,7 @@ const useRecordForm = (props?: Partial<UseFormProps<TRecordFormData>>) => {
       routes: [],
       imageUrls: [],
       userMembershipId: "",
+      gymCheckInId: "",
       ...defaultValuesOverride,
     },
     mode: "onChange",

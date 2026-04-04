@@ -2,7 +2,7 @@
 
 import { format } from "date-fns";
 import { FormProvider, useWatch } from "react-hook-form";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 
 import { normalizeSessionTimeRange } from "@clog/utils";
@@ -14,6 +14,7 @@ import RecordDurationField from "#web/app/(auth)/records/(created-and-edit)/_sou
 import RecordFormSaveBar from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordFormSaveBar";
 import RecordGallerySection from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordGallerySection";
 import RecordGymDifficultyLegend from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordGymDifficultyLegend";
+import RecordCheckInLinkField from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordCheckInLinkField";
 import RecordGymSearchField from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordGymSearchField";
 import RecordMembershipField from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordMembershipField";
 import RecordMemoField from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordMemoField";
@@ -25,12 +26,19 @@ import useRecordForm, {
   type TRecordFormData,
 } from "#web/app/(auth)/records/(created-and-edit)/_source/hooks/useRecordForm";
 import { removeRecordCreateDraftForDate } from "#web/app/(auth)/records/(created-and-edit)/_source/utils/record-create-draft-storage";
+import {
+  initialSessionMinutesFromCheckIn,
+  recordDateToYmd,
+} from "#web/app/(auth)/records/(created-and-edit)/_source/utils/sessionTimesFromRecord";
 import TopBar from "#web/components/layout/TopBar";
 import { ROUTES } from "#web/constants";
 import useRecordMutations from "#web/hooks/mutations/records/useRecordMutations";
 
 const RecordNewMain = () => {
   const searchParams = useSearchParams();
+  const checkInIdParam = searchParams.get("checkInId");
+  const appliedCheckInRef = useRef(false);
+
   const prefilledDateYmd = useMemo(
     () =>
       format(
@@ -44,10 +52,46 @@ const RecordNewMain = () => {
     defaultValues: { dateYmd: prefilledDateYmd },
   });
   const { onBeforeDateYmdChange } = useRecordCreateDraftPersistence(methods);
-  const { control, handleSubmit, getValues } = methods;
+  const { control, handleSubmit, getValues, setValue } = methods;
   const gymId = useWatch({ control, name: "gymId" });
 
   const { recordCreateMutation } = useRecordMutations();
+
+  const { data: linkablePrefill } = openapi.useQuery(
+    "get",
+    "/api/v1/users/me/check-ins",
+    {
+      params: { query: { linkableOnly: true } },
+    },
+    { enabled: Boolean(checkInIdParam) },
+  );
+
+  useEffect(() => {
+    if (
+      appliedCheckInRef.current ||
+      !checkInIdParam ||
+      !linkablePrefill?.payload?.items
+    ) {
+      return;
+    }
+    const item = linkablePrefill.payload.items.find(
+      (i) => i.id === checkInIdParam,
+    );
+    if (!item?.endedAt) return;
+    appliedCheckInRef.current = true;
+    setValue("gymCheckInId", item.id, { shouldValidate: true });
+    setValue("gymId", item.gymId, { shouldValidate: true });
+    setValue("gymName", item.gymName, { shouldValidate: true });
+    setValue("dateYmd", recordDateToYmd(item.startedAt), {
+      shouldValidate: true,
+    });
+    const { startMinutes, endMinutes } = initialSessionMinutesFromCheckIn(
+      item.startedAt,
+      item.endedAt,
+    );
+    setValue("startMinutes", startMinutes, { shouldValidate: true });
+    setValue("endMinutes", endMinutes, { shouldValidate: true });
+  }, [checkInIdParam, linkablePrefill, setValue]);
 
   const { data: gym } = openapi.useQuery(
     "get",
@@ -93,6 +137,7 @@ const RecordNewMain = () => {
           ...(data.userMembershipId
             ? { userMembershipId: data.userMembershipId }
             : {}),
+          ...(data.gymCheckInId ? { gymCheckInId: data.gymCheckInId } : {}),
         },
       },
       {
@@ -123,6 +168,7 @@ const RecordNewMain = () => {
               onBeforeDateYmdChange={onBeforeDateYmdChange}
             />
             <RecordGymSearchField />
+            <RecordCheckInLinkField />
             <RecordMembershipField />
             {gymId ? (
               <RecordGymDifficultyLegend difficultyColors={difficultyColors} />
