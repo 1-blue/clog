@@ -27,6 +27,11 @@ const RootLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
           crossOrigin="anonymous"
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
         />
+
+        <meta
+          name="naver-site-verification"
+          content="387c563c855835c8a342bb468161e30c7a0dbe45"
+        />
       </head>
       {/* 확장 프로그램이 body에 속성 주입 시(cz-shortcut-listen 등) hydration 경고 방지 */}
       <body className="flex min-h-full flex-col" suppressHydrationWarning>
