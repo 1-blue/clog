@@ -20,11 +20,19 @@ const toSitemapEntry = (
   priority: priority ?? DEFAULT_SITEMAP.priority,
 });
 
-/** 공개·색인 대상 정적 라우트 (로그인 전용·작성 화면은 제외) */
+/**
+ * 공개·색인 대상 정적 라우트
+ * (auth) 전용·작성·수정 화면은 제외 — (public)/(landing) 기준
+ */
 const getStaticRoutes = (): MetadataRoute.Sitemap => [
   toSitemapEntry(ROUTES.HOME.path, {
     priority: 1,
     changefreq: "daily" as const,
+    lastModified: new Date().toISOString(),
+  }),
+  toSitemapEntry(ROUTES.LANDING.path, {
+    priority: 0.95,
+    changefreq: "weekly" as const,
     lastModified: new Date().toISOString(),
   }),
   toSitemapEntry(ROUTES.GYMS.path, {
@@ -35,6 +43,11 @@ const getStaticRoutes = (): MetadataRoute.Sitemap => [
   toSitemapEntry(ROUTES.COMMUNITY.path, {
     priority: 0.9,
     changefreq: "daily" as const,
+    lastModified: new Date().toISOString(),
+  }),
+  toSitemapEntry(ROUTES.LOGIN.path, {
+    priority: 0.5,
+    changefreq: "monthly" as const,
     lastModified: new Date().toISOString(),
   }),
 ];
@@ -69,6 +82,21 @@ const getCommunityPostRoutes = async (): Promise<MetadataRoute.Sitemap> => {
   );
 };
 
+const getUserProfileRoutes = async (): Promise<MetadataRoute.Sitemap> => {
+  const users = await prisma.user.findMany({
+    select: { id: true, updatedAt: true },
+    orderBy: { updatedAt: "desc" },
+  });
+
+  return users.map((u) =>
+    toSitemapEntry(ROUTES.USERS.PROFILE.path(u.id), {
+      priority: 0.55,
+      changefreq: "weekly",
+      lastModified: u.updatedAt.toISOString(),
+    }),
+  );
+};
+
 /** DB 반영 주기 (초) — 요청마다 Prisma 호출 완화 */
 export const revalidate = 3600;
 
@@ -76,12 +104,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes = getStaticRoutes();
 
   try {
-    const [gymRoutes, postRoutes] = await Promise.all([
+    const [gymRoutes, postRoutes, userRoutes] = await Promise.all([
       getGymDetailRoutes(),
       getCommunityPostRoutes(),
+      getUserProfileRoutes(),
     ]);
 
-    return [...staticRoutes, ...gymRoutes, ...postRoutes];
+    return [...staticRoutes, ...gymRoutes, ...postRoutes, ...userRoutes];
   } catch (error) {
     console.error("🚫 사이트맵 생성 실패 (정적 라우트만 반환) >> ", error);
     return staticRoutes;

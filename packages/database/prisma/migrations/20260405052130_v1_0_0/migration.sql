@@ -1,6 +1,3 @@
--- CreateSchema
-CREATE SCHEMA IF NOT EXISTS "public";
-
 -- CreateEnum
 CREATE TYPE "Provider" AS ENUM ('KAKAO', 'GOOGLE');
 
@@ -32,13 +29,16 @@ CREATE TYPE "ClimbingAttemptResult" AS ENUM ('SEND', 'ATTEMPT', 'FLASH', 'ONSIGH
 CREATE TYPE "PostCategory" AS ENUM ('FREE', 'TIPS', 'REVIEW', 'MEETUP', 'GEAR');
 
 -- CreateEnum
-CREATE TYPE "NotificationType" AS ENUM ('COMMENT', 'LIKE', 'FOLLOW', 'SYSTEM', 'GYM_UPDATE');
+CREATE TYPE "NotificationType" AS ENUM ('COMMENT', 'POST_COMMENT', 'COMMENT_REPLY', 'LIKE', 'FOLLOW', 'SYSTEM', 'GYM_UPDATE', 'AUTO_CHECKOUT');
 
 -- CreateEnum
 CREATE TYPE "MembershipPlanCode" AS ENUM ('PERIOD_1M', 'PERIOD_3M', 'PERIOD_6M', 'PERIOD_12M', 'COUNT_DAY', 'COUNT_3', 'COUNT_5', 'COUNT_10');
 
 -- CreateEnum
 CREATE TYPE "GymMembershipBrand" AS ENUM ('THE_CLIMB', 'SEOULFOREST', 'CLIMBINGPARK', 'SONCLIMB', 'PEAKERS', 'WAVEROCK', 'CLIMB_US', 'DAMJANG', 'B_BLOC', 'ALLEZ', 'STANDALONE');
+
+-- CreateEnum
+CREATE TYPE "PushPlatform" AS ENUM ('ANDROID');
 
 -- CreateTable
 CREATE TABLE "users" (
@@ -54,10 +54,23 @@ CREATE TABLE "users" (
     "home_gym_id" UUID,
     "role" "Role" NOT NULL DEFAULT 'GUEST',
     "check_in_auto_duration_minutes" INTEGER NOT NULL DEFAULT 240,
+    "push_notifications_enabled" BOOLEAN NOT NULL DEFAULT true,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "user_push_devices" (
+    "id" UUID NOT NULL,
+    "user_id" UUID NOT NULL,
+    "expo_push_token" TEXT NOT NULL,
+    "platform" "PushPlatform" NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "user_push_devices_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -119,6 +132,7 @@ CREATE TABLE "gyms" (
     "setting_schedule_memo" TEXT,
     "cover_image_url" TEXT NOT NULL,
     "logo_image_url" TEXT NOT NULL,
+    "difficulty_image_url" TEXT,
     "instagram_id" TEXT,
     "avg_rating" DOUBLE PRECISION NOT NULL DEFAULT 0,
     "review_count" INTEGER NOT NULL DEFAULT 0,
@@ -257,6 +271,7 @@ CREATE TABLE "climbing_sessions" (
     "updated_at" TIMESTAMP(3) NOT NULL,
     "image_urls" TEXT[] DEFAULT ARRAY[]::TEXT[],
     "user_membership_id" UUID,
+    "gym_check_in_id" UUID,
 
     CONSTRAINT "climbing_sessions_pkey" PRIMARY KEY ("id")
 );
@@ -336,6 +351,7 @@ CREATE TABLE "notifications" (
     "message" TEXT NOT NULL,
     "is_read" BOOLEAN NOT NULL DEFAULT false,
     "link" TEXT,
+    "comment_id" UUID,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "notifications_pkey" PRIMARY KEY ("id")
@@ -345,6 +361,12 @@ CREATE TABLE "notifications" (
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- CreateIndex
+CREATE INDEX "user_push_devices_user_id_idx" ON "user_push_devices"("user_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "user_push_devices_user_id_expo_push_token_key" ON "user_push_devices"("user_id", "expo_push_token");
+
+-- CreateIndex
 CREATE INDEX "api_error_logs_created_at_idx" ON "api_error_logs"("created_at");
 
 -- CreateIndex
@@ -352,6 +374,9 @@ CREATE INDEX "api_error_logs_user_id_idx" ON "api_error_logs"("user_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "accounts_provider_provider_account_id_key" ON "accounts"("provider", "provider_account_id");
+
+-- CreateIndex
+CREATE INDEX "follows_following_id_idx" ON "follows"("following_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "follows_follower_id_following_id_key" ON "follows"("follower_id", "following_id");
@@ -393,10 +418,28 @@ CREATE UNIQUE INDEX "gym_difficulty_colors_gym_id_difficulty_key" ON "gym_diffic
 CREATE UNIQUE INDEX "gym_bookmarks_user_id_gym_id_key" ON "gym_bookmarks"("user_id", "gym_id");
 
 -- CreateIndex
+CREATE INDEX "reviews_gym_id_idx" ON "reviews"("gym_id");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "reviews_user_id_gym_id_key" ON "reviews"("user_id", "gym_id");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "climbing_sessions_gym_check_in_id_key" ON "climbing_sessions"("gym_check_in_id");
+
+-- CreateIndex
+CREATE INDEX "climbing_sessions_user_id_idx" ON "climbing_sessions"("user_id");
+
+-- CreateIndex
+CREATE INDEX "climbing_sessions_gym_id_idx" ON "climbing_sessions"("gym_id");
+
+-- CreateIndex
 CREATE INDEX "climbing_sessions_user_membership_id_idx" ON "climbing_sessions"("user_membership_id");
+
+-- CreateIndex
+CREATE INDEX "routes_session_id_idx" ON "routes"("session_id");
+
+-- CreateIndex
+CREATE INDEX "posts_author_id_idx" ON "posts"("author_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "post_likes_post_id_user_id_key" ON "post_likes"("post_id", "user_id");
@@ -404,8 +447,20 @@ CREATE UNIQUE INDEX "post_likes_post_id_user_id_key" ON "post_likes"("post_id", 
 -- CreateIndex
 CREATE UNIQUE INDEX "post_bookmarks_post_id_user_id_key" ON "post_bookmarks"("post_id", "user_id");
 
+-- CreateIndex
+CREATE INDEX "comments_post_id_idx" ON "comments"("post_id");
+
+-- CreateIndex
+CREATE INDEX "notifications_user_id_idx" ON "notifications"("user_id");
+
+-- CreateIndex
+CREATE INDEX "notifications_comment_id_idx" ON "notifications"("comment_id");
+
 -- AddForeignKey
 ALTER TABLE "users" ADD CONSTRAINT "users_home_gym_id_fkey" FOREIGN KEY ("home_gym_id") REFERENCES "gyms"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "user_push_devices" ADD CONSTRAINT "user_push_devices_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "api_error_logs" ADD CONSTRAINT "api_error_logs_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -471,6 +526,9 @@ ALTER TABLE "climbing_sessions" ADD CONSTRAINT "climbing_sessions_gym_id_fkey" F
 ALTER TABLE "climbing_sessions" ADD CONSTRAINT "climbing_sessions_user_membership_id_fkey" FOREIGN KEY ("user_membership_id") REFERENCES "user_memberships"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "climbing_sessions" ADD CONSTRAINT "climbing_sessions_gym_check_in_id_fkey" FOREIGN KEY ("gym_check_in_id") REFERENCES "gym_check_ins"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "routes" ADD CONSTRAINT "routes_session_id_fkey" FOREIGN KEY ("session_id") REFERENCES "climbing_sessions"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -499,3 +557,6 @@ ALTER TABLE "comments" ADD CONSTRAINT "comments_parent_id_fkey" FOREIGN KEY ("pa
 
 -- AddForeignKey
 ALTER TABLE "notifications" ADD CONSTRAINT "notifications_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "notifications" ADD CONSTRAINT "notifications_comment_id_fkey" FOREIGN KEY ("comment_id") REFERENCES "comments"("id") ON DELETE CASCADE ON UPDATE CASCADE;

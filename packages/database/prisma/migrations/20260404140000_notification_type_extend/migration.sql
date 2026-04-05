@@ -1,4 +1,0 @@
--- AlterEnum
-ALTER TYPE "NotificationType" ADD VALUE 'POST_COMMENT';
-ALTER TYPE "NotificationType" ADD VALUE 'COMMENT_REPLY';
-ALTER TYPE "NotificationType" ADD VALUE 'AUTO_CHECKOUT';

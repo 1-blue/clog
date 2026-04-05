@@ -43,6 +43,25 @@ const LandingFooterCta: React.FC = () => {
           체험해보기
         </Link>
       </div>
+      <div className="mt-6 flex items-center justify-center gap-4 text-sm text-on-surface-variant">
+        <Link
+          href={ROUTES.EXTERNAL_LINKS.OPEN_KAKAO.path}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline-offset-2 transition-colors hover:text-on-surface hover:underline"
+        >
+          오픈 카톡방
+        </Link>
+        <span className="text-outline-variant/50">|</span>
+        <Link
+          href={ROUTES.EXTERNAL_LINKS.FEEDBACK_FORM.path}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline-offset-2 transition-colors hover:text-on-surface hover:underline"
+        >
+          피드백 보내기
+        </Link>
+      </div>
     </motion.section>
   );
 };
