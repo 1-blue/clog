@@ -56,7 +56,7 @@ const LandingHero: React.FC = () => {
                 "rounded-full px-10 py-6 text-base shadow-lg shadow-primary/10",
               )}
             >
-              무료로 시작하기
+              가입하기
             </Link>
             <Link
               href={ROUTES.GYMS.path}

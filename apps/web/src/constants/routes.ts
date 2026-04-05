@@ -11,6 +11,16 @@ export const ROUTES = {
       path: "https://thrilling-mapusaurus-f24.notion.site/335b6aeed401802da749f0dd74d544b9?source=copy_link",
       label: "서비스 이용약관",
     },
+    /** 오픈 카카오톡 채팅방 */
+    OPEN_KAKAO: {
+      path: "https://open.kakao.com/o/gKwF0Voi",
+      label: "오픈 카톡방",
+    },
+    /** 피드백 / 요청사항 구글폼 */
+    FEEDBACK_FORM: {
+      path: "https://forms.gle/9wywrAWigFq2oTaJA",
+      label: "피드백 보내기",
+    },
   },
 
   /** =============================================== 홈 =============================================== */
