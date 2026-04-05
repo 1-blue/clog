@@ -30,7 +30,7 @@ const scrollToFirstInvalid = (errors: FieldErrors<TCommunityPostFormData>) => {
     "category",
     "title",
     "content",
-    "tagInput",
+    "tags",
     "imageUrls",
   ];
   for (const key of order) {
@@ -66,7 +66,7 @@ const CommunityPostEditMain: React.FC<IProps> = ({ postId }) => {
       category: post.category,
       title: post.title,
       content: post.content,
-      tagInput: post.tags.join(", "),
+      tags: [...post.tags],
       imageUrls: post.imageUrls ?? [],
     },
   });
@@ -84,9 +84,9 @@ const CommunityPostEditMain: React.FC<IProps> = ({ postId }) => {
   return (
     <>
       <FormProvider {...methods}>
-        <div className="min-h-svh bg-background pb-[calc(4.5rem+max(1.25rem,env(safe-area-inset-bottom)))]">
+        <div className="min-h-svh bg-background pb-[calc(7.25rem+env(safe-area-inset-bottom,0px))]">
           <TopBar
-            showNotification={false}
+            showQuickActions={false}
             className="bg-background/95"
             title="게시글 수정"
           />
@@ -103,7 +103,7 @@ const CommunityPostEditMain: React.FC<IProps> = ({ postId }) => {
             <div data-community-post-field="content">
               <CommunityPostContentField />
             </div>
-            <div data-community-post-field="tagInput">
+            <div data-community-post-field="tags">
               <CommunityPostTagsField />
             </div>
           </div>

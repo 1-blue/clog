@@ -1,18 +1,13 @@
 import { useQueryClient } from "@tanstack/react-query";
 
 import { openapi } from "#web/apis/openapi";
+import { invalidateUserMembershipQueries } from "#web/libs/react-query/invalidateUserMembershipQueries";
 
 const useMembershipMutations = () => {
   const queryClient = useQueryClient();
 
   const invalidateMemberships = () => {
-    void queryClient.invalidateQueries({
-      predicate: (q) =>
-        Array.isArray(q.queryKey) &&
-        q.queryKey[0] === "get" &&
-        typeof q.queryKey[1] === "string" &&
-        q.queryKey[1].includes("/api/v1/users/me/memberships"),
-    });
+    invalidateUserMembershipQueries(queryClient);
   };
 
   const createMutation = openapi.useMutation(

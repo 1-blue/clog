@@ -43,7 +43,9 @@ export const GET = async (
     const session = await prisma.climbingSession.findUnique({
       where: { id: recordId },
       include: {
-        gym: { select: { id: true, name: true, address: true } },
+        gym: {
+          select: { id: true, name: true, address: true, logoImageUrl: true },
+        },
         routes: { orderBy: { order: "asc" } },
         user: { select: { id: true, nickname: true, profileImage: true } },
         userMembership: {

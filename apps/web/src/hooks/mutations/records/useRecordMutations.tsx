@@ -6,6 +6,7 @@ import { revalidateTagForServer } from "#web/actions/revalidateForServer";
 import { openapi } from "#web/apis/openapi";
 import { ROUTES } from "#web/constants";
 import { extractApiToastAsync } from "#web/libs/api/extractApiToast";
+import { invalidateUserMembershipQueries } from "#web/libs/react-query/invalidateUserMembershipQueries";
 
 const useRecordMutations = () => {
   const router = useRouter();
@@ -17,9 +18,7 @@ const useRecordMutations = () => {
   const recordCreateMutation = openapi.useMutation("post", "/api/v1/records", {
     onSuccess() {
       queryClient.invalidateQueries({ queryKey });
-      queryClient.invalidateQueries({
-        queryKey: ["get", "/api/v1/users/me/memberships"],
-      });
+      invalidateUserMembershipQueries(queryClient);
       revalidateTagForServer([path]);
       router.replace(ROUTES.MY.path);
     },
@@ -43,9 +42,7 @@ const useRecordMutations = () => {
             params: { path: { recordId: rid } },
           }).queryKey,
         });
-        queryClient.invalidateQueries({
-          queryKey: ["get", "/api/v1/users/me/memberships"],
-        });
+        invalidateUserMembershipQueries(queryClient);
         router.replace(ROUTES.RECORDS.DETAIL.path(rid));
       },
       async onError(err) {
@@ -62,9 +59,7 @@ const useRecordMutations = () => {
     {
       onSuccess() {
         queryClient.invalidateQueries({ queryKey });
-        queryClient.invalidateQueries({
-          queryKey: ["get", "/api/v1/users/me/memberships"],
-        });
+        invalidateUserMembershipQueries(queryClient);
         revalidateTagForServer([path]);
         router.replace(ROUTES.MY.path);
       },

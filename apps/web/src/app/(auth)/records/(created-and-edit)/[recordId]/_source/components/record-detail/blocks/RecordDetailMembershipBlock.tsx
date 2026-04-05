@@ -67,12 +67,9 @@ const RecordDetailMembershipBlock: React.FC<IProps> = ({ record }) => {
       </span>
       <div className="min-w-0 flex-1">
         <p className="text-xs font-medium text-on-surface-variant">
-          연결된 회원권
+          회원권을 연결하지 않은 기록
         </p>
         <p className="truncate font-semibold text-on-surface">일일 이용권</p>
-        <p className="truncate text-xs text-on-surface-variant">
-          회원권을 연결하지 않은 기록이에요.
-        </p>
       </div>
     </div>
   );

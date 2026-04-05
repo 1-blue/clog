@@ -9,12 +9,12 @@ import { normalizeSessionTimeRange } from "@clog/utils";
 
 import { openapi } from "#web/apis/openapi";
 import { getSelectedDateFromQuery } from "#web/app/(auth)/records/_source/utils/records-list-date";
+import RecordCheckInLinkField from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordCheckInLinkField";
 import RecordDiscardRow from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordDiscardRow";
 import RecordDurationField from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordDurationField";
 import RecordFormSaveBar from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordFormSaveBar";
 import RecordGallerySection from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordGallerySection";
 import RecordGymDifficultyLegend from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordGymDifficultyLegend";
-import RecordCheckInLinkField from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordCheckInLinkField";
 import RecordGymSearchField from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordGymSearchField";
 import RecordMembershipField from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordMembershipField";
 import RecordMemoField from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordMemoField";
@@ -153,7 +153,7 @@ const RecordNewMain = () => {
       <div className="flex min-h-dvh flex-col bg-background">
         <TopBar
           className="border-outline-variant bg-surface-container/80"
-          showNotification={false}
+          showQuickActions={false}
           title="기록 추가"
         />
 

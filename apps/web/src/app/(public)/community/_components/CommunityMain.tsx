@@ -15,7 +15,7 @@ const CommunityMain = () => {
           <span className="text-lg font-bold text-on-surface">커뮤니티</span>
         }
       />
-      <div className="text-on-background mx-auto flex min-h-screen flex-col gap-4 bg-background pt-3 pb-24">
+      <div className="text-on-background mx-auto flex min-h-screen flex-col gap-4 bg-background pt-3 pb-2">
         <div className="flex flex-col gap-3">
           <CommunityGuestNotice />
           <CommunityCategoryFilterChips />

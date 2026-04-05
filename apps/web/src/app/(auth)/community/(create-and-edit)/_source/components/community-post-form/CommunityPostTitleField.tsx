@@ -15,16 +15,13 @@ const CommunityPostTitleField: React.FC = () => {
       control={control}
       name="title"
       render={({ field, fieldState }) => (
-        <FormHelper
-          label="제목"
-          message={{ error: fieldState.error?.message }}
-        >
+        <FormHelper label="제목" message={{ error: fieldState.error?.message }}>
           <Input
             {...field}
             type="text"
             placeholder="제목을 입력하세요"
             maxLength={100}
-            className="rounded-xl bg-surface-container-high px-3 py-3 text-sm text-on-surface placeholder:text-on-surface-variant"
+            className="rounded-sm bg-surface-container-high px-4 py-5 text-sm text-on-surface placeholder:text-on-surface-variant"
           />
         </FormHelper>
       )}

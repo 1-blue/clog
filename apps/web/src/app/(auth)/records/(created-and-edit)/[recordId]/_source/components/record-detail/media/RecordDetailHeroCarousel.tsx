@@ -1,71 +1,41 @@
 "use client";
 
-import { Images, Mountain } from "lucide-react";
+import { Images } from "lucide-react";
 import { useCallback, useState } from "react";
 
 import ImageCarouselLightboxDialog from "#web/components/shared/image-carousel-lightbox/ImageCarouselLightboxDialog";
 import { cn } from "#web/libs/utils";
 
-/** (auth) layout `main`의 `px-2.5`만큼 좌우로 벌려 엣지 투 엣지로 보이게 함 (`-mx`만으로는 flex 자식에서 폭이 안 늘어나는 경우가 있어 width 보정 포함) */
-const heroBleedClass =
-  "relative -mx-2.5 w-[calc(100%+1.25rem)] max-w-none min-w-0 shrink-0 self-stretch";
+import { RECORD_DETAIL_HERO_BLEED_CLASS } from "./recordDetailHeroLayout";
+
+const heroBleedClass = RECORD_DETAIL_HERO_BLEED_CLASS;
 
 interface IProps {
   imageUrls: string[];
-  /** DB에 사진이 없을 때 암장 로고 등 표시용 */
-  fallbackImageUrl?: string | null;
   className?: string;
 }
 
-/** 대표 1장 + 다장일 때 배지, 탭 시 라이트박스. 이미지 없으면 플레이스홀더만 */
-const RecordDetailHeroCarousel: React.FC<IProps> = ({
-  imageUrls,
-  fallbackImageUrl,
-  className,
-}) => {
+/** 사용자 등록 사진만 표시. 없으면 null (커버/플레이스홀더 없음) */
+const RecordDetailHeroCarousel: React.FC<IProps> = ({ imageUrls, className }) => {
   const [open, setOpen] = useState(false);
   const [startIndex, setStartIndex] = useState(0);
 
-  const displayUrls =
-    imageUrls.length > 0
-      ? imageUrls
-      : fallbackImageUrl
-        ? [fallbackImageUrl]
-        : [];
-
   const openAt = useCallback(
     (index: number) => {
-      setStartIndex(Math.min(Math.max(0, index), displayUrls.length - 1));
+      setStartIndex(
+        Math.min(Math.max(0, index), Math.max(0, imageUrls.length - 1)),
+      );
       setOpen(true);
     },
-    [displayUrls.length],
+    [imageUrls.length],
   );
 
-  if (displayUrls.length === 0) {
-    return (
-      <div
-        className={cn(
-          heroBleedClass,
-          "overflow-hidden bg-surface-container-high",
-          className,
-        )}
-      >
-        <div
-          className="flex h-40 w-full items-center justify-center sm:h-44 md:h-48"
-          role="img"
-          aria-label="등록된 사진 없음"
-        >
-          <Mountain
-            className="size-20 text-on-surface-variant/40"
-            strokeWidth={1.25}
-          />
-        </div>
-      </div>
-    );
+  if (imageUrls.length === 0) {
+    return null;
   }
 
-  const heroUrl = displayUrls[0]!;
-  const extraCount = displayUrls.length - 1;
+  const heroUrl = imageUrls[0]!;
+  const extraCount = imageUrls.length - 1;
   const hasMore = extraCount > 0;
 
   return (
@@ -86,7 +56,7 @@ const RecordDetailHeroCarousel: React.FC<IProps> = ({
           )}
           aria-label={
             hasMore
-              ? `기록 사진 ${displayUrls.length}장 전체 보기`
+              ? `기록 사진 ${imageUrls.length}장 전체 보기`
               : "기록 사진 크게 보기"
           }
         >
@@ -96,7 +66,7 @@ const RecordDetailHeroCarousel: React.FC<IProps> = ({
               alt=""
               className="size-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.01] group-active:scale-[0.99]"
             />
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-transparent to-black/25" />
+            <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-background via-transparent to-black/25" />
             <div
               className="pointer-events-none absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10"
               aria-hidden
@@ -122,7 +92,7 @@ const RecordDetailHeroCarousel: React.FC<IProps> = ({
       </div>
 
       <ImageCarouselLightboxDialog
-        urls={displayUrls}
+        urls={imageUrls}
         open={open}
         onOpenChange={setOpen}
         initialIndex={startIndex}

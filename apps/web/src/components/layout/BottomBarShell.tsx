@@ -29,6 +29,7 @@ const BottomBarShell: React.FC<React.PropsWithChildren> = ({ children }) => {
       >
         {children}
       </main>
+
       {show && (
         <>
           <CheckInStatusBanner />

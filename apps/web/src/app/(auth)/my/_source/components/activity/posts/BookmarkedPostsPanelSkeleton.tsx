@@ -1,11 +1,11 @@
+import CommunityPostCardSkeleton from "#web/app/(public)/community/_components/community-post-list/CommunityPostCardSkeleton";
+
 const BookmarkedPostsPanelSkeleton = () => (
-  <div className="space-y-3">
-    {Array.from({ length: 4 }).map((_, i) => (
-      <div
-        key={i}
-        className="h-32 animate-pulse rounded-2xl bg-surface-container-low"
-      />
-    ))}
+  <div className="space-y-5">
+    <CommunityPostCardSkeleton withImage withTags />
+    <CommunityPostCardSkeleton withImage={false} />
+    <CommunityPostCardSkeleton withImage />
+    <CommunityPostCardSkeleton withImage={false} withTags />
   </div>
 );
 

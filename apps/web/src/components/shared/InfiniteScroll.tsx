@@ -52,4 +52,5 @@ const InfiniteScroll: React.FC<React.PropsWithChildren<IProps>> = ({
     </>
   );
 };
+
 export default InfiniteScroll;

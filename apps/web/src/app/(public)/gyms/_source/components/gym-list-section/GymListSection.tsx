@@ -61,7 +61,7 @@ const GymListSection: React.FC = () => {
       hasMore={!!hasNextPage}
       isLoading={isFetchingNextPage}
     >
-      <div className="mt-2 flex flex-col gap-2">
+      <div className="flex flex-col gap-2">
         {gyms.map((gym) => (
           <GymCard key={gym.id} gym={gym} />
         ))}

@@ -49,7 +49,7 @@ const ProfileEditCoverSection = ({ coverImage }: IProps) => {
   return (
     <label
       className={cn(
-        "group relative block h-36 w-screen max-w-[100vw] shrink-0 cursor-pointer overflow-hidden bg-surface-container-low",
+        "group relative block h-48 w-screen max-w-[100vw] shrink-0 cursor-pointer overflow-hidden bg-surface-container-low sm:h-64",
         "ml-[calc(50%-50vw)]",
       )}
     >

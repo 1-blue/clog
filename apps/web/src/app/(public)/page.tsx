@@ -22,17 +22,19 @@ export const dynamic = "force-dynamic";
 /** 홈 / 탐색 페이지 */
 const HomePage: NextPage = () => {
   return (
-    <div className="pb-8">
+    <div>
       {/* 상단 바 */}
       <TopBar />
 
-      <div className="mt-4 flex flex-col gap-10">
-        {/* 빠른 체크인 (로그인 유저 전용) */}
-        <HomeCheckInSection />
+      <div className="mt-4 mb-4 flex flex-col gap-10">
+        <div className="flex flex-col gap-4">
+          {/* 빠른 체크인 (로그인 유저 전용) */}
+          <HomeCheckInSection />
 
-        <Suspense fallback={<CongestionRankingSkeleton />}>
-          <CongestionRankingSection />
-        </Suspense>
+          <Suspense fallback={<CongestionRankingSkeleton />}>
+            <CongestionRankingSection />
+          </Suspense>
+        </div>
 
         <Suspense fallback={<CompletionTrendSkeleton />}>
           <CompletionTrendSection />

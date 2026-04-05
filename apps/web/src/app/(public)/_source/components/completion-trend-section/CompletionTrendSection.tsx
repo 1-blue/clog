@@ -35,8 +35,7 @@ const CompletionTrendSection = () => {
       <div className="flex flex-col gap-1">
         <h2 className="text-lg font-bold text-on-surface">이번 주 완등 추이</h2>
         <p className="text-xs leading-relaxed text-on-surface-variant">
-          세팅 주기에 맞춰 가장 많은 완등 기록이 올라오고 있어요. (시도 제외
-          루트 기준)
+          모든 유저의 완등 기록 추이를 보여줍니다.
         </p>
       </div>
 

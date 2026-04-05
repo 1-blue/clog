@@ -15,6 +15,7 @@ import RecordDetailRoutesSection from "#web/app/(auth)/records/(created-and-edit
 import RecordDetailSessionCard from "#web/app/(auth)/records/(created-and-edit)/[recordId]/_source/components/record-detail/summary/RecordDetailSessionCard";
 import RecordDetailStatsPanel from "#web/app/(auth)/records/(created-and-edit)/[recordId]/_source/components/record-detail/summary/RecordDetailStatsPanel";
 import TopBar from "#web/components/layout/TopBar";
+import { cn } from "#web/libs/utils";
 
 type TRecordDetail = components["schemas"]["RecordDetail"];
 
@@ -38,16 +39,20 @@ const RecordDetailLoaded = ({ recordId, record }: IContentProps) => {
     <div className="flex min-h-dvh flex-col bg-background pb-10">
       <TopBar
         className="border-outline-variant bg-surface-container/80"
-        showNotification={false}
+        showQuickActions={false}
         title="클라이밍 기록 상세"
       />
 
-      <RecordDetailHeroCarousel
-        imageUrls={record.imageUrls}
-        fallbackImageUrl={record.gym.logoImageUrl}
-      />
+      {record.imageUrls.length > 0 ? (
+        <RecordDetailHeroCarousel imageUrls={record.imageUrls} />
+      ) : null}
 
-      <div className="relative z-10 -mt-6 flex flex-col gap-10">
+      <div
+        className={cn(
+          "relative z-10 flex flex-col gap-10",
+          record.imageUrls.length > 0 ? "-mt-6" : "pt-2",
+        )}
+      >
         <RecordDetailEditEntry
           recordUserId={record.user.id}
           recordId={recordId}
