@@ -150,7 +150,7 @@ const ProfileEditMain = () => {
           void form.handleSubmit(onSubmit)(e);
         }}
       >
-        <TopBar showNotification={false} title="프로필 수정" />
+        <TopBar showQuickActions={false} title="프로필 수정" />
         <div className="relative">
           <ProfileEditCoverSection coverImage={me.coverImage} />
           <ProfileEditAvatarSection

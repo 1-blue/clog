@@ -1,9 +1,9 @@
 "use client";
 
+import { toast } from "sonner";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 
 import type { components } from "#web/@types/openapi";
 import { openapi } from "#web/apis/openapi";
@@ -157,11 +157,11 @@ const MembershipNewMain = () => {
     <div className="flex min-h-dvh flex-col bg-background pb-10">
       <TopBar
         className="border-outline-variant bg-surface-container/80"
-        showNotification={false}
+        showQuickActions={false}
         title="회원권 등록"
       />
 
-      <div className="mx-auto flex w-full max-w-lg flex-col gap-6 p-4">
+      <div className="mx-auto flex w-full max-w-lg flex-col gap-6 pt-4">
         <FormHelper label="암장" cloneChild={false}>
           <SearchableCombobox<TGymPick>
             items={mergedItems}

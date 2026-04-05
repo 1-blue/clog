@@ -2661,7 +2661,7 @@ components:
         content: { type: string, minLength: 10, maxLength: 5000 }
         tags:
           type: array
-          maxItems: 5
+          maxItems: 10
           items: { type: string, maxLength: 20 }
         imageUrls:
           type: array
@@ -2676,7 +2676,7 @@ components:
         category: { $ref: "#/components/schemas/CommunityCategory" }
         tags:
           type: array
-          maxItems: 5
+          maxItems: 10
           items: { type: string, maxLength: 20 }
         imageUrls:
           type: array

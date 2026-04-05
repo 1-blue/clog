@@ -1,13 +1,9 @@
 "use client";
 
 import {
-  BarChart3,
-  Bell,
   Check,
   Instagram,
   MapPin,
-  Settings,
-  Ticket,
   User,
   Youtube,
 } from "lucide-react";
@@ -19,7 +15,6 @@ import { difficultyToKoreanMap, type Difficulty } from "@clog/utils";
 
 import { openapi } from "#web/apis/openapi";
 import TopBar from "#web/components/layout/TopBar";
-import { useNotificationPanel } from "#web/components/notifications/NotificationPanelProvider";
 import ImageLightboxDialog from "#web/components/shared/image-carousel-lightbox/ImageLightboxDialog";
 import { ROUTES } from "#web/constants";
 import { formatProfileCount } from "#web/libs/format/formatProfileCount";
@@ -29,7 +24,6 @@ import ProfileSummarySkeleton from "./skeleton/ProfileSummarySkeleton";
 
 const ProfileSummarySection = () => {
   const router = useRouter();
-  const notificationPanel = useNotificationPanel();
   const { data: me } = openapi.useSuspenseQuery(
     "get",
     "/api/v1/users/me",
@@ -61,49 +55,6 @@ const ProfileSummarySection = () => {
         left={
           <span className="text-lg font-bold text-on-surface">내 정보</span>
         }
-        right={
-          <div className="flex items-center gap-4">
-            <Link
-              href={ROUTES.STATISTICS.path}
-              className="text-primary transition-opacity hover:opacity-80 active:scale-95"
-              aria-label="통계"
-            >
-              <BarChart3 className="size-6" strokeWidth={1.75} />
-            </Link>
-            <Link
-              href={ROUTES.MY.MEMBERSHIPS.path}
-              className="text-primary transition-opacity hover:opacity-80 active:scale-95"
-              aria-label="회원권"
-            >
-              <Ticket className="size-6" strokeWidth={1.75} />
-            </Link>
-            <Link
-              href={ROUTES.MY.SETTINGS.path}
-              className="text-primary transition-opacity hover:opacity-80 active:scale-95"
-              aria-label="설정"
-            >
-              <Settings className="size-6" strokeWidth={1.75} />
-            </Link>
-            {notificationPanel ? (
-              <button
-                type="button"
-                onClick={() => notificationPanel.open()}
-                className="text-primary transition-opacity hover:opacity-80 active:scale-95"
-                aria-label="알림"
-              >
-                <Bell className="size-6" strokeWidth={1.75} />
-              </button>
-            ) : (
-              <Link
-                href={ROUTES.NOTIFICATIONS.path}
-                className="text-primary transition-opacity hover:opacity-80 active:scale-95"
-                aria-label="알림"
-              >
-                <Bell className="size-6" strokeWidth={1.75} />
-              </Link>
-            )}
-          </div>
-        }
       />
 
       {/* 커버 이미지 (프로필과 겹치는 영역은 아래 프로필 섹션 z-20이 클릭을 가져감) */}
@@ -129,92 +80,100 @@ const ProfileSummarySection = () => {
 
       {/* 프로필 영역 */}
       <section className="relative z-20 -mt-16 flex flex-col items-center">
-        {/* 아바타 */}
-        <div className="relative">
-          {me.profileImage ? (
-            <button
-              type="button"
-              aria-label="프로필 이미지 크게 보기"
-              className="size-32 cursor-zoom-in overflow-hidden rounded-full border-4 border-background bg-surface-container-highest shadow-xl ring-1 ring-outline-variant/20"
-              onClick={() => setLightboxUrl(me.profileImage)}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={me.profileImage}
-                alt=""
-                className="size-full object-cover"
-              />
-            </button>
-          ) : (
-            <div className="size-32 overflow-hidden rounded-full border-4 border-background bg-surface-container-highest shadow-xl ring-1 ring-outline-variant/20">
-              <div className="flex size-full items-center justify-center">
-                <User className="size-12 text-on-surface-variant" />
+        <div className="flex flex-col items-center gap-4">
+          {/* 아바타 */}
+          <div className="relative shrink-0">
+            {me.profileImage ? (
+              <button
+                type="button"
+                aria-label="프로필 이미지 크게 보기"
+                className="size-32 cursor-zoom-in overflow-hidden rounded-full border-4 border-background bg-surface-container-highest shadow-xl ring-1 ring-outline-variant/20"
+                onClick={() => setLightboxUrl(me.profileImage)}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={me.profileImage}
+                  alt=""
+                  className="size-full object-cover"
+                />
+              </button>
+            ) : (
+              <div className="size-32 overflow-hidden rounded-full border-4 border-background bg-surface-container-highest shadow-xl ring-1 ring-outline-variant/20">
+                <div className="flex size-full items-center justify-center">
+                  <User className="size-12 text-on-surface-variant" />
+                </div>
               </div>
+            )}
+            <div className="pointer-events-none absolute right-1 bottom-1 flex size-8 items-center justify-center rounded-full border-4 border-background bg-secondary">
+              <Check className="text-on-secondary size-4" strokeWidth={3} />
             </div>
-          )}
-          <div className="pointer-events-none absolute right-1 bottom-1 flex size-8 items-center justify-center rounded-full border-4 border-background bg-secondary">
-            <Check className="text-on-secondary size-4" strokeWidth={3} />
           </div>
-        </div>
 
-        {/* 닉네임 / 소개 */}
-        <div className="mt-4 text-center">
-          <h1 className="text-3xl font-bold tracking-tight text-on-surface">
-            {me.nickname}
-          </h1>
-          <p className="mt-1 font-medium tracking-wide text-primary">
-            @{me.nickname}
-          </p>
-          {me.bio ? (
-            <p className="mt-3 max-w-xs text-sm leading-relaxed break-keep text-on-surface-variant">
-              {me.bio}
-            </p>
-          ) : null}
-          {me.maxDifficulty ? (
-            <p className="mt-2 text-xs text-on-surface-variant">
-              최고 난이도{" "}
-              <span className="font-semibold text-tertiary">
-                {difficultyToKoreanMap[me.maxDifficulty as Difficulty]}
-              </span>
-            </p>
-          ) : null}
-          {me.homeGym ? (
-            <Link
-              href={ROUTES.GYMS.DETAIL.path(me.homeGym.id)}
-              className="mt-3 inline-flex max-w-full items-center gap-1.5 rounded-lg border border-outline-variant/25 bg-surface-container-low px-3 py-2 text-sm font-medium text-primary transition-colors hover:bg-surface-container"
-            >
-              <MapPin className="size-4 shrink-0" strokeWidth={2} />
-              <span className="truncate">홈짐 · {me.homeGym.name}</span>
-            </Link>
-          ) : null}
-
-          {/* 인스타그램 / 유튜브 */}
-          {(me.instagramId || me.youtubeUrl) && (
-            <div className="mt-3 flex items-center justify-center gap-3">
-              {me.instagramId && (
-                <a
-                  href={`https://instagram.com/${me.instagramId}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1 text-xs text-on-surface-variant transition-colors hover:text-primary"
-                >
-                  <Instagram className="size-4" strokeWidth={1.75} />
-                  <span>@{me.instagramId}</span>
-                </a>
-              )}
-              {me.youtubeUrl && (
-                <a
-                  href={me.youtubeUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1 text-xs text-on-surface-variant transition-colors hover:text-destructive"
-                >
-                  <Youtube className="size-4" strokeWidth={1.75} />
-                  <span>YouTube</span>
-                </a>
-              )}
+          {/* 닉네임 / 소개 */}
+          <div className="flex w-full max-w-xs flex-col items-center gap-3 text-center">
+            <div className="flex flex-col items-center gap-1">
+              <h1 className="text-3xl font-bold tracking-tight text-on-surface">
+                {me.nickname}
+              </h1>
+              <Link
+                href={ROUTES.USERS.PROFILE.path(me.id)}
+                className="inline-block font-medium tracking-wide text-primary underline-offset-4 transition-colors hover:text-primary/85 hover:underline"
+                aria-label={`${me.nickname} 공개 프로필 보기`}
+              >
+                @{me.nickname}
+              </Link>
             </div>
-          )}
+            {me.bio ? (
+              <p className="max-w-full text-sm leading-relaxed break-keep text-on-surface-variant">
+                {me.bio}
+              </p>
+            ) : null}
+            {me.maxDifficulty ? (
+              <p className="text-xs text-on-surface-variant">
+                최고 난이도{" "}
+                <span className="font-semibold text-tertiary">
+                  {difficultyToKoreanMap[me.maxDifficulty as Difficulty]}
+                </span>
+              </p>
+            ) : null}
+            {me.homeGym ? (
+              <Link
+                href={ROUTES.GYMS.DETAIL.path(me.homeGym.id)}
+                className="inline-flex max-w-full items-center gap-1.5 rounded-lg border border-outline-variant/25 bg-surface-container-low px-3 py-2 text-sm font-medium text-primary transition-colors hover:bg-surface-container"
+              >
+                <MapPin className="size-4 shrink-0" strokeWidth={2} />
+                <span className="truncate">홈짐 · {me.homeGym.name}</span>
+              </Link>
+            ) : null}
+
+            {/* 인스타그램 / 유튜브 */}
+            {(me.instagramId || me.youtubeUrl) && (
+              <div className="flex items-center justify-center gap-3">
+                {me.instagramId && (
+                  <a
+                    href={`https://instagram.com/${me.instagramId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 text-xs text-on-surface-variant transition-colors hover:text-primary"
+                  >
+                    <Instagram className="size-4" strokeWidth={1.75} />
+                    <span>@{me.instagramId}</span>
+                  </a>
+                )}
+                {me.youtubeUrl && (
+                  <a
+                    href={me.youtubeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 text-xs text-on-surface-variant transition-colors hover:text-destructive"
+                  >
+                    <Youtube className="size-4" strokeWidth={1.75} />
+                    <span>YouTube</span>
+                  </a>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* 통계 카드 */}

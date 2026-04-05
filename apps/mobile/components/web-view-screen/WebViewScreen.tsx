@@ -5,8 +5,12 @@ import {
   BackHandler,
   Linking,
   Platform,
+  RefreshControl,
+  ScrollView,
   StyleSheet,
   ToastAndroid,
+  View,
+  useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { WebView, type WebViewNavigation } from "react-native-webview";
@@ -34,9 +38,14 @@ interface IProps {
 const isAndroid = Platform.OS === "android";
 
 const WebViewScreen: React.FC<IProps> = ({ path = "", authCallbackUrl }) => {
+  const { height: windowHeight } = useWindowDimensions();
   const webViewRef = useRef<WebView>(null);
   const canGoBackRef = useRef(false);
   const lastHttpUrlRef = useRef(`${WEB_URL}${path}`);
+  /** Android: ScrollView+RefreshControl 안에서 WebView 높이( flex만으로는 측정 안 될 때 대비 ) */
+  const [webViewSlotHeight, setWebViewSlotHeight] = useState(0);
+  /** Android: SwipeRefreshLayout(RefreshControl) 동작 중 */
+  const [androidRefreshing, setAndroidRefreshing] = useState(false);
 
   const baseUri = `${WEB_URL}${path}`;
   // 인증 콜백 URL이 있으면 우선 사용, 재시도 시 기본 URL로 복원
@@ -111,6 +120,7 @@ true;
 
   useEffect(() => {
     setWebLoadedOnce(false);
+    setAndroidRefreshing(false);
   }, [webviewKey]);
 
   useEffect(() => {
@@ -344,40 +354,89 @@ true;
     setWebviewKey((k) => k + 1);
   };
 
+  const onAndroidPullToRefresh = useCallback(() => {
+    setAndroidRefreshing(true);
+    webViewRef.current?.reload();
+  }, []);
+
+  const handleWebViewLoadEnd = useCallback(() => {
+    setIsInitialLoading(false);
+    setWebLoadedOnce(true);
+    hideSplash();
+    if (isAndroid) {
+      setAndroidRefreshing(false);
+    }
+  }, [isAndroid]);
+
+  const webViewAndroidHeight =
+    webViewSlotHeight > 0 ? webViewSlotHeight : windowHeight;
+
+  const webViewSharedProps = {
+    source: { uri: sourceUri },
+    onNavigationStateChange: handleNavigationStateChange,
+    onShouldStartLoadWithRequest,
+    originWhitelist: ["*"],
+    javaScriptEnabled: true,
+    domStorageEnabled: true,
+    thirdPartyCookiesEnabled: true,
+    onLoadEnd: handleWebViewLoadEnd,
+    onError: () => {
+      setIsOffline(true);
+      hideSplash();
+      if (isAndroid) setAndroidRefreshing(false);
+    },
+    onHttpError: (e: { nativeEvent: { statusCode: number } }) => {
+      if (e.nativeEvent.statusCode >= 500) {
+        setIsOffline(true);
+        hideSplash();
+        if (isAndroid) setAndroidRefreshing(false);
+      }
+    },
+  };
+
   return (
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       {isOffline ? (
         <OfflineView onRetry={handleRetry} />
+      ) : isAndroid ? (
+        <View
+          style={styles.flexFill}
+          onLayout={(e) => {
+            setWebViewSlotHeight(e.nativeEvent.layout.height);
+          }}
+        >
+          <ScrollView
+            style={styles.flexFill}
+            contentContainerStyle={styles.androidScrollContent}
+            nestedScrollEnabled
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl
+                refreshing={androidRefreshing}
+                onRefresh={onAndroidPullToRefresh}
+                colors={["#E8E8E8"]}
+                progressBackgroundColor="#2A2A2A"
+              />
+            }
+          >
+            <WebView
+              key={webviewKey}
+              ref={webViewRef}
+              {...webViewSharedProps}
+              nestedScrollEnabled
+              style={[styles.webview, { height: webViewAndroidHeight }]}
+            />
+          </ScrollView>
+        </View>
       ) : (
         <WebView
           key={webviewKey}
           ref={webViewRef}
-          source={{ uri: sourceUri }}
+          {...webViewSharedProps}
           style={styles.webview}
-          onNavigationStateChange={handleNavigationStateChange}
-          onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
-          originWhitelist={["*"]}
-          javaScriptEnabled
-          domStorageEnabled
-          thirdPartyCookiesEnabled
           pullToRefreshEnabled
           refreshControlLightMode
-          onLoadEnd={() => {
-            setIsInitialLoading(false);
-            setWebLoadedOnce(true);
-            hideSplash();
-          }}
-          onError={() => {
-            setIsOffline(true);
-            hideSplash();
-          }}
-          onHttpError={(e) => {
-            // 5xx 서버 오류만 오프라인 화면으로 처리 (4xx는 웹앱이 자체 처리)
-            if (e.nativeEvent.statusCode >= 500) {
-              setIsOffline(true);
-              hideSplash();
-            }
-          }}
         />
       )}
 
@@ -391,5 +450,10 @@ export default WebViewScreen;
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#151515" },
+  flexFill: { flex: 1 },
+  /** ScrollView 자식이 화면 높이만큼 차지하도록 — RefreshControl이 동작하려면 부모 스크롤 계층 필요 */
+  androidScrollContent: {
+    flexGrow: 1,
+  },
   webview: { flex: 1, backgroundColor: "transparent" },
 });

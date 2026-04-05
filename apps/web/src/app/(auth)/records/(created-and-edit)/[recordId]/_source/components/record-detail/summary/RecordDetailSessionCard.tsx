@@ -6,10 +6,9 @@ import { CalendarDays, Clock } from "lucide-react";
 import Link from "next/link";
 
 import type { components } from "#web/@types/openapi";
+import type { IExerciseTimeSummary } from "#web/app/(auth)/records/(created-and-edit)/_source/utils/record-detail-utils";
 import { ROUTES } from "#web/constants";
 import { cn } from "#web/libs/utils";
-
-import type { IExerciseTimeSummary } from "#web/app/(auth)/records/(created-and-edit)/_source/utils/record-detail-utils";
 
 type RecordDetail = components["schemas"]["RecordDetail"];
 
@@ -49,16 +48,27 @@ const RecordDetailSessionCard = ({ record, exercise, className }: IProps) => {
         </span>
       </div>
 
-      <div className="flex flex-col gap-0.5">
-        <Link
-          href={ROUTES.GYMS.DETAIL.path(record.gym.id)}
-          className="block text-2xl font-bold tracking-tight text-on-surface hover:underline"
-        >
-          {record.gym.name}
-        </Link>
-        <p className="text-xs leading-snug text-on-surface-variant">
-          {record.gym.address}
-        </p>
+      <div className="flex gap-3">
+        {record.gym.logoImageUrl ? (
+          <div className="shrink-0">
+            <img
+              src={record.gym.logoImageUrl}
+              alt=""
+              className="size-12 rounded-sm object-contain sm:size-14"
+            />
+          </div>
+        ) : null}
+        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+          <Link
+            href={ROUTES.GYMS.DETAIL.path(record.gym.id)}
+            className="block text-2xl font-bold tracking-tight text-on-surface hover:underline"
+          >
+            {record.gym.name}
+          </Link>
+          <p className="text-xs leading-snug text-on-surface-variant">
+            {record.gym.address}
+          </p>
+        </div>
       </div>
 
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm font-medium text-on-surface-variant">
@@ -78,13 +88,9 @@ const RecordDetailSessionCard = ({ record, exercise, className }: IProps) => {
       </div>
 
       <p className="text-xs leading-relaxed text-on-surface-variant/90">
-        작성{" "}
-        {format(created, "yyyy.MM.dd HH:mm", { locale: ko })}
+        작성 {format(created, "yyyy.MM.dd HH:mm", { locale: ko })}
         {showUpdated ? (
-          <>
-            {" "}
-            · 수정 {format(updated, "yyyy.MM.dd HH:mm", { locale: ko })}
-          </>
+          <> · 수정 {format(updated, "yyyy.MM.dd HH:mm", { locale: ko })}</>
         ) : null}
       </p>
     </div>

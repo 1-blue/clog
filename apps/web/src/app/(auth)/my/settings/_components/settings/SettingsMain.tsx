@@ -18,9 +18,9 @@ const SettingsMain = () => {
   }
 
   return (
-    <div className="pb-12">
-      <TopBar showNotification={false} title="설정" />
-      <div className="mx-auto flex max-w-lg flex-col gap-8 pt-8">
+    <div className="pb-8">
+      <TopBar showQuickActions={false} title="설정" />
+      <div className="mx-auto flex max-w-lg flex-col gap-8 pt-4">
         <SettingsProfileSummaryCard me={me} />
         <SettingsAccountSection />
         <SettingsAppSection me={me} />

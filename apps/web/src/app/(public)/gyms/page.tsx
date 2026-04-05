@@ -15,9 +15,7 @@ const GymsPage = () => {
   return (
     <>
       <TopBar
-        left={
-          <span className="text-lg font-bold text-on-surface">암장 찾기</span>
-        }
+        left={<span className="text-lg font-bold text-on-surface">암장</span>}
       />
       <Suspense>
         <div className="pb-8">

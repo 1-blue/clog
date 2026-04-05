@@ -2,15 +2,18 @@
 
 import { format, parseISO } from "date-fns";
 import { ko } from "date-fns/locale";
-import { Unlink } from "lucide-react";
+import { Check, ChevronDown, Link2 } from "lucide-react";
 import { useFormContext, useWatch } from "react-hook-form";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { components } from "#web/@types/openapi";
 import { openapi } from "#web/apis/openapi";
 import FormHelper from "#web/components/shared/FormHelper";
-import { Button } from "#web/components/ui/button";
-import SearchableCombobox from "#web/components/ui/searchable-combobox";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "#web/components/ui/popover";
 import { cn } from "#web/libs/utils";
 
 import type { TRecordFormData } from "../../hooks/useRecordForm";
@@ -22,16 +25,7 @@ import {
 
 type TMyCheckInItem = components["schemas"]["MyCheckInItem"];
 
-const NONE_VALUE = "__checkin_none__";
-
-/** 목록용 “연결 안 함” 행 (API 스키마 형태 맞춤) */
-const NONE_CHECKIN: TMyCheckInItem = {
-  id: NONE_VALUE,
-  gymId: "00000000-0000-0000-0000-000000000001",
-  gymName: "",
-  startedAt: "1970-01-01T00:00:00.000Z",
-  endedAt: null,
-};
+const NONE_DISPLAY_LABEL = "연결 안 함";
 
 interface IProps {
   className?: string;
@@ -39,46 +33,34 @@ interface IProps {
   forSessionId?: string;
 }
 
+/**
+ * 체크인 구간 표시.
+ * 같은 날이면 종료는 시각만(HH:mm)으로 짧게 표시.
+ * 날짜가 바뀌면 시작·종료 모두 M/d HH:mm — 종료만 HH:mm이면 “당일 오전”으로 오해하기 쉬움(예: 4/4 20:42 – 11:16).
+ */
 const formatCheckInRange = (startedAt: string, endedAt: string) => {
   const s = parseISO(startedAt);
   const e = parseISO(endedAt);
-  return `${format(s, "M/d HH:mm", { locale: ko })} – ${format(e, "HH:mm")}`;
+  const dayS = format(s, "yyyy-MM-dd");
+  const dayE = format(e, "yyyy-MM-dd");
+  if (dayS === dayE) {
+    return `${format(s, "M/d HH:mm", { locale: ko })} – ${format(e, "HH:mm")}`;
+  }
+  return `${format(s, "M/d HH:mm", { locale: ko })} – ${format(e, "M/d HH:mm", { locale: ko })}`;
 };
 
-const filterCheckInsByQuery = (
-  items: TMyCheckInItem[],
-  q: string,
-): TMyCheckInItem[] => {
-  const needle = q.trim().toLowerCase();
-  if (!needle) return items;
-  return items.filter((c) => {
-    if (c.id === NONE_VALUE) return true;
-    const range =
-      c.endedAt != null
-        ? formatCheckInRange(c.startedAt, c.endedAt).toLowerCase()
-        : "";
-    return c.gymName.toLowerCase().includes(needle) || range.includes(needle);
-  });
-};
+const rowClass =
+  "flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm outline-none transition-colors hover:bg-accent focus-visible:bg-accent";
 
 const RecordCheckInLinkField: React.FC<IProps> = ({
   className,
   forSessionId,
 }) => {
+  const [open, setOpen] = useState(false);
   const { control, setValue } = useFormContext<TRecordFormData>();
   const gymId = useWatch({ control, name: "gymId" });
   const gymCheckInId = useWatch({ control, name: "gymCheckInId" });
   const prevGymIdRef = useRef(gymId);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-
-  useEffect(() => {
-    const id = window.setTimeout(
-      () => setDebouncedSearch(searchQuery.trim()),
-      280,
-    );
-    return () => window.clearTimeout(id);
-  }, [searchQuery]);
 
   useEffect(() => {
     if (prevGymIdRef.current !== gymId && gymCheckInId) {
@@ -116,10 +98,10 @@ const RecordCheckInLinkField: React.FC<IProps> = ({
 
   const selectedItem = useMemo((): TMyCheckInItem | null => {
     if (!gymCheckInId) return null;
-    const fromList = (linkableRes as TMyCheckInItem[]).find(
-      (c) => c.id === gymCheckInId,
+    return (
+      (linkableRes as TMyCheckInItem[]).find((c) => c.id === gymCheckInId) ??
+      null
     );
-    return fromList ?? null;
   }, [gymCheckInId, linkableRes]);
 
   const mergedLinkable = useMemo(() => {
@@ -130,19 +112,38 @@ const RecordCheckInLinkField: React.FC<IProps> = ({
     return [selectedItem, ...linkableForContext];
   }, [linkableForContext, selectedItem]);
 
-  const trimmedInput = searchQuery.trim();
-  const debounced = debouncedSearch.trim();
-  const isPendingDebounce =
-    trimmedInput.length >= 1 && trimmedInput !== debounced;
+  const emptyHint =
+    !isFetched || isFetching
+      ? ""
+      : mergedLinkable.length === 0
+        ? gymId
+          ? "이 암장에서 연결 가능한 체크인이 없어요."
+          : "연결 가능한 체크인이 없어요."
+        : "";
 
-  const comboboxItems = useMemo(() => {
-    const withNone = [NONE_CHECKIN, ...mergedLinkable];
-    if (isPendingDebounce) return [];
-    return filterCheckInsByQuery(withNone, debounced);
-  }, [mergedLinkable, debounced, isPendingDebounce]);
+  const triggerLines = useMemo(() => {
+    if (!isFetched || isFetching) {
+      return { title: "불러오는 중…", subtitle: "" as string };
+    }
+    if (!gymCheckInId) {
+      return { title: NONE_DISPLAY_LABEL, subtitle: "" };
+    }
+    const item =
+      mergedLinkable.find((c) => c.id === gymCheckInId) ??
+      (selectedItem?.id === gymCheckInId ? selectedItem : null);
+    if (!item) {
+      return { title: "체크인 선택", subtitle: "" };
+    }
+    return {
+      title: item.gymName,
+      subtitle: item.endedAt
+        ? formatCheckInRange(item.startedAt, item.endedAt)
+        : "",
+    };
+  }, [isFetched, isFetching, gymCheckInId, mergedLinkable, selectedItem]);
 
   const applyCheckIn = (item: TMyCheckInItem) => {
-    if (item.id === NONE_VALUE || !item.endedAt) return;
+    if (!item.endedAt) return;
     setValue("gymCheckInId", item.id, { shouldValidate: true });
     setValue("gymId", item.gymId, { shouldValidate: true });
     setValue("gymName", item.gymName, { shouldValidate: true });
@@ -161,19 +162,17 @@ const RecordCheckInLinkField: React.FC<IProps> = ({
     setValue("gymCheckInId", "", { shouldValidate: true });
   };
 
-  const emptyContent = isPendingDebounce
-    ? "검색 중…"
-    : isFetching
-      ? "불러오는 중…"
-      : !isFetched
-        ? "불러오는 중…"
-        : mergedLinkable.length === 0
-          ? gymId
-            ? "이 암장에서 연결 가능한 체크인이 없어요."
-            : "연결 가능한 체크인이 없어요."
-          : "검색 결과가 없어요.";
+  const pickNone = () => {
+    clearLink();
+    setOpen(false);
+  };
 
-  const valueForCombobox = selectedItem;
+  const pickCheckIn = (item: TMyCheckInItem) => {
+    applyCheckIn(item);
+    setOpen(false);
+  };
+
+  const loading = !isFetched || isFetching;
 
   return (
     <FormHelper
@@ -181,64 +180,120 @@ const RecordCheckInLinkField: React.FC<IProps> = ({
       labelClassName={recordFormFieldLabelClass}
       className={cn("gap-2", className)}
       cloneChild={false}
-      controlAriaLabel="체크인 연결 검색"
+      controlAriaLabel="체크인 연결 선택"
       description="체크아웃 후 30분 이상인 종료 체크인만 연결할 수 있어요."
     >
-      <div className="flex flex-wrap items-end gap-2">
-        <div className="min-w-0 flex-1">
-          <SearchableCombobox<TMyCheckInItem>
-            items={comboboxItems}
-            value={valueForCombobox}
-            onValueChange={(next) => {
-              if (!next || next.id === NONE_VALUE) {
-                clearLink();
-                return;
-              }
-              applyCheckIn(next);
-            }}
-            onInputValueChange={setSearchQuery}
-            itemToStringLabel={(item) => {
-              if (item.id === NONE_VALUE) return "연결 안 함";
-              if (!item.endedAt) return item.gymName;
-              return `${item.gymName} · ${formatCheckInRange(item.startedAt, item.endedAt)}`;
-            }}
-            getItemKey={(item) => item.id}
-            isItemEqualToValue={(a, b) => a.id === b.id}
-            renderItem={(item) =>
-              item.id === NONE_VALUE ? (
-                <span className="min-w-0 text-on-surface-variant">
-                  연결 안 함
+      <>
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <button
+              type="button"
+              disabled={loading}
+              className={cn(
+                "flex w-full items-center justify-between gap-3 rounded-2xl border border-outline-variant/40 bg-surface-container-high px-4 py-3.5 text-left transition-colors",
+                "hover:bg-surface-container focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+                "disabled:pointer-events-none disabled:opacity-60",
+                !gymCheckInId && !loading && "text-on-surface-variant",
+              )}
+            >
+              <span className="flex min-w-0 flex-1 items-center gap-3">
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/15">
+                  <Link2 className="size-5 text-primary" strokeWidth={2} />
                 </span>
-              ) : (
-                <span className="flex min-w-0 flex-col gap-0.5 text-left">
-                  <span className="font-medium wrap-break-word">
-                    {item.gymName}
+                <span className="min-w-0 flex-1 text-left">
+                  <span
+                    className={cn(
+                      "block leading-tight font-medium text-on-surface",
+                      !gymCheckInId && !loading && "text-on-surface-variant",
+                    )}
+                  >
+                    {triggerLines.title}
                   </span>
-                  {item.endedAt ? (
-                    <span className="text-xs text-muted-foreground">
-                      {formatCheckInRange(item.startedAt, item.endedAt)}
+                  {triggerLines.subtitle ? (
+                    <span className="mt-0.5 block text-xs leading-snug text-on-surface-variant">
+                      {triggerLines.subtitle}
                     </span>
                   ) : null}
                 </span>
-              )
-            }
-            placeholder={gymId ? "체크인 검색" : "암장 선택 후 검색해주세요"}
-            emptyContent={emptyContent}
-          />
-        </div>
-        {gymCheckInId ? (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="shrink-0 gap-1"
-            onClick={clearLink}
+              </span>
+              <ChevronDown
+                className={cn(
+                  "size-5 shrink-0 self-center text-on-surface-variant transition-transform",
+                  open && "rotate-180",
+                )}
+              />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent
+            align="start"
+            sideOffset={8}
+            className="max-h-[min(24rem,70dvh)] w-[min(calc(100vw-2rem),28rem)] overflow-y-auto p-1"
           >
-            <Unlink className="size-3.5" strokeWidth={2} />
-            연결 해제
-          </Button>
+            <div className="flex flex-col gap-0.5">
+              <button
+                type="button"
+                className={cn(rowClass, !gymCheckInId && "bg-accent/50")}
+                onClick={pickNone}
+              >
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-surface-container-high">
+                  <Link2 className="size-4 text-tertiary" strokeWidth={2} />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block leading-tight font-medium text-on-surface">
+                    {NONE_DISPLAY_LABEL}
+                  </span>
+                </span>
+                {!gymCheckInId ? (
+                  <Check
+                    className="size-4 shrink-0 self-center text-primary"
+                    strokeWidth={2}
+                  />
+                ) : (
+                  <span className="size-4 shrink-0 self-center" />
+                )}
+              </button>
+
+              {mergedLinkable.map((item) => {
+                const selected = gymCheckInId === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    className={cn(rowClass, selected && "bg-accent/50")}
+                    onClick={() => pickCheckIn(item)}
+                    disabled={!item.endedAt}
+                  >
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-surface-container-high">
+                      <Link2 className="size-4 text-tertiary" strokeWidth={2} />
+                    </span>
+                    <span className="min-w-0 flex-1 text-left">
+                      <span className="block leading-tight font-medium text-on-surface">
+                        {item.gymName}
+                      </span>
+                      {item.endedAt ? (
+                        <span className="mt-0.5 block text-xs leading-snug text-on-surface-variant">
+                          {formatCheckInRange(item.startedAt, item.endedAt)}
+                        </span>
+                      ) : null}
+                    </span>
+                    {selected ? (
+                      <Check
+                        className="size-4 shrink-0 self-center text-primary"
+                        strokeWidth={2}
+                      />
+                    ) : (
+                      <span className="size-4 shrink-0 self-center" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </PopoverContent>
+        </Popover>
+        {emptyHint && !loading ? (
+          <p className="text-xs text-on-surface-variant">{emptyHint}</p>
         ) : null}
-      </div>
+      </>
     </FormHelper>
   );
 };

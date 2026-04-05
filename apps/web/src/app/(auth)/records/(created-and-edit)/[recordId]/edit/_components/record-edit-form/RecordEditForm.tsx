@@ -6,12 +6,12 @@ import { normalizeSessionTimeRange } from "@clog/utils";
 
 import type { components } from "#web/@types/openapi";
 import { openapi } from "#web/apis/openapi";
+import RecordCheckInLinkField from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordCheckInLinkField";
 import RecordDiscardRow from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordDiscardRow";
 import RecordDurationField from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordDurationField";
 import RecordFormSaveBar from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordFormSaveBar";
 import RecordGallerySection from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordGallerySection";
 import RecordGymDifficultyLegend from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordGymDifficultyLegend";
-import RecordCheckInLinkField from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordCheckInLinkField";
 import RecordGymReadonlyCard from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordGymReadonlyCard";
 import RecordMembershipField from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordMembershipField";
 import RecordMemoField from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordMemoField";
@@ -103,9 +103,7 @@ const RecordEditForm: React.FC<IProps> = ({ recordId, record }) => {
           attempts,
         })),
         imageUrls: data.imageUrls ?? [],
-        userMembershipId: data.userMembershipId
-          ? data.userMembershipId
-          : null,
+        userMembershipId: data.userMembershipId ? data.userMembershipId : null,
         gymCheckInId: data.gymCheckInId ? data.gymCheckInId : null,
       },
     });
@@ -116,7 +114,7 @@ const RecordEditForm: React.FC<IProps> = ({ recordId, record }) => {
       <div className="flex min-h-dvh flex-col bg-background">
         <TopBar
           className="border-outline-variant bg-surface-container/80"
-          showNotification={false}
+          showQuickActions={false}
           title="기록 수정"
         />
 

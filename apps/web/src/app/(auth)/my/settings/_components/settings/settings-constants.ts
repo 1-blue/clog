@@ -12,4 +12,15 @@ export const SETTINGS_CHECKOUT_DURATION_OPTIONS = [
   { minutes: 720, label: "12시간" },
 ] as const;
 
+/** 트리거 표시용: 분 → `N시간` / 그 외 `N분` */
+export const formatCheckoutDurationTriggerLabel = (minutes: number): string => {
+  if (!Number.isFinite(minutes) || minutes <= 0) {
+    return "—";
+  }
+  if (minutes % 60 === 0) {
+    return `${minutes / 60}시간`;
+  }
+  return `${minutes}분`;
+};
+
 export const SETTINGS_PUSH_STORAGE_KEY = "clog-settings-push-enabled";

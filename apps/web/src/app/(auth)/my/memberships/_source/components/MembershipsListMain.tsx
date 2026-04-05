@@ -28,11 +28,11 @@ const MembershipsListMain = () => {
     <div className="flex min-h-dvh flex-col bg-background pb-10">
       <TopBar
         className="border-outline-variant bg-surface-container/80"
-        showNotification={false}
+        showQuickActions={false}
         title="회원권"
       />
 
-      <div className="mx-auto flex w-full max-w-lg flex-col gap-4 p-4">
+      <div className="mx-auto flex w-full max-w-lg flex-col gap-4 pt-4">
         <Link
           href={ROUTES.MY.MEMBERSHIPS.NEW.path}
           className={buttonVariants({

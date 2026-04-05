@@ -25,7 +25,7 @@ const PostDetailTopBar = () => {
 
   return (
     <TopBar
-      showNotification={false}
+      showQuickActions={false}
       title="커뮤니티"
       right={
         <div className="flex shrink-0 items-center gap-2">

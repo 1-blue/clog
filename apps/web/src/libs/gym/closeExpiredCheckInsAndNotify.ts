@@ -23,9 +23,10 @@ export const closeExpiredCheckInsAndNotify = async (userId: string) => {
 
   await prisma.$transaction(async (tx) => {
     for (const checkIn of expired) {
+      // 자동 체크아웃 종료 시각 = 체크인 시 저장된 예정 시각(endsAt). 조회 시점(now)이 아님.
       const updated = await tx.gymCheckIn.update({
         where: { id: checkIn.id },
-        data: { endedAt: now },
+        data: { endedAt: checkIn.endsAt },
       });
       await createSessionFromCheckInIfEligible(tx, {
         checkInId: updated.id,

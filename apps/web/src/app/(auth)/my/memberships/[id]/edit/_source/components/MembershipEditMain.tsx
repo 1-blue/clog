@@ -1,16 +1,16 @@
 "use client";
 
 import { Trash2 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { toast } from "sonner";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 import type { components } from "#web/@types/openapi";
 import { openapi } from "#web/apis/openapi";
 import TopBar from "#web/components/layout/TopBar";
+import FormHelper from "#web/components/shared/FormHelper";
 import YmdSheetDateField from "#web/components/shared/YmdSheetDateField";
 import { Button } from "#web/components/ui/button";
-import FormHelper from "#web/components/shared/FormHelper";
 import { Textarea } from "#web/components/ui/textarea";
 import useMembershipMutations from "#web/hooks/mutations/memberships/useMembershipMutations";
 import { extractApiToastAsync } from "#web/libs/api/extractApiToast";
@@ -23,11 +23,8 @@ interface IProps {
 
 const MembershipEditMain: React.FC<IProps> = ({ userMembershipId }) => {
   const router = useRouter();
-  const {
-    patchMutation,
-    createPauseMutation,
-    deletePauseMutation,
-  } = useMembershipMutations();
+  const { patchMutation, createPauseMutation, deletePauseMutation } =
+    useMembershipMutations();
 
   const { data: m } = openapi.useSuspenseQuery(
     "get",
@@ -104,11 +101,11 @@ const MembershipEditMain: React.FC<IProps> = ({ userMembershipId }) => {
     <div className="flex min-h-dvh flex-col bg-background pb-10">
       <TopBar
         className="border-outline-variant bg-surface-container/80"
-        showNotification={false}
+        showQuickActions={false}
         title="회원권 수정"
       />
 
-      <div className="mx-auto flex w-full max-w-lg flex-col gap-6 p-4">
+      <div className="mx-auto flex w-full max-w-lg flex-col gap-6 pt-4">
         <YmdSheetDateField
           label="시작일"
           sheetTitle="시작일 선택"

@@ -19,7 +19,6 @@ import type { components } from "#web/@types/openapi";
 import { openapi } from "#web/apis/openapi";
 import TopBar from "#web/components/layout/TopBar";
 import { Button } from "#web/components/ui/button";
-import { buttonVariants } from "#web/components/ui/button-variants";
 import { ROUTES } from "#web/constants";
 import useMembershipMutations from "#web/hooks/mutations/memberships/useMembershipMutations";
 import { gymMembershipBrandLabel } from "#web/libs/membership/brandLabels";
@@ -78,11 +77,11 @@ const MembershipDetailMain: React.FC<IProps> = ({ userMembershipId }) => {
     <div className="flex min-h-dvh flex-col bg-background pb-10">
       <TopBar
         className="border-outline-variant bg-surface-container/80"
-        showNotification={false}
+        showQuickActions={false}
         title={membership.gym.name}
       />
 
-      <div className="mx-auto flex w-full max-w-lg flex-col gap-6 p-4">
+      <div className="mx-auto flex w-full max-w-lg flex-col gap-6 pt-4">
         <section className="rounded-2xl border border-outline-variant/20 bg-surface-container-low p-5">
           <div className="flex items-start justify-between gap-3">
             <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary-container/60 text-primary">
@@ -214,7 +213,9 @@ const MembershipDetailMain: React.FC<IProps> = ({ userMembershipId }) => {
               <div className="mt-4">
                 <div className="mb-1.5 flex justify-between text-xs text-on-surface-variant">
                   <span>사용률</span>
-                  <span className="font-semibold text-tertiary">{usageRate}%</span>
+                  <span className="font-semibold text-tertiary">
+                    {usageRate}%
+                  </span>
                 </div>
                 <div className="h-2.5 overflow-hidden rounded-full bg-surface-container-high">
                   <div

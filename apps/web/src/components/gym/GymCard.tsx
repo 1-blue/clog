@@ -89,4 +89,5 @@ const GymCard: React.FC<IProps> = ({ gym }) => {
     </Link>
   );
 };
+
 export default GymCard;

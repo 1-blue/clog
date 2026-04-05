@@ -82,7 +82,7 @@ const GymDetailMain: React.FC<IProps> = ({ gymId }) => {
   return (
     <div className="relative pb-[calc(5.75rem+env(safe-area-inset-bottom))]">
       <TopBar
-        showNotification={false}
+        showQuickActions={false}
         title={gym.name ?? "암장 상세"}
         right={
           <div className="flex shrink-0 items-center gap-0.5">

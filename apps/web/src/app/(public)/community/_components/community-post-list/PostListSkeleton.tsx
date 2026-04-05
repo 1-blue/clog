@@ -1,10 +1,14 @@
-const PostListSkeleton = () => {
+import CommunityPostCardSkeleton from "./CommunityPostCardSkeleton";
+
+/** `CommunityMain` — 카드 여러 개(썸네일·태그 유무 교차) */
+const PostListSkeleton: React.FC = () => {
   return (
     <div className="space-y-5">
       {Array.from({ length: 5 }).map((_, i) => (
-        <div
+        <CommunityPostCardSkeleton
           key={i}
-          className="h-40 animate-pulse rounded-2xl border border-outline-variant/5 bg-surface-container-low"
+          withImage={i % 2 === 0}
+          withTags={i % 3 === 0}
         />
       ))}
     </div>

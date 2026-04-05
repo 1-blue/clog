@@ -9,7 +9,7 @@ interface IProps {
 const GymReviewTopBar: React.FC<IProps> = ({ title }) => {
   return (
     <TopBar
-      showNotification={false}
+      showQuickActions={false}
       className="sticky top-0 z-40 mx-0 border-b border-outline-variant bg-surface-container/80 backdrop-blur-xl"
       title={title}
     />

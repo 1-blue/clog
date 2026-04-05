@@ -1,6 +1,13 @@
 "use client";
 
-import { ArrowLeft, Bell, Mountain } from "lucide-react";
+import {
+  ArrowLeft,
+  BarChart3,
+  Bell,
+  Mountain,
+  Settings,
+  Ticket,
+} from "lucide-react";
 import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -11,13 +18,20 @@ import { ROUTES } from "#web/constants";
 import useMe from "#web/hooks/useMe";
 import { cn } from "#web/libs/utils";
 
+const quickActionClass =
+  "text-primary transition-opacity hover:opacity-80 active:scale-95";
+
 interface IProps {
   /** 왼쪽 슬롯 — 지정 시 뒤로가기 행보다 우선 */
   left?: React.ReactNode;
-  /** 오른쪽 슬롯 — 기본: 알림 아이콘 */
+  /** 오른쪽 슬롯 — 미지정 시 `showQuickActions`에 따라 기본 퀵 액션(통계·회원권·설정·알림) */
   right?: React.ReactNode;
-  /** 알림 아이콘 표시 여부 (right 미지정 시). 기본: true */
-  showNotification?: boolean;
+  /**
+   * 기본 우측: 마이페이지 헤더와 동일한 아이콘 묶음(통계·회원권·설정·알림).
+   * `right`를 넘기면 이 옵션은 무시됩니다.
+   * @default true
+   */
+  showQuickActions?: boolean;
   className?: string;
   /** 있으면 뒤로 버튼 + 제목 행 (`router.back()`, 히스토리 없으면 홈으로) */
   title?: string;
@@ -26,7 +40,7 @@ interface IProps {
 const TopBar: React.FC<IProps> = ({
   left,
   right,
-  showNotification = true,
+  showQuickActions = true,
   className,
   title,
 }) => {
@@ -78,37 +92,60 @@ const TopBar: React.FC<IProps> = ({
     </div>
   ) : null;
 
-  const defaultRight = showNotification ? (
-    notificationPanel ? (
-      <button
-        type="button"
-        onClick={() => notificationPanel.open()}
-        className="relative text-on-surface-variant"
-        aria-label={hasUnread ? "알림, 읽지 않은 알림 있음" : "알림"}
-      >
-        <Bell className="size-6" strokeWidth={2} aria-hidden />
-        {hasUnread ? (
-          <span
-            className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-primary ring-2 ring-background"
-            aria-hidden
-          />
-        ) : null}
-      </button>
-    ) : (
+  const defaultRight = showQuickActions ? (
+    <div className="flex items-center gap-4">
       <Link
-        href={ROUTES.NOTIFICATIONS.path}
-        className="relative inline-flex text-on-surface-variant"
-        aria-label={hasUnread ? "알림, 읽지 않은 알림 있음" : "알림"}
+        href={ROUTES.STATISTICS.path}
+        className={quickActionClass}
+        aria-label="통계"
       >
-        <Bell className="size-6" strokeWidth={2} aria-hidden />
-        {hasUnread ? (
-          <span
-            className="absolute -top-0.5 -right-0.5 size-1.5 rounded-full bg-primary ring-2 ring-background"
-            aria-hidden
-          />
-        ) : null}
+        <BarChart3 className="size-6" strokeWidth={1.75} />
       </Link>
-    )
+      <Link
+        href={ROUTES.MY.MEMBERSHIPS.path}
+        className={quickActionClass}
+        aria-label="회원권"
+      >
+        <Ticket className="size-6" strokeWidth={1.75} />
+      </Link>
+      <Link
+        href={ROUTES.MY.SETTINGS.path}
+        className={quickActionClass}
+        aria-label="설정"
+      >
+        <Settings className="size-6" strokeWidth={1.75} />
+      </Link>
+      {notificationPanel ? (
+        <button
+          type="button"
+          onClick={() => notificationPanel.open()}
+          className={cn(quickActionClass, "relative")}
+          aria-label={hasUnread ? "알림, 읽지 않은 알림 있음" : "알림"}
+        >
+          <Bell className="size-6" strokeWidth={1.75} aria-hidden />
+          {hasUnread ? (
+            <span
+              className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-primary ring-2 ring-background"
+              aria-hidden
+            />
+          ) : null}
+        </button>
+      ) : (
+        <Link
+          href={ROUTES.NOTIFICATIONS.path}
+          className={cn(quickActionClass, "relative inline-flex")}
+          aria-label={hasUnread ? "알림, 읽지 않은 알림 있음" : "알림"}
+        >
+          <Bell className="size-6" strokeWidth={1.75} aria-hidden />
+          {hasUnread ? (
+            <span
+              className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-primary ring-2 ring-background"
+              aria-hidden
+            />
+          ) : null}
+        </Link>
+      )}
+    </div>
   ) : null;
 
   return (
