@@ -291,7 +291,7 @@ const RecordCheckInLinkField: React.FC<IProps> = ({
           </PopoverContent>
         </Popover>
         {emptyHint && !loading ? (
-          <p className="text-xs text-on-surface-variant">{emptyHint}</p>
+          <p className="mt-2 text-xs text-on-surface-variant">{emptyHint}</p>
         ) : null}
       </>
     </FormHelper>

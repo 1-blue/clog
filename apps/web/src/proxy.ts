@@ -5,6 +5,7 @@ import { NextResponse, type NextRequest } from "next/server";
 const AUTH_ROUTES = [
   "/my",
   "/records",
+  "/statistics",
   "/notifications",
   "/community/create",
   "/community/edit",
