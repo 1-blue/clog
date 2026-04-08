@@ -1,5 +1,4 @@
 import { useFocusEffect } from "expo-router";
-import * as Notifications from "expo-notifications";
 import * as SplashScreen from "expo-splash-screen";
 import {
   BackHandler,
@@ -18,6 +17,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { WEB_URL } from "../../constants";
 import {
+  Notifications,
   ensurePushNotificationHandler,
   registerForPushNotificationsOnce,
 } from "../../libs/pushNotifications";
@@ -46,6 +46,8 @@ const WebViewScreen: React.FC<IProps> = ({ path = "", authCallbackUrl }) => {
   const [webViewSlotHeight, setWebViewSlotHeight] = useState(0);
   /** Android: SwipeRefreshLayout(RefreshControl) 동작 중 */
   const [androidRefreshing, setAndroidRefreshing] = useState(false);
+  /** Android: WebView 내부 스크롤이 최상단인지 여부 — RefreshControl 활성화 조건 */
+  const [isWebViewAtTop, setIsWebViewAtTop] = useState(true);
 
   const baseUri = `${WEB_URL}${path}`;
   // 인증 콜백 URL이 있으면 우선 사용, 재시도 시 기본 URL로 복원
@@ -140,7 +142,7 @@ true;
   );
 
   useEffect(() => {
-    if (!isAndroid) return;
+    if (!isAndroid || !Notifications) return;
 
     const navigateFromPayload = (data: Record<string, unknown> | undefined) => {
       const link = typeof data?.link === "string" ? data.link : null;
@@ -157,16 +159,18 @@ true;
 
     const sub = Notifications.addNotificationResponseReceivedListener(
       (response) => {
-        const data = response.notification.request.content
-          .data as Record<string, unknown> | undefined;
+        const data = response.notification.request.content.data as
+          | Record<string, unknown>
+          | undefined;
         navigateFromPayload(data);
       },
     );
 
     void Notifications.getLastNotificationResponseAsync().then((response) => {
       if (!response) return;
-      const data = response.notification.request.content
-        .data as Record<string, unknown> | undefined;
+      const data = response.notification.request.content.data as
+        | Record<string, unknown>
+        | undefined;
       navigateFromPayload(data);
     });
 
@@ -359,12 +363,21 @@ true;
     webViewRef.current?.reload();
   }, []);
 
+  const handleWebViewScroll = useCallback(
+    (e: { nativeEvent: { contentOffset: { y: number } } }) => {
+      // 작은 값(예: 1px 미만)은 최상단으로 간주 — 부드러운 스크롤 종료 시 0이 정확히 안 들어올 수 있음
+      setIsWebViewAtTop(e.nativeEvent.contentOffset.y <= 0);
+    },
+    [],
+  );
+
   const handleWebViewLoadEnd = useCallback(() => {
     setIsInitialLoading(false);
     setWebLoadedOnce(true);
     hideSplash();
     if (isAndroid) {
       setAndroidRefreshing(false);
+      setIsWebViewAtTop(true);
     }
   }, [isAndroid]);
 
@@ -415,6 +428,7 @@ true;
               <RefreshControl
                 refreshing={androidRefreshing}
                 onRefresh={onAndroidPullToRefresh}
+                enabled={isWebViewAtTop}
                 colors={["#E8E8E8"]}
                 progressBackgroundColor="#2A2A2A"
               />
@@ -425,6 +439,7 @@ true;
               ref={webViewRef}
               {...webViewSharedProps}
               nestedScrollEnabled
+              onScroll={handleWebViewScroll}
               style={[styles.webview, { height: webViewAndroidHeight }]}
             />
           </ScrollView>
@@ -450,10 +465,10 @@ export default WebViewScreen;
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#151515" },
-  flexFill: { flex: 1 },
+  flexFill: { flex: 1, backgroundColor: "#151515" },
   /** ScrollView 자식이 화면 높이만큼 차지하도록 — RefreshControl이 동작하려면 부모 스크롤 계층 필요 */
   androidScrollContent: {
     flexGrow: 1,
   },
-  webview: { flex: 1, backgroundColor: "transparent" },
+  webview: { flex: 1, backgroundColor: "#151515" },
 });

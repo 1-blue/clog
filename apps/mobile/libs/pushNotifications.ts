@@ -1,13 +1,36 @@
 import * as Device from "expo-device";
-import * as Notifications from "expo-notifications";
-import Constants from "expo-constants";
+import Constants, { ExecutionEnvironment } from "expo-constants";
 import { Platform } from "react-native";
+
+/**
+ * Expo Go 환경 여부.
+ *
+ * Constants.appOwnership은 SDK 49부터 deprecated 되어 신뢰할 수 없으므로
+ * executionEnvironment를 사용한다.
+ */
+export const isExpoGo =
+  Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
+
+/**
+ * expo-notifications 모듈.
+ *
+ * SDK 53부터 Expo Go(Android)에서는 expo-notifications의 푸시 기능이 제거되어
+ * top-level `import` 자체가 throw 한다. 시뮬레이터/Expo Go에서도 앱이 뜨도록
+ * `require`로 한 번만 가드 로드하고, Expo Go에서는 null로 둔다.
+ *
+ * 푸시 자체는 development build에서만 동작한다.
+ */
+type TNotifications = typeof import("expo-notifications");
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+export const Notifications: TNotifications | null = isExpoGo
+  ? null
+  : (require("expo-notifications") as TNotifications);
 
 let notificationHandlerConfigured = false;
 
 /** 포그라운드 수신 시 표시 방식 (앱 전역 1회) */
 export const ensurePushNotificationHandler = () => {
-  if (notificationHandlerConfigured) return;
+  if (!Notifications || notificationHandlerConfigured) return;
   notificationHandlerConfigured = true;
 
   Notifications.setNotificationHandler({
@@ -22,7 +45,7 @@ export const ensurePushNotificationHandler = () => {
 
 /** Android 8+ 알림 채널 — 권한/표시 전에 생성 */
 export const ensureDefaultAndroidChannel = async () => {
-  if (Platform.OS !== "android") return;
+  if (Platform.OS !== "android" || !Notifications) return;
 
   await Notifications.setNotificationChannelAsync("default", {
     name: "default",
@@ -49,6 +72,14 @@ export const registerForPushNotificationsOnce =
 
 const registerForPushNotificationsAsync =
   async (): Promise<TRegisterPushResult> => {
+    if (!Notifications) {
+      return {
+        ok: false,
+        reason:
+          "Expo Go에서는 푸시 알림을 등록할 수 없습니다. development build를 사용하세요.",
+      };
+    }
+
     await ensureDefaultAndroidChannel();
 
     if (!Device.isDevice) {
