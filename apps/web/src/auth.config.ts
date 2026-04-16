@@ -1,6 +1,8 @@
 import type { NextAuthConfig } from "next-auth";
+import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 
+import { signInWithGoogleIdToken } from "#web/libs/auth/googleNativeSignIn";
 import { kakaoProvider } from "#web/libs/auth/kakaoProvider";
 
 /** 인증이 필요한 경로 패턴 (proxy.ts와 동일) */
@@ -39,6 +41,18 @@ const authConfig = {
       allowDangerousEmailAccountLinking: true,
     }),
     kakaoProvider,
+    Credentials({
+      id: "google-id-token",
+      name: "Google (native)",
+      credentials: {
+        idToken: { label: "ID Token", type: "text" },
+      },
+      async authorize(credentials) {
+        const raw = credentials?.idToken;
+        if (typeof raw !== "string" || !raw.trim()) return null;
+        return signInWithGoogleIdToken(raw.trim());
+      },
+    }),
   ],
   pages: { signIn: "/login" },
   trustHost: true,

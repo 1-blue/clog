@@ -1,6 +1,8 @@
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { useFocusEffect } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import {
+  Alert,
   BackHandler,
   Linking,
   Platform,
@@ -12,7 +14,11 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { WebView, type WebViewNavigation } from "react-native-webview";
+import {
+  WebView,
+  type WebViewMessageEvent,
+  type WebViewNavigation,
+} from "react-native-webview";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { WEB_URL } from "../../constants";
@@ -37,6 +43,8 @@ interface IProps {
 
 const isAndroid = Platform.OS === "android";
 
+/** 구글: 네이티브 id_token → WebView에서 Auth.js callback으로 세션 쿠키. 카카오는 웹뷰 내 OAuth. */
+
 const WebViewScreen: React.FC<IProps> = ({ path = "", authCallbackUrl }) => {
   const { height: windowHeight } = useWindowDimensions();
   const webViewRef = useRef<WebView>(null);
@@ -48,10 +56,6 @@ const WebViewScreen: React.FC<IProps> = ({ path = "", authCallbackUrl }) => {
   const [androidRefreshing, setAndroidRefreshing] = useState(false);
   /** Android: WebView 내부 스크롤이 최상단인지 여부 — RefreshControl 활성화 조건 */
   const [isWebViewAtTop, setIsWebViewAtTop] = useState(true);
-
-  const baseUri = `${WEB_URL}${path}`;
-  // 인증 콜백 URL이 있으면 우선 사용, 재시도 시 기본 URL로 복원
-  const [sourceUri, setSourceUri] = useState(authCallbackUrl || baseUri);
 
   // 💡 마지막으로 뒤로가기를 누른 시간을 저장할 변수
   const exitAppRef = useRef(0);
@@ -69,6 +73,9 @@ const WebViewScreen: React.FC<IProps> = ({ path = "", authCallbackUrl }) => {
   /** Android Expo 푸시 — WebView 쿠키로 서버 등록 */
   const [expoPushToken, setExpoPushToken] = useState<string | null>(null);
   const [webLoadedOnce, setWebLoadedOnce] = useState(false);
+
+  const baseUri = `${WEB_URL}${path}`;
+  const [sourceUri, setSourceUri] = useState(authCallbackUrl || `${WEB_URL}${path}`);
 
   /** WebView 실제 origin과 네이티브 WEB_URL 불일치 시 쿠키가 안 붙어 401 나는 경우 방지 */
   const injectRegisterPushToken = useCallback((token: string) => {
@@ -103,6 +110,150 @@ true;
   );
 
   const webOriginPrefix = useMemo(() => WEB_URL.replace(/\/$/, ""), []);
+
+  const authApiBase = useMemo(
+    () => `${WEB_URL.replace(/\/$/, "")}/api/auth`,
+    [],
+  );
+
+  useEffect(() => {
+    const webId = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID?.trim();
+    if (!webId) {
+      return;
+    }
+    GoogleSignin.configure({
+      webClientId: webId,
+      offlineAccess: false,
+    });
+  }, []);
+
+  const injectGoogleIdTokenSession = useCallback(
+    (idToken: string, callbackPath: string) => {
+      const wv = webViewRef.current;
+      if (!wv) return;
+
+      const nextUrl = (() => {
+        try {
+          if (callbackPath.startsWith("http://") || callbackPath.startsWith("https://")) {
+            return callbackPath;
+          }
+          const u = new URL(callbackPath, `${WEB_URL}/`);
+          return u.toString();
+        } catch {
+          return `${WEB_URL}${callbackPath.startsWith("/") ? "" : "/"}${callbackPath}`;
+        }
+      })();
+
+      const script = `
+(function(){
+  var idToken = ${JSON.stringify(idToken)};
+  var nextUrl = ${JSON.stringify(nextUrl)};
+  var authBase = ${JSON.stringify(authApiBase)};
+  function postErr(msg) {
+    try {
+      if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+        window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'clog.auth.error', message: msg }));
+      }
+    } catch (e) {}
+  }
+  fetch(authBase + '/csrf', { credentials: 'include' })
+    .then(function(r){ return r.json(); })
+    .then(function(csrf){
+      if (!csrf || !csrf.csrfToken) {
+        postErr('로그인에 실패했습니다. 다시 시도해 주세요.');
+        return Promise.reject(new Error('csrf'));
+      }
+      return fetch(authBase + '/callback/google-id-token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-Auth-Return-Redirect': '1'
+        },
+        credentials: 'include',
+        body: new URLSearchParams({
+          idToken: idToken,
+          csrfToken: csrf.csrfToken,
+          callbackUrl: nextUrl
+        }).toString()
+      });
+    })
+    .then(function(r){
+      return r.text().then(function(t){
+        var j = {};
+        try { j = JSON.parse(t); } catch (e) {}
+        return { ok: r.ok, j: j, status: r.status };
+      });
+    })
+    .then(function(x){
+      if (x.ok) {
+        window.location.href = nextUrl;
+        return;
+      }
+      postErr('로그인에 실패했습니다. 다시 시도해 주세요.');
+    })
+    .catch(function(e){
+      if (e && e.message !== 'csrf') postErr('로그인에 실패했습니다. 다시 시도해 주세요.');
+    });
+})();
+true;
+`;
+      wv.injectJavaScript(script);
+    },
+    [authApiBase],
+  );
+
+  const runNativeGoogleSignIn = useCallback(
+    async (nextPath: string) => {
+      const webId = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID?.trim();
+      if (!webId) {
+        return;
+      }
+      try {
+        if (isAndroid) {
+          await GoogleSignin.hasPlayServices({
+            showPlayServicesUpdateDialog: true,
+          });
+        }
+        const response = await GoogleSignin.signIn();
+        if (response.type !== "success") return;
+        let idToken = response.data.idToken;
+        if (!idToken) {
+          const tokens = await GoogleSignin.getTokens();
+          idToken = tokens.idToken;
+        }
+        if (!idToken) {
+          Alert.alert("로그인", "로그인에 실패했습니다. 다시 시도해 주세요.");
+          return;
+        }
+        injectGoogleIdTokenSession(idToken, nextPath);
+      } catch (e) {
+        Alert.alert("로그인", "로그인에 실패했습니다. 다시 시도해 주세요.");
+      }
+    },
+    [injectGoogleIdTokenSession],
+  );
+
+  const handleWebViewMessage = useCallback(
+    (event: WebViewMessageEvent) => {
+      try {
+        const data = JSON.parse(event.nativeEvent.data) as {
+          type?: string;
+          next?: string;
+          message?: string;
+        };
+        if (data.type === "clog.auth.error") {
+          Alert.alert("로그인", "로그인에 실패했습니다. 다시 시도해 주세요.");
+          return;
+        }
+        if (data.type !== "clog.oauth.google") return;
+        const next = data.next ?? "/";
+        void runNativeGoogleSignIn(next);
+      } catch {
+        // ignore
+      }
+    },
+    [runNativeGoogleSignIn],
+  );
 
   useEffect(() => {
     if (!isAndroid) return;
@@ -208,21 +359,6 @@ true;
 
   const onShouldStartLoadWithRequest = (event: any) => {
     const { url } = event;
-
-    // ✅ Google OAuth는 WebView(User-Agent)에서 차단될 수 있음(403 disallowed_useragent).
-    // Google 로그인 도중 accounts.google.com으로 이동하려는 순간 외부 브라우저로 넘긴다.
-    // (Android WebView/Chrome, iOS WKWebView/Safari는 쿠키를 공유할 수 있어 로그인 완료 후 WebView에서 세션이 이어질 수 있음)
-    try {
-      if (url.startsWith("https://")) {
-        const u = new URL(url);
-        if (u.hostname === "accounts.google.com") {
-          Linking.openURL(url);
-          return false;
-        }
-      }
-    } catch {
-      // ignore
-    }
 
     // 1. 일반 웹페이지 (http, https)는 정상적으로 웹뷰에서 엽니다.
     if (
@@ -365,6 +501,7 @@ true;
     source: { uri: sourceUri },
     onNavigationStateChange: handleNavigationStateChange,
     onShouldStartLoadWithRequest,
+    onMessage: handleWebViewMessage,
     originWhitelist: ["*"],
     javaScriptEnabled: true,
     domStorageEnabled: true,

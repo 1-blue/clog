@@ -49,9 +49,11 @@ declare namespace NodeJS {
     KAKAO_REST_API_KEY: string;
     /** Kakao Secret Key */
     KAKAO_SECRET_KEY: string;
-    /** Google Client ID */
+    /** Google 웹 클라이언트 ID (웹 OAuth + 일부 네이티브 id_token aud) */
     GOOGLE_CLIENT_ID: string;
     /** Google Client Secret */
     GOOGLE_CLIENT_SECRET: string;
+    /** Android OAuth 클라이언트 ID — 네이티브 id_token의 aud가 Android일 때 서버 검증에 필요 */
+    GOOGLE_ANDROID_CLIENT_ID?: string;
   }
 }

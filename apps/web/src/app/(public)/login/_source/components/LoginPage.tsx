@@ -1,8 +1,8 @@
 "use client";
 
 import { Mountain } from "lucide-react";
-import Link from "next/link";
 import { signIn } from "next-auth/react";
+import Link from "next/link";
 
 import { Button } from "#web/components/ui/button";
 import { ROUTES } from "#web/constants";
@@ -13,11 +13,30 @@ const LoginPage: React.FC = () => {
     return params.get("callbackUrl") ?? ROUTES.HOME.path;
   };
 
+  /** Expo WebView: 구글만 네이티브 Sign-In → id_token으로 세션 (카카오는 WebView 내 OAuth 유지) */
+  const postNativeGoogleSignIn = () => {
+    if (typeof window === "undefined") return false;
+    const bridge = (
+      window as Window & {
+        ReactNativeWebView?: { postMessage: (msg: string) => void };
+      }
+    ).ReactNativeWebView;
+    if (!bridge?.postMessage) return false;
+    bridge.postMessage(
+      JSON.stringify({
+        type: "clog.oauth.google",
+        next: getCallbackUrl(),
+      }),
+    );
+    return true;
+  };
+
   const signInWithKakao = async () => {
     await signIn("kakao", { callbackUrl: getCallbackUrl() });
   };
 
   const signInWithGoogle = async () => {
+    if (postNativeGoogleSignIn()) return;
     await signIn("google", { callbackUrl: getCallbackUrl() });
   };
 
@@ -46,8 +65,9 @@ const LoginPage: React.FC = () => {
             클라이머를 위한 커뮤니티 · 기록 앱
           </p>
           <p className="mx-auto mt-4 max-w-xs text-xs leading-relaxed text-on-surface-variant/90">
-            로그인 없이도 게시글을 읽을 수 있어요. 댓글과 글쓰기는 로그인 후
-            이용할 수 있습니다.
+            로그인 없이도 게시글을 읽을 수 있어요.
+            <br />
+            댓글과 글쓰기는 로그인 후 이용할 수 있습니다.
           </p>
         </div>
       </div>

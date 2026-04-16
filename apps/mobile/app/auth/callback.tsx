@@ -4,7 +4,7 @@ import { useEffect } from "react";
 
 import { WEB_URL } from "../../constants";
 
-// 외부 브라우저 OAuth 후 앱으로 복귀 — 웹 세션은 브라우저 쿠키에만 있을 수 있어 WebView를 홈으로 다시 연다.
+/** clog://auth/callback — 딥링크 복귀 시 WebView 시작 URL만 지정 (핸드오프 제거) */
 const AuthCallback = () => {
   const { next } = useLocalSearchParams<{
     next?: string;
@@ -12,7 +12,9 @@ const AuthCallback = () => {
 
   useEffect(() => {
     const nextSafe =
-      next && next.startsWith("/") && !next.startsWith("//") ? next : "/";
+      next && typeof next === "string" && next.startsWith("/") && !next.startsWith("//")
+        ? next
+        : "/";
 
     router.replace({
       pathname: "/",
@@ -20,7 +22,6 @@ const AuthCallback = () => {
     });
   }, [next]);
 
-  // 라우트 전환 중 깜빡임 방지
   return <View style={{ flex: 1, backgroundColor: "#151515" }} />;
 };
 

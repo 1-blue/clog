@@ -1,0 +1,44 @@
+import type { ExpoConfig } from "expo/config";
+
+const config: ExpoConfig = {
+  owner: "1-blue",
+  name: "클로그",
+  slug: "clog",
+  scheme: "clog",
+  version: "1.0.2",
+  orientation: "portrait",
+  userInterfaceStyle: "light",
+  icon: "./assets/logo.png",
+  splash: {
+    image: "./assets/logo.png",
+    resizeMode: "contain",
+    backgroundColor: "#151515",
+  },
+  ios: {
+    supportsTablet: true,
+  },
+  android: {
+    backgroundColor: "#151515",
+    navigationBar: {
+      backgroundColor: "#151515",
+      barStyle: "light-content",
+    },
+    adaptiveIcon: {
+      foregroundImage: "./assets/logo.png",
+      backgroundColor: "#FFFFFF",
+    },
+    package: "com.oneblue.clog",
+    googleServicesFile: "./google-services.json",
+  },
+  web: {
+    favicon: "./assets/favicon.ico",
+  },
+  extra: {
+    eas: {
+      projectId: "d39d6c86-8f47-4104-b4aa-4fb4b467d40f",
+    },
+  },
+  plugins: ["expo-router", "expo-notifications"],
+} as ExpoConfig;
+
+export default { expo: config };
