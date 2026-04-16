@@ -31,8 +31,6 @@ export const slackPostMessage = async (
 
 /** 알림 실패가 API 응답에 영향 없도록 fire-and-forget */
 export const fireSlackNotify = (channel: string | undefined, text: string) => {
-  console.log("🐬 fireSlackNotify channel, text >> ", channel, text);
-
   slackPostMessage(channel, text).catch((err: unknown) => {
     console.error("[slack] notify error:", err);
   });

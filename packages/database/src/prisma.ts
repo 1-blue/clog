@@ -11,7 +11,15 @@ const createPrismaClient = () => {
     throw new Error("DATABASE_URL 환경 변수가 필요합니다.");
   }
 
-  const adapter = new PrismaPg({ connectionString });
+  /**
+   * PrismaPg는 내부적으로 node-pg Pool을 쓴다. Vercel 등 서버리스에서는
+   * 인스턴스(람다)마다 풀이 생기므로, 풀당 최대 연결을 1로 두는 것이 안전하다.
+   * (여러 PrismaClient 인스턴스가 생기면 풀 max × 인스턴스 수만큼 PgBouncer에 붙는다)
+   */
+  const adapter = new PrismaPg({
+    connectionString,
+    max: 1,
+  });
   return new PrismaClient({ adapter });
 };
 
@@ -23,9 +31,7 @@ const createPrismaClient = () => {
  */
 export const prisma: PrismaClient = new Proxy({} as PrismaClient, {
   get(_target, prop, receiver) {
-    const instance = globalForPrisma.prisma ?? createPrismaClient();
-    if (process.env.NODE_ENV !== "production")
-      globalForPrisma.prisma = instance;
-    return Reflect.get(instance, prop, receiver);
+    globalForPrisma.prisma ??= createPrismaClient();
+    return Reflect.get(globalForPrisma.prisma, prop, receiver);
   },
 });
