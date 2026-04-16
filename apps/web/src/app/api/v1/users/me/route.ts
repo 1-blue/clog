@@ -9,16 +9,14 @@ import {
   requireAuth,
 } from "#web/libs/api";
 import { catchApiError } from "#web/libs/api/errorCatch";
-import { linkedProvidersFromSupabase } from "#web/libs/auth/linkedProvidersFromSupabase";
-import { syncSupabaseUserToPrisma } from "#web/libs/auth/syncSupabaseUserToPrisma";
+import { getLinkedProvidersForUserId } from "#web/libs/auth/linkedProviders";
 import { closeExpiredCheckInsAndNotify } from "#web/libs/gym/closeExpiredCheckInsAndNotify";
 import { notifySlackUserWithdrawal } from "#web/libs/slack/notifications";
-import { createClient } from "#web/libs/supabase/server";
 import { getUserProfileStats } from "#web/libs/user/profileStats";
 
 const meInclude = {
   _count: {
-    select: { following: true, followers: true, sessions: true },
+    select: { following: true, followers: true, climbingSessions: true },
   },
   homeGym: { select: { id: true, name: true } },
 } as const;
@@ -31,25 +29,10 @@ export const GET = async (request: Request) => {
   }
 
   try {
-    const supabase = await createClient();
-    const {
-      data: { user: authUser },
-    } = await supabase.auth.getUser();
-
-    let user = await prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: { id: userId },
       include: meInclude,
     });
-
-    if (!user) {
-      if (authUser?.id === userId) {
-        await syncSupabaseUserToPrisma(authUser);
-        user = await prisma.user.findUnique({
-          where: { id: userId },
-          include: meInclude,
-        });
-      }
-    }
 
     if (!user) return errorResponse("유저를 찾을 수 없습니다.", 404);
 
@@ -58,7 +41,7 @@ export const GET = async (request: Request) => {
       "owner",
     );
 
-    const linkedProviders = linkedProvidersFromSupabase(authUser?.identities);
+    const linkedProviders = await getLinkedProvidersForUserId(user.id);
 
     await closeExpiredCheckInsAndNotify(user.id);
 
@@ -74,8 +57,15 @@ export const GET = async (request: Request) => {
       orderBy: { startedAt: "desc" },
     });
 
+    const { _count, ...rest } = user;
+
     return json({
-      ...user,
+      ...rest,
+      _count: {
+        following: _count.following,
+        followers: _count.followers,
+        sessions: _count.climbingSessions,
+      },
       visitCount,
       sendCount,
       linkedProviders,
@@ -102,15 +92,13 @@ export const DELETE = async (request: Request) => {
   if (error) return error;
 
   try {
-    const supabase = await createClient();
-    const { data: authData } = await supabase.auth.admin.getUserById(userId!);
     const prismaUser = await prisma.user.findUnique({
       where: { id: userId! },
       select: { nickname: true, email: true },
     });
     if (!prismaUser) return errorResponse("유저를 찾을 수 없습니다.", 404);
 
-    const providers = linkedProvidersFromSupabase(authData.user?.identities);
+    const providers = await getLinkedProvidersForUserId(userId!);
 
     /** Prisma 모델은 onDelete: Cascade이므로 유저 삭제 시 관련 데이터 자동 삭제 */
     await prisma.user.delete({ where: { id: userId! } });
@@ -121,9 +109,6 @@ export const DELETE = async (request: Request) => {
       email: prismaUser.email,
       providers,
     });
-
-    /** Supabase Auth 유저도 삭제 */
-    await supabase.auth.admin.deleteUser(userId!);
 
     return jsonWithToast(null, "회원 탈퇴가 완료되었습니다.");
   } catch (err) {

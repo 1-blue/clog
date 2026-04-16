@@ -3,7 +3,7 @@
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
 import { ChevronDown, ChevronRight, User } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 
 import type { components } from "#web/@types/openapi";
@@ -38,12 +38,6 @@ const PostCommentBlock: React.FC<IProps> = ({
   const [draft, setDraft] = useState(comment.content);
 
   const { updateCommentMutation } = usePostDetailMutations();
-
-  useEffect(() => {
-    if (!editing) {
-      setDraft(comment.content);
-    }
-  }, [comment.content, editing]);
 
   const handleSaveEdit = () => {
     const trimmed = draft.trim();

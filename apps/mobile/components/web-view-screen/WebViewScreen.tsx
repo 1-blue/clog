@@ -209,39 +209,19 @@ true;
   const onShouldStartLoadWithRequest = (event: any) => {
     const { url } = event;
 
-    // ✅ Google OAuth는 WebView(User-Agent)에서 차단됨(403 disallowed_useragent)
-    // Supabase authorize URL로 이동하려 할 때 redirect_to를 앱 딥링크로 바꿔서 "외부 브라우저"에서 진행한다.
+    // ✅ Google OAuth는 WebView(User-Agent)에서 차단될 수 있음(403 disallowed_useragent).
+    // Google 로그인 도중 accounts.google.com으로 이동하려는 순간 외부 브라우저로 넘긴다.
+    // (Android WebView/Chrome, iOS WKWebView/Safari는 쿠키를 공유할 수 있어 로그인 완료 후 WebView에서 세션이 이어질 수 있음)
     try {
       if (url.startsWith("https://")) {
         const u = new URL(url);
-        const isSupabaseAuthorize = u.pathname.endsWith("/auth/v1/authorize");
-        const provider = u.searchParams.get("provider");
-
-        if (isSupabaseAuthorize && provider === "google") {
-          const redirectTo = u.searchParams.get("redirect_to");
-          let next = "/";
-          if (redirectTo) {
-            try {
-              const r = new URL(redirectTo);
-              next = r.searchParams.get("next") ?? "/";
-            } catch {
-              // ignore
-            }
-          }
-          const nextSafe =
-            next.startsWith("/") && !next.startsWith("//") ? next : "/";
-
-          const deepLink = new URL("clog://auth/callback");
-          deepLink.searchParams.set("next", nextSafe);
-          u.searchParams.set("redirect_to", deepLink.toString());
-
-          // 외부 브라우저로 OAuth 진행 (Google 정책 대응)
-          Linking.openURL(u.toString());
+        if (u.hostname === "accounts.google.com") {
+          Linking.openURL(url);
           return false;
         }
       }
     } catch {
-      // URL 파싱 실패 시 기존 로직 진행
+      // ignore
     }
 
     // 1. 일반 웹페이지 (http, https)는 정상적으로 웹뷰에서 엽니다.
@@ -389,6 +369,7 @@ true;
     javaScriptEnabled: true,
     domStorageEnabled: true,
     thirdPartyCookiesEnabled: true,
+    sharedCookiesEnabled: true,
     onLoadEnd: handleWebViewLoadEnd,
     onError: () => {
       setIsOffline(true);

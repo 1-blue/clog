@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { prisma } from "@clog/db/prisma";
 
-import { createClient } from "#web/libs/supabase/server";
+import { auth } from "#web/auth";
 
 /** 성공 응답 */
 export const json = <T>(payload: T, status = 200) => {
@@ -26,11 +26,8 @@ export const paginatedJson = <T>(items: T[], nextCursor: string | null) => {
 
 /** 인증된 유저 ID 가져오기 */
 export const getAuthUserId = async (): Promise<string | null> => {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  return user?.id ?? null;
+  const session = await auth();
+  return session?.user?.id ?? null;
 };
 
 /** 인증 필수 체크 - 실패 시 401 응답 반환 */

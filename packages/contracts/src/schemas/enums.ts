@@ -12,7 +12,6 @@ import {
   MembershipPlanCode,
   NotificationType,
   PostCategory,
-  Provider,
   PushPlatform,
   Region,
   Role,
@@ -31,14 +30,21 @@ export type {
   MembershipPlanCode,
   NotificationType,
   PostCategory,
-  Provider,
   PushPlatform,
   Region,
   Role,
 } from "@clog/db";
 
 // Zod 스키마 — Prisma 런타임 enum 객체로부터 파생
-export const providerEnum = z.nativeEnum(Provider).openapi("Provider");
+/**
+ * OAuth Provider는 DB(Prisma Client)의 런타임 enum 객체에 의존하지 않는다.
+ *
+ * - Prisma는 "모델에서 사용되지 않는 enum"을 런타임 export 하지 않을 수 있어
+ *   `z.nativeEnum(Provider)`가 브라우저 번들에서 `Provider === undefined`로 깨질 수 있음.
+ * - 앱 계약(연동 provider)은 고정된 union이라 z.enum으로 정의한다.
+ */
+export const providerEnum = z.enum(["KAKAO", "GOOGLE"]).openapi("Provider");
+export type Provider = z.infer<typeof providerEnum>;
 export const roleEnum = z.nativeEnum(Role).openapi("Role");
 export const regionEnum = z.nativeEnum(Region).openapi("Region");
 export const difficultyEnum = z.nativeEnum(Difficulty).openapi("Difficulty");

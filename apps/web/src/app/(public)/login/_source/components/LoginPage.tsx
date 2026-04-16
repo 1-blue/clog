@@ -2,32 +2,23 @@
 
 import { Mountain } from "lucide-react";
 import Link from "next/link";
+import { signIn } from "next-auth/react";
 
 import { Button } from "#web/components/ui/button";
 import { ROUTES } from "#web/constants";
-import { createClient } from "#web/libs/supabase/client";
 
 const LoginPage: React.FC = () => {
-  const supabase = createClient();
-
-  const buildRedirectTo = () => {
+  const getCallbackUrl = () => {
     const params = new URLSearchParams(window.location.search);
-    const next = params.get("callbackUrl") ?? ROUTES.HOME.path;
-    return `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
+    return params.get("callbackUrl") ?? ROUTES.HOME.path;
   };
 
   const signInWithKakao = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: "kakao",
-      options: { redirectTo: buildRedirectTo() },
-    });
+    await signIn("kakao", { callbackUrl: getCallbackUrl() });
   };
 
   const signInWithGoogle = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: buildRedirectTo() },
-    });
+    await signIn("google", { callbackUrl: getCallbackUrl() });
   };
 
   return (

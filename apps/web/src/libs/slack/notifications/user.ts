@@ -1,7 +1,7 @@
 import {
   formatLinkedProviders,
   type TLinkedProvider,
-} from "#web/libs/auth/linkedProvidersFromSupabase";
+} from "#web/libs/auth/linkedProviders";
 
 import { fireSlackNotify } from "../postMessage";
 import { slackChannelIds } from "./channels";
