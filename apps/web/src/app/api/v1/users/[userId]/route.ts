@@ -32,7 +32,7 @@ export const GET = async (
         createdAt: true,
         homeGym: { select: { id: true, name: true } },
         _count: {
-          select: { following: true, followers: true, sessions: true },
+          select: { following: true, followers: true, climbingSessions: true },
         },
         ...(currentUserId && {
           followers: {
@@ -54,8 +54,15 @@ export const GET = async (
       publicSessionCountInRange: activityHeatmapSessionCount,
     } = await getUserActivityHeatmap(userId);
 
+    const { _count, ...rest } = user;
+
     return json({
-      ...user,
+      ...rest,
+      _count: {
+        following: _count.following,
+        followers: _count.followers,
+        sessions: _count.climbingSessions,
+      },
       visitCount,
       sendCount,
       activityHeatmap,

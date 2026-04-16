@@ -1,5 +1,5 @@
-import { Prisma } from "@prisma/client";
-import { z } from "zod";
+import { z } from 'zod';
+import { Prisma } from '@prisma/client';
 
 /////////////////////////////////////////
 // HELPER FUNCTIONS
@@ -8,17 +8,11 @@ import { z } from "zod";
 // JSON
 //------------------------------------------------------
 
-export type NullableJsonInput =
-  | Prisma.JsonValue
-  | null
-  | "JsonNull"
-  | "DbNull"
-  | Prisma.NullTypes.DbNull
-  | Prisma.NullTypes.JsonNull;
+export type NullableJsonInput = Prisma.JsonValue | null | 'JsonNull' | 'DbNull' | Prisma.NullTypes.DbNull | Prisma.NullTypes.JsonNull;
 
 export const transformJsonNull = (v?: NullableJsonInput) => {
-  if (!v || v === "DbNull") return Prisma.NullTypes.DbNull;
-  if (v === "JsonNull") return Prisma.NullTypes.JsonNull;
+  if (!v || v === 'DbNull') return Prisma.NullTypes.DbNull;
+  if (v === 'JsonNull') return Prisma.NullTypes.JsonNull;
   return v;
 };
 
@@ -28,501 +22,159 @@ export const JsonValueSchema: z.ZodType<Prisma.JsonValue> = z.lazy(() =>
     z.number(),
     z.boolean(),
     z.literal(null),
-    z.record(
-      z.string(),
-      z.lazy(() => JsonValueSchema.optional()),
-    ),
+    z.record(z.string(), z.lazy(() => JsonValueSchema.optional())),
     z.array(z.lazy(() => JsonValueSchema)),
-  ]),
+  ])
 );
 
 export type JsonValueType = z.infer<typeof JsonValueSchema>;
 
 export const NullableJsonValue = z
-  .union([JsonValueSchema, z.literal("DbNull"), z.literal("JsonNull")])
+  .union([JsonValueSchema, z.literal('DbNull'), z.literal('JsonNull')])
   .nullable()
   .transform((v) => transformJsonNull(v));
 
 export type NullableJsonValueType = z.infer<typeof NullableJsonValue>;
 
-export const InputJsonValueSchema: z.ZodType<Prisma.InputJsonValue> = z.lazy(
-  () =>
-    z.union([
-      z.string(),
-      z.number(),
-      z.boolean(),
-      z.object({ toJSON: z.any() }),
-      z.record(
-        z.string(),
-        z.lazy(() => z.union([InputJsonValueSchema, z.literal(null)])),
-      ),
-      z.array(z.lazy(() => z.union([InputJsonValueSchema, z.literal(null)]))),
-    ]),
+export const InputJsonValueSchema: z.ZodType<Prisma.InputJsonValue> = z.lazy(() =>
+  z.union([
+    z.string(),
+    z.number(),
+    z.boolean(),
+    z.object({ toJSON: z.any() }),
+    z.record(z.string(), z.lazy(() => z.union([InputJsonValueSchema, z.literal(null)]))),
+    z.array(z.lazy(() => z.union([InputJsonValueSchema, z.literal(null)]))),
+  ])
 );
 
 export type InputJsonValueType = z.infer<typeof InputJsonValueSchema>;
+
 
 /////////////////////////////////////////
 // ENUMS
 /////////////////////////////////////////
 
-export const TransactionIsolationLevelSchema = z.enum([
-  "ReadUncommitted",
-  "ReadCommitted",
-  "RepeatableRead",
-  "Serializable",
-]);
+export const TransactionIsolationLevelSchema = z.enum(['ReadUncommitted','ReadCommitted','RepeatableRead','Serializable']);
 
-export const UserScalarFieldEnumSchema = z.enum([
-  "id",
-  "email",
-  "nickname",
-  "bio",
-  "profileImage",
-  "coverImage",
-  "instagramId",
-  "youtubeUrl",
-  "maxDifficulty",
-  "homeGymId",
-  "role",
-  "checkInAutoDurationMinutes",
-  "pushNotificationsEnabled",
-  "createdAt",
-  "updatedAt",
-]);
+export const UserScalarFieldEnumSchema = z.enum(['id','name','email','emailVerified','image','nickname','bio','profileImage','coverImage','instagramId','youtubeUrl','maxDifficulty','homeGymId','role','checkInAutoDurationMinutes','pushNotificationsEnabled','createdAt','updatedAt']);
 
-export const UserPushDeviceScalarFieldEnumSchema = z.enum([
-  "id",
-  "userId",
-  "expoPushToken",
-  "platform",
-  "createdAt",
-  "updatedAt",
-]);
+export const UserPushDeviceScalarFieldEnumSchema = z.enum(['id','userId','expoPushToken','platform','createdAt','updatedAt']);
 
-export const ApiErrorLogScalarFieldEnumSchema = z.enum([
-  "id",
-  "createdAt",
-  "method",
-  "path",
-  "endpoint",
-  "errorLog",
-  "userId",
-  "httpStatus",
-  "clientMessage",
-  "errorName",
-  "traceId",
-]);
+export const ApiErrorLogScalarFieldEnumSchema = z.enum(['id','createdAt','method','path','endpoint','errorLog','userId','httpStatus','clientMessage','errorName','traceId']);
 
-export const AccountScalarFieldEnumSchema = z.enum([
-  "id",
-  "userId",
-  "provider",
-  "providerAccountId",
-  "accessToken",
-  "refreshToken",
-  "expiresAt",
-  "createdAt",
-]);
+export const AccountScalarFieldEnumSchema = z.enum(['id','userId','type','provider','providerAccountId','refresh_token','access_token','expires_at','token_type','scope','id_token','session_state']);
 
-export const FollowScalarFieldEnumSchema = z.enum([
-  "id",
-  "followerId",
-  "followingId",
-  "createdAt",
-]);
+export const SessionScalarFieldEnumSchema = z.enum(['id','sessionToken','userId','expires']);
 
-export const GymScalarFieldEnumSchema = z.enum([
-  "id",
-  "name",
-  "address",
-  "region",
-  "phone",
-  "notice",
-  "congestion",
-  "visitorCount",
-  "visitorCapacity",
-  "latitude",
-  "longitude",
-  "description",
-  "website",
-  "settingScheduleMemo",
-  "coverImageUrl",
-  "logoImageUrl",
-  "difficultyImageUrl",
-  "instagramId",
-  "avgRating",
-  "reviewCount",
-  "createdAt",
-  "updatedAt",
-  "membershipBrand",
-  "isClosed",
-  "closedAt",
-  "closedReason",
-  "facilities",
-]);
+export const VerificationTokenScalarFieldEnumSchema = z.enum(['identifier','token','expires']);
 
-export const GymMembershipPlanScalarFieldEnumSchema = z.enum([
-  "id",
-  "gymId",
-  "code",
-  "priceWon",
-  "sortOrder",
-  "isActive",
-  "createdAt",
-  "updatedAt",
-]);
+export const FollowScalarFieldEnumSchema = z.enum(['id','followerId','followingId','createdAt']);
 
-export const UserMembershipScalarFieldEnumSchema = z.enum([
-  "id",
-  "userId",
-  "gymId",
-  "planId",
-  "startedAt",
-  "remainingUses",
-  "note",
-  "createdAt",
-  "updatedAt",
-]);
+export const GymScalarFieldEnumSchema = z.enum(['id','name','address','region','phone','notice','congestion','visitorCount','visitorCapacity','latitude','longitude','description','website','settingScheduleMemo','coverImageUrl','logoImageUrl','difficultyImageUrl','instagramId','avgRating','reviewCount','createdAt','updatedAt','membershipBrand','isClosed','closedAt','closedReason','facilities']);
 
-export const MembershipPauseScalarFieldEnumSchema = z.enum([
-  "id",
-  "userMembershipId",
-  "startDate",
-  "endDate",
-  "createdAt",
-  "updatedAt",
-]);
+export const GymMembershipPlanScalarFieldEnumSchema = z.enum(['id','gymId','code','priceWon','sortOrder','isActive','createdAt','updatedAt']);
 
-export const GymCheckInScalarFieldEnumSchema = z.enum([
-  "id",
-  "userId",
-  "gymId",
-  "startedAt",
-  "endsAt",
-  "endedAt",
-]);
+export const UserMembershipScalarFieldEnumSchema = z.enum(['id','userId','gymId','planId','startedAt','remainingUses','note','createdAt','updatedAt']);
 
-export const GymImageScalarFieldEnumSchema = z.enum([
-  "id",
-  "gymId",
-  "url",
-  "order",
-  "createdAt",
-]);
+export const MembershipPauseScalarFieldEnumSchema = z.enum(['id','userMembershipId','startDate','endDate','createdAt','updatedAt']);
 
-export const GymOpenHourScalarFieldEnumSchema = z.enum([
-  "id",
-  "gymId",
-  "dayType",
-  "open",
-  "close",
-]);
+export const GymCheckInScalarFieldEnumSchema = z.enum(['id','userId','gymId','startedAt','endsAt','endedAt']);
 
-export const GymDifficultyColorScalarFieldEnumSchema = z.enum([
-  "id",
-  "gymId",
-  "difficulty",
-  "color",
-  "label",
-  "order",
-]);
+export const GymImageScalarFieldEnumSchema = z.enum(['id','gymId','url','order','createdAt']);
 
-export const GymBookmarkScalarFieldEnumSchema = z.enum([
-  "id",
-  "userId",
-  "gymId",
-  "createdAt",
-]);
+export const GymOpenHourScalarFieldEnumSchema = z.enum(['id','gymId','dayType','open','close']);
 
-export const GymReviewScalarFieldEnumSchema = z.enum([
-  "id",
-  "userId",
-  "gymId",
-  "rating",
-  "content",
-  "perceivedDifficulty",
-  "features",
-  "createdAt",
-  "updatedAt",
-  "imageUrls",
-]);
+export const GymDifficultyColorScalarFieldEnumSchema = z.enum(['id','gymId','difficulty','color','label','order']);
 
-export const ClimbingSessionScalarFieldEnumSchema = z.enum([
-  "id",
-  "userId",
-  "gymId",
-  "date",
-  "startTime",
-  "endTime",
-  "memo",
-  "isPublic",
-  "createdAt",
-  "updatedAt",
-  "imageUrls",
-  "userMembershipId",
-  "gymCheckInId",
-]);
+export const GymBookmarkScalarFieldEnumSchema = z.enum(['id','userId','gymId','createdAt']);
 
-export const ClimbingRouteScalarFieldEnumSchema = z.enum([
-  "id",
-  "sessionId",
-  "difficulty",
-  "result",
-  "attempts",
-  "perceivedDifficulty",
-  "memo",
-  "order",
-  "createdAt",
-]);
+export const GymReviewScalarFieldEnumSchema = z.enum(['id','userId','gymId','rating','content','perceivedDifficulty','features','createdAt','updatedAt','imageUrls']);
 
-export const PostScalarFieldEnumSchema = z.enum([
-  "id",
-  "authorId",
-  "category",
-  "title",
-  "content",
-  "viewCount",
-  "likeCount",
-  "commentCount",
-  "createdAt",
-  "updatedAt",
-  "imageUrls",
-  "tags",
-]);
+export const ClimbingSessionScalarFieldEnumSchema = z.enum(['id','userId','gymId','date','startTime','endTime','memo','isPublic','createdAt','updatedAt','imageUrls','userMembershipId','gymCheckInId']);
 
-export const PostLikeScalarFieldEnumSchema = z.enum([
-  "id",
-  "postId",
-  "userId",
-  "createdAt",
-]);
+export const ClimbingRouteScalarFieldEnumSchema = z.enum(['id','sessionId','difficulty','result','attempts','perceivedDifficulty','memo','order','createdAt']);
 
-export const PostBookmarkScalarFieldEnumSchema = z.enum([
-  "id",
-  "postId",
-  "userId",
-  "createdAt",
-]);
+export const PostScalarFieldEnumSchema = z.enum(['id','authorId','category','title','content','viewCount','likeCount','commentCount','createdAt','updatedAt','imageUrls','tags']);
 
-export const PostCommentScalarFieldEnumSchema = z.enum([
-  "id",
-  "postId",
-  "authorId",
-  "parentId",
-  "content",
-  "createdAt",
-  "updatedAt",
-]);
+export const PostLikeScalarFieldEnumSchema = z.enum(['id','postId','userId','createdAt']);
 
-export const NotificationScalarFieldEnumSchema = z.enum([
-  "id",
-  "userId",
-  "type",
-  "title",
-  "message",
-  "isRead",
-  "link",
-  "commentId",
-  "createdAt",
-]);
+export const PostBookmarkScalarFieldEnumSchema = z.enum(['id','postId','userId','createdAt']);
 
-export const AdminAuditLogScalarFieldEnumSchema = z.enum([
-  "id",
-  "actorId",
-  "action",
-  "targetType",
-  "targetId",
-  "targetLabel",
-  "before",
-  "after",
-  "note",
-  "requestMeta",
-  "createdAt",
-]);
+export const PostCommentScalarFieldEnumSchema = z.enum(['id','postId','authorId','parentId','content','createdAt','updatedAt']);
 
-export const SortOrderSchema = z.enum(["asc", "desc"]);
+export const NotificationScalarFieldEnumSchema = z.enum(['id','userId','type','title','message','isRead','link','commentId','createdAt']);
 
-export const NullableJsonNullValueInputSchema: z.ZodType<Prisma.NullableJsonNullValueInput> =
-  z
-    .enum(["DbNull", "JsonNull"])
-    .transform((value) =>
-      value === "JsonNull"
-        ? Prisma.JsonNull
-        : value === "DbNull"
-          ? Prisma.DbNull
-          : value,
-    );
+export const AdminAuditLogScalarFieldEnumSchema = z.enum(['id','actorId','action','targetType','targetId','targetLabel','before','after','note','requestMeta','createdAt']);
 
-export const QueryModeSchema = z.enum(["default", "insensitive"]);
+export const SortOrderSchema = z.enum(['asc','desc']);
 
-export const NullsOrderSchema = z.enum(["first", "last"]);
+export const NullableJsonNullValueInputSchema: z.ZodType<Prisma.NullableJsonNullValueInput> = z.enum(['DbNull','JsonNull',]).transform((value) => value === 'JsonNull' ? Prisma.JsonNull : value === 'DbNull' ? Prisma.DbNull : value);
 
-export const JsonNullValueFilterSchema: z.ZodType<Prisma.JsonNullValueFilter> =
-  z
-    .enum(["DbNull", "JsonNull", "AnyNull"])
-    .transform((value) =>
-      value === "JsonNull"
-        ? Prisma.JsonNull
-        : value === "DbNull"
-          ? Prisma.DbNull
-          : value === "AnyNull"
-            ? Prisma.AnyNull
-            : value,
-    );
+export const QueryModeSchema = z.enum(['default','insensitive']);
 
-export const ProviderSchema = z.enum(["KAKAO", "GOOGLE"]);
+export const NullsOrderSchema = z.enum(['first','last']);
 
-export type ProviderType = `${z.infer<typeof ProviderSchema>}`;
+export const JsonNullValueFilterSchema: z.ZodType<Prisma.JsonNullValueFilter> = z.enum(['DbNull','JsonNull','AnyNull',]).transform((value) => value === 'JsonNull' ? Prisma.JsonNull : value === 'DbNull' ? Prisma.DbNull : value === 'AnyNull' ? Prisma.AnyNull : value);
 
-export const RoleSchema = z.enum(["ADMIN", "MANAGER", "GUEST"]);
+export const ProviderSchema = z.enum(['KAKAO','GOOGLE']);
 
-export type RoleType = `${z.infer<typeof RoleSchema>}`;
+export type ProviderType = `${z.infer<typeof ProviderSchema>}`
 
-export const RegionSchema = z.enum(["SEOUL", "GYEONGGI", "INCHEON", "BUSAN"]);
+export const RoleSchema = z.enum(['ADMIN','MANAGER','GUEST']);
 
-export type RegionType = `${z.infer<typeof RegionSchema>}`;
+export type RoleType = `${z.infer<typeof RoleSchema>}`
 
-export const DifficultySchema = z.enum([
-  "V0",
-  "V1",
-  "V2",
-  "V3",
-  "V4",
-  "V5",
-  "V6",
-  "V7",
-  "V8",
-  "V9",
-  "V10",
-]);
+export const RegionSchema = z.enum(['SEOUL','GYEONGGI','INCHEON','BUSAN']);
 
-export type DifficultyType = `${z.infer<typeof DifficultySchema>}`;
+export type RegionType = `${z.infer<typeof RegionSchema>}`
 
-export const DayTypeSchema = z.enum([
-  "MON",
-  "TUE",
-  "WED",
-  "THU",
-  "FRI",
-  "SAT",
-  "SUN",
-]);
+export const DifficultySchema = z.enum(['V0','V1','V2','V3','V4','V5','V6','V7','V8','V9','V10']);
 
-export type DayTypeType = `${z.infer<typeof DayTypeSchema>}`;
+export type DifficultyType = `${z.infer<typeof DifficultySchema>}`
 
-export const GymFacilityTypeSchema = z.enum([
-  "PARKING",
-  "SHOWER",
-  "LOCKER",
-  "REST_AREA",
-  "TRAINING",
-]);
+export const DayTypeSchema = z.enum(['MON','TUE','WED','THU','FRI','SAT','SUN']);
 
-export type GymFacilityTypeType = `${z.infer<typeof GymFacilityTypeSchema>}`;
+export type DayTypeType = `${z.infer<typeof DayTypeSchema>}`
 
-export const GymReviewFeatureSchema = z.enum([
-  "COOL_AIR",
-  "WIDE_STRETCH",
-  "VARIOUS_LEVEL",
-  "KIND_STAFF",
-  "EASY_PARKING",
-  "SHOWER_ROOM",
-  "CLEAN_FACILITY",
-  "GOOD_VENT",
-]);
+export const GymFacilityTypeSchema = z.enum(['PARKING','SHOWER','LOCKER','REST_AREA','TRAINING']);
 
-export type GymReviewFeatureType = `${z.infer<typeof GymReviewFeatureSchema>}`;
+export type GymFacilityTypeType = `${z.infer<typeof GymFacilityTypeSchema>}`
 
-export const GymPerceivedDifficultySchema = z.enum([
-  "EASY",
-  "EASY_NORMAL",
-  "NORMAL",
-  "NORMAL_HARD",
-  "HARD",
-]);
+export const GymReviewFeatureSchema = z.enum(['COOL_AIR','WIDE_STRETCH','VARIOUS_LEVEL','KIND_STAFF','EASY_PARKING','SHOWER_ROOM','CLEAN_FACILITY','GOOD_VENT']);
 
-export type GymPerceivedDifficultyType =
-  `${z.infer<typeof GymPerceivedDifficultySchema>}`;
+export type GymReviewFeatureType = `${z.infer<typeof GymReviewFeatureSchema>}`
 
-export const ClimbingAttemptResultSchema = z.enum([
-  "SEND",
-  "ATTEMPT",
-  "FLASH",
-  "ONSIGHT",
-]);
+export const GymPerceivedDifficultySchema = z.enum(['EASY','EASY_NORMAL','NORMAL','NORMAL_HARD','HARD']);
 
-export type ClimbingAttemptResultType =
-  `${z.infer<typeof ClimbingAttemptResultSchema>}`;
+export type GymPerceivedDifficultyType = `${z.infer<typeof GymPerceivedDifficultySchema>}`
 
-export const PostCategorySchema = z.enum([
-  "FREE",
-  "TIPS",
-  "REVIEW",
-  "MEETUP",
-  "GEAR",
-]);
+export const ClimbingAttemptResultSchema = z.enum(['SEND','ATTEMPT','FLASH','ONSIGHT']);
 
-export type PostCategoryType = `${z.infer<typeof PostCategorySchema>}`;
+export type ClimbingAttemptResultType = `${z.infer<typeof ClimbingAttemptResultSchema>}`
 
-export const NotificationTypeSchema = z.enum([
-  "COMMENT",
-  "POST_COMMENT",
-  "COMMENT_REPLY",
-  "LIKE",
-  "FOLLOW",
-  "SYSTEM",
-  "GYM_UPDATE",
-  "AUTO_CHECKOUT",
-]);
+export const PostCategorySchema = z.enum(['FREE','TIPS','REVIEW','MEETUP','GEAR']);
 
-export type NotificationTypeType = `${z.infer<typeof NotificationTypeSchema>}`;
+export type PostCategoryType = `${z.infer<typeof PostCategorySchema>}`
 
-export const MembershipPlanCodeSchema = z.enum([
-  "PERIOD_1M",
-  "PERIOD_3M",
-  "PERIOD_6M",
-  "PERIOD_12M",
-  "COUNT_DAY",
-  "COUNT_3",
-  "COUNT_5",
-  "COUNT_10",
-]);
+export const NotificationTypeSchema = z.enum(['COMMENT','POST_COMMENT','COMMENT_REPLY','LIKE','FOLLOW','SYSTEM','GYM_UPDATE','AUTO_CHECKOUT']);
 
-export type MembershipPlanCodeType =
-  `${z.infer<typeof MembershipPlanCodeSchema>}`;
+export type NotificationTypeType = `${z.infer<typeof NotificationTypeSchema>}`
 
-export const GymMembershipBrandSchema = z.enum([
-  "THE_CLIMB",
-  "SEOULFOREST",
-  "CLIMBINGPARK",
-  "SONCLIMB",
-  "PEAKERS",
-  "WAVEROCK",
-  "CLIMB_US",
-  "DAMJANG",
-  "B_BLOC",
-  "ALLEZ",
-  "STANDALONE",
-]);
+export const MembershipPlanCodeSchema = z.enum(['PERIOD_1M','PERIOD_3M','PERIOD_6M','PERIOD_12M','COUNT_DAY','COUNT_3','COUNT_5','COUNT_10']);
 
-export type GymMembershipBrandType =
-  `${z.infer<typeof GymMembershipBrandSchema>}`;
+export type MembershipPlanCodeType = `${z.infer<typeof MembershipPlanCodeSchema>}`
 
-export const PushPlatformSchema = z.enum(["ANDROID"]);
+export const GymMembershipBrandSchema = z.enum(['THE_CLIMB','SEOULFOREST','CLIMBINGPARK','SONCLIMB','PEAKERS','WAVEROCK','CLIMB_US','DAMJANG','B_BLOC','ALLEZ','STANDALONE']);
 
-export type PushPlatformType = `${z.infer<typeof PushPlatformSchema>}`;
+export type GymMembershipBrandType = `${z.infer<typeof GymMembershipBrandSchema>}`
 
-export const AdminAuditActionSchema = z.enum([
-  "CREATE",
-  "UPDATE",
-  "DELETE",
-  "CLOSE",
-  "REOPEN",
-  "ROLE_CHANGE",
-]);
+export const PushPlatformSchema = z.enum(['ANDROID']);
 
-export type AdminAuditActionType = `${z.infer<typeof AdminAuditActionSchema>}`;
+export type PushPlatformType = `${z.infer<typeof PushPlatformSchema>}`
+
+export const AdminAuditActionSchema = z.enum(['CREATE','UPDATE','DELETE','CLOSE','REOPEN','ROLE_CHANGE']);
+
+export type AdminAuditActionType = `${z.infer<typeof AdminAuditActionSchema>}`
 
 /////////////////////////////////////////
 // MODELS
@@ -549,11 +201,23 @@ export const UserSchema = z.object({
    */
   id: z.uuid(),
   /**
+   * NextAuth OAuth 표시 이름
+   */
+  name: z.string().nullable(),
+  /**
    * 이메일
    */
   email: z.string(),
   /**
-   * 닉네임
+   * 이메일 인증 시각 (NextAuth)
+   */
+  emailVerified: z.coerce.date().nullable(),
+  /**
+   * OAuth 프로필 이미지 URL (NextAuth)
+   */
+  image: z.string().nullable(),
+  /**
+   * 닉네임 (신규 가입 시 어댑터 생성 직후 `createUser` 이벤트에서 채움)
    */
   nickname: z.string(),
   /**
@@ -596,9 +260,9 @@ export const UserSchema = z.object({
    * 수정일
    */
   updatedAt: z.coerce.date(),
-});
+})
 
-export type User = z.infer<typeof UserSchema>;
+export type User = z.infer<typeof UserSchema>
 
 /////////////////////////////////////////
 // USER PUSH DEVICE SCHEMA
@@ -632,9 +296,9 @@ export const UserPushDeviceSchema = z.object({
    * 수정일
    */
   updatedAt: z.coerce.date(),
-});
+})
 
-export type UserPushDevice = z.infer<typeof UserPushDeviceSchema>;
+export type UserPushDevice = z.infer<typeof UserPushDeviceSchema>
 
 /////////////////////////////////////////
 // API ERROR LOG SCHEMA
@@ -688,53 +352,64 @@ export const ApiErrorLogSchema = z.object({
    * x-trace-id / x-request-id 또는 생성 UUID
    */
   traceId: z.string().nullable(),
-});
+})
 
-export type ApiErrorLog = z.infer<typeof ApiErrorLogSchema>;
+export type ApiErrorLog = z.infer<typeof ApiErrorLogSchema>
 
 /////////////////////////////////////////
 // ACCOUNT SCHEMA
 /////////////////////////////////////////
 
 /**
- * OAuth 계정
+ * OAuth 계정 (NextAuth Prisma Adapter)
  */
 export const AccountSchema = z.object({
-  /**
-   * OAuth 제공자
-   */
-  provider: ProviderSchema,
-  /**
-   * 계정 고유 ID
-   */
   id: z.uuid(),
-  /**
-   * 유저 ID
-   */
   userId: z.string(),
-  /**
-   * 제공자 계정 ID
-   */
+  type: z.string(),
+  provider: z.string(),
   providerAccountId: z.string(),
-  /**
-   * 액세스 토큰
-   */
-  accessToken: z.string().nullable(),
-  /**
-   * 리프레시 토큰
-   */
-  refreshToken: z.string().nullable(),
-  /**
-   * 토큰 만료일
-   */
-  expiresAt: z.number().int().nullable(),
-  /**
-   * 생성일
-   */
-  createdAt: z.coerce.date(),
-});
+  refresh_token: z.string().nullable(),
+  access_token: z.string().nullable(),
+  expires_at: z.number().int().nullable(),
+  token_type: z.string().nullable(),
+  scope: z.string().nullable(),
+  id_token: z.string().nullable(),
+  session_state: z.string().nullable(),
+})
 
-export type Account = z.infer<typeof AccountSchema>;
+export type Account = z.infer<typeof AccountSchema>
+
+/////////////////////////////////////////
+// SESSION SCHEMA
+/////////////////////////////////////////
+
+/**
+ * NextAuth DB 세션
+ */
+export const SessionSchema = z.object({
+  id: z.uuid(),
+  sessionToken: z.string(),
+  userId: z.string(),
+  expires: z.coerce.date(),
+})
+
+export type Session = z.infer<typeof SessionSchema>
+
+/////////////////////////////////////////
+// VERIFICATION TOKEN SCHEMA
+/////////////////////////////////////////
+
+/**
+ * NextAuth 이메일 로그인 등 검증 토큰
+ */
+export const VerificationTokenSchema = z.object({
+  identifier: z.string(),
+  token: z.string(),
+  expires: z.coerce.date(),
+})
+
+export type VerificationToken = z.infer<typeof VerificationTokenSchema>
 
 /////////////////////////////////////////
 // FOLLOW SCHEMA
@@ -760,9 +435,9 @@ export const FollowSchema = z.object({
    * 생성일
    */
   createdAt: z.coerce.date(),
-});
+})
 
-export type Follow = z.infer<typeof FollowSchema>;
+export type Follow = z.infer<typeof FollowSchema>
 
 /////////////////////////////////////////
 // GYM SCHEMA
@@ -880,9 +555,9 @@ export const GymSchema = z.object({
    * 폐업 사유 (관리자 메모)
    */
   closedReason: z.string().nullable(),
-});
+})
 
-export type Gym = z.infer<typeof GymSchema>;
+export type Gym = z.infer<typeof GymSchema>
 
 /////////////////////////////////////////
 // GYM MEMBERSHIP PLAN SCHEMA
@@ -924,9 +599,9 @@ export const GymMembershipPlanSchema = z.object({
    * 수정일
    */
   updatedAt: z.coerce.date(),
-});
+})
 
-export type GymMembershipPlan = z.infer<typeof GymMembershipPlanSchema>;
+export type GymMembershipPlan = z.infer<typeof GymMembershipPlanSchema>
 
 /////////////////////////////////////////
 // USER MEMBERSHIP SCHEMA
@@ -972,9 +647,9 @@ export const UserMembershipSchema = z.object({
    * 수정일
    */
   updatedAt: z.coerce.date(),
-});
+})
 
-export type UserMembership = z.infer<typeof UserMembershipSchema>;
+export type UserMembership = z.infer<typeof UserMembershipSchema>
 
 /////////////////////////////////////////
 // MEMBERSHIP PAUSE SCHEMA
@@ -1008,9 +683,9 @@ export const MembershipPauseSchema = z.object({
    * 수정일
    */
   updatedAt: z.coerce.date(),
-});
+})
 
-export type MembershipPause = z.infer<typeof MembershipPauseSchema>;
+export type MembershipPause = z.infer<typeof MembershipPauseSchema>
 
 /////////////////////////////////////////
 // GYM CHECK IN SCHEMA
@@ -1044,9 +719,9 @@ export const GymCheckInSchema = z.object({
    * 수동 체크아웃 또는 정리 시각 (null이면 아직 활성 후보)
    */
   endedAt: z.coerce.date().nullable(),
-});
+})
 
-export type GymCheckIn = z.infer<typeof GymCheckInSchema>;
+export type GymCheckIn = z.infer<typeof GymCheckInSchema>
 
 /////////////////////////////////////////
 // GYM IMAGE SCHEMA
@@ -1076,9 +751,9 @@ export const GymImageSchema = z.object({
    * 생성일
    */
   createdAt: z.coerce.date(),
-});
+})
 
-export type GymImage = z.infer<typeof GymImageSchema>;
+export type GymImage = z.infer<typeof GymImageSchema>
 
 /////////////////////////////////////////
 // GYM OPEN HOUR SCHEMA
@@ -1108,9 +783,9 @@ export const GymOpenHourSchema = z.object({
    * 마감 시간 "HH:mm"
    */
   close: z.string(),
-});
+})
 
-export type GymOpenHour = z.infer<typeof GymOpenHourSchema>;
+export type GymOpenHour = z.infer<typeof GymOpenHourSchema>
 
 /////////////////////////////////////////
 // GYM DIFFICULTY COLOR SCHEMA
@@ -1144,9 +819,9 @@ export const GymDifficultyColorSchema = z.object({
    * 표시 순서
    */
   order: z.number().int(),
-});
+})
 
-export type GymDifficultyColor = z.infer<typeof GymDifficultyColorSchema>;
+export type GymDifficultyColor = z.infer<typeof GymDifficultyColorSchema>
 
 /////////////////////////////////////////
 // GYM BOOKMARK SCHEMA
@@ -1172,9 +847,9 @@ export const GymBookmarkSchema = z.object({
    * 생성일
    */
   createdAt: z.coerce.date(),
-});
+})
 
-export type GymBookmark = z.infer<typeof GymBookmarkSchema>;
+export type GymBookmark = z.infer<typeof GymBookmarkSchema>
 
 /////////////////////////////////////////
 // GYM REVIEW SCHEMA
@@ -1224,9 +899,9 @@ export const GymReviewSchema = z.object({
    * 이미지 URL 목록
    */
   imageUrls: z.string().array(),
-});
+})
 
-export type GymReview = z.infer<typeof GymReviewSchema>;
+export type GymReview = z.infer<typeof GymReviewSchema>
 
 /////////////////////////////////////////
 // CLIMBING SESSION SCHEMA
@@ -1288,9 +963,9 @@ export const ClimbingSessionSchema = z.object({
    * 연결된 암장 체크인 (동일 체크인에 세션 1건)
    */
   gymCheckInId: z.string().nullable(),
-});
+})
 
-export type ClimbingSession = z.infer<typeof ClimbingSessionSchema>;
+export type ClimbingSession = z.infer<typeof ClimbingSessionSchema>
 
 /////////////////////////////////////////
 // CLIMBING ROUTE SCHEMA
@@ -1336,9 +1011,9 @@ export const ClimbingRouteSchema = z.object({
    * 생성일
    */
   createdAt: z.coerce.date(),
-});
+})
 
-export type ClimbingRoute = z.infer<typeof ClimbingRouteSchema>;
+export type ClimbingRoute = z.infer<typeof ClimbingRouteSchema>
 
 /////////////////////////////////////////
 // POST SCHEMA
@@ -1396,9 +1071,9 @@ export const PostSchema = z.object({
    * 태그 목록
    */
   tags: z.string().array(),
-});
+})
 
-export type Post = z.infer<typeof PostSchema>;
+export type Post = z.infer<typeof PostSchema>
 
 /////////////////////////////////////////
 // POST LIKE SCHEMA
@@ -1424,9 +1099,9 @@ export const PostLikeSchema = z.object({
    * 생성일
    */
   createdAt: z.coerce.date(),
-});
+})
 
-export type PostLike = z.infer<typeof PostLikeSchema>;
+export type PostLike = z.infer<typeof PostLikeSchema>
 
 /////////////////////////////////////////
 // POST BOOKMARK SCHEMA
@@ -1452,9 +1127,9 @@ export const PostBookmarkSchema = z.object({
    * 생성일
    */
   createdAt: z.coerce.date(),
-});
+})
 
-export type PostBookmark = z.infer<typeof PostBookmarkSchema>;
+export type PostBookmark = z.infer<typeof PostBookmarkSchema>
 
 /////////////////////////////////////////
 // POST COMMENT SCHEMA
@@ -1492,9 +1167,9 @@ export const PostCommentSchema = z.object({
    * 수정일
    */
   updatedAt: z.coerce.date(),
-});
+})
 
-export type PostComment = z.infer<typeof PostCommentSchema>;
+export type PostComment = z.infer<typeof PostCommentSchema>
 
 /////////////////////////////////////////
 // NOTIFICATION SCHEMA
@@ -1540,9 +1215,9 @@ export const NotificationSchema = z.object({
    * 생성일
    */
   createdAt: z.coerce.date(),
-});
+})
 
-export type Notification = z.infer<typeof NotificationSchema>;
+export type Notification = z.infer<typeof NotificationSchema>
 
 /////////////////////////////////////////
 // ADMIN AUDIT LOG SCHEMA
@@ -1596,6 +1271,6 @@ export const AdminAuditLogSchema = z.object({
    * 생성일
    */
   createdAt: z.coerce.date(),
-});
+})
 
-export type AdminAuditLog = z.infer<typeof AdminAuditLogSchema>;
+export type AdminAuditLog = z.infer<typeof AdminAuditLogSchema>

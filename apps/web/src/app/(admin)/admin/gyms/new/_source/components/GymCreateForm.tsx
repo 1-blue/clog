@@ -28,6 +28,20 @@ const BRAND_OPTIONS = [
   "ALLEZ",
 ] as const;
 
+interface IRowProps {
+  label: string;
+  error?: string;
+  children: React.ReactNode;
+}
+
+const Row: React.FC<IRowProps> = ({ label, error, children }) => (
+  <div className="flex flex-col gap-1">
+    <Label>{label}</Label>
+    {children}
+    {error ? <p className="text-error text-xs">{error}</p> : null}
+  </div>
+);
+
 const GymCreateForm = () => {
   const router = useRouter();
   const {
@@ -58,22 +72,6 @@ const GymCreateForm = () => {
     toast.success(body?.toast ?? "암장이 생성되었습니다.");
     router.push(`/admin/gyms/${body.payload.id}`);
   };
-
-  const Row = ({
-    label,
-    error,
-    children,
-  }: {
-    label: string;
-    error?: string;
-    children: React.ReactNode;
-  }) => (
-    <div className="flex flex-col gap-1">
-      <Label>{label}</Label>
-      {children}
-      {error ? <p className="text-error text-xs">{error}</p> : null}
-    </div>
-  );
 
   return (
     <Card className="p-6">

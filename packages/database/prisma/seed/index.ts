@@ -1,6 +1,6 @@
 import "./load-env";
 
-import { prisma } from "../../src/index";
+import { prisma } from "../../src/prisma";
 import { seedComments } from "./comments";
 import { seedDifficultyColors } from "./difficulty-colors";
 import { seedFollows } from "./follows";

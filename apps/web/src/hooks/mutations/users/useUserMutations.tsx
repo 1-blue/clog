@@ -31,19 +31,25 @@ const useUserMutations = () => {
         await queryClient.cancelQueries(userQueryOptions);
         const prev = queryClient.getQueryData(userQueryOptions.queryKey);
 
-        queryClient.setQueryData(userQueryOptions.queryKey, (old: any) => {
-          if (!old) return old;
-          const isFollowing = (old.payload.followers?.length ?? 0) > 0;
+        queryClient.setQueryData(userQueryOptions.queryKey, (old: unknown) => {
+          const prevData = old as {
+            payload?: {
+              followers?: Array<{ id: string }> | null;
+              _count?: { followers?: number | null } | null;
+            };
+          } | null;
+          if (!prevData?.payload) return old;
+          const isFollowing = (prevData.payload.followers?.length ?? 0) > 0;
           return {
-            ...old,
+            ...prevData,
             payload: {
-              ...old.payload,
+              ...prevData.payload,
               followers: isFollowing ? [] : [{ id: "optimistic" }],
               _count: {
-                ...old.payload._count,
+                ...(prevData.payload._count ?? {}),
                 followers: isFollowing
-                  ? Math.max(0, (old.payload._count?.followers ?? 0) - 1)
-                  : (old.payload._count?.followers ?? 0) + 1,
+                  ? Math.max(0, (prevData.payload._count?.followers ?? 0) - 1)
+                  : (prevData.payload._count?.followers ?? 0) + 1,
               },
             },
           };

@@ -9,8 +9,9 @@ import { difficultyToKoreanMap, type Difficulty } from "@clog/contracts";
 import type { components } from "#web/@types/openapi";
 import { Avatar, AvatarFallback, AvatarImage } from "#web/components/ui/avatar";
 import { Card } from "#web/components/ui/card";
+import { signOut } from "next-auth/react";
+
 import { ROUTES } from "#web/constants";
-import { createClient } from "#web/libs/supabase/client";
 
 type UserMe = components["schemas"]["UserMe"];
 
@@ -20,15 +21,14 @@ interface IProps {
 
 const SettingsProfileSummaryCard = ({ me }: IProps) => {
   const router = useRouter();
-  const supabase = createClient();
 
   const subtitle =
     me.maxDifficulty != null
       ? `${difficultyToKoreanMap[me.maxDifficulty as Difficulty]} · ${me.sendCount} 완등`
       : `${me.sendCount} 완등`;
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
+  const handleSignOut = async () => {
+    await signOut({ redirect: false });
     router.push(ROUTES.LOGIN.path);
     router.refresh();
   };
@@ -65,7 +65,7 @@ const SettingsProfileSummaryCard = ({ me }: IProps) => {
       <div className="border-t border-outline-variant/30">
         <button
           type="button"
-          onClick={() => void signOut()}
+          onClick={() => void handleSignOut()}
           className="flex min-h-12 w-full cursor-pointer items-center gap-3 px-4 py-3 text-left text-destructive transition-colors hover:bg-destructive/10 active:bg-destructive/15"
         >
           <LogOut className="size-5 shrink-0" strokeWidth={1.75} />

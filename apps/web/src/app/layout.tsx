@@ -6,6 +6,7 @@ import { Toaster } from "sonner";
 
 import { getSharedMetadata } from "#web/libs/sharedMetadata";
 import QueryProvider from "#web/providers/QueryProvider";
+import SessionProvider from "#web/providers/SessionProvider";
 import ThemeProvider from "#web/providers/ThemeProvider";
 
 export const viewport: Viewport = {
@@ -36,8 +37,9 @@ const RootLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
       {/* 확장 프로그램이 body에 속성 주입 시(cz-shortcut-listen 등) hydration 경고 방지 */}
       <body className="flex min-h-full flex-col" suppressHydrationWarning>
         <ThemeProvider>
-          <QueryProvider>
-            {children}
+          <SessionProvider>
+            <QueryProvider>
+              {children}
 
             <Toaster
               position="top-center"
@@ -46,7 +48,8 @@ const RootLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
                   "!bg-surface-container-high !text-on-surface !border-outline-variant",
               }}
             />
-          </QueryProvider>
+            </QueryProvider>
+          </SessionProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -32,12 +32,18 @@ const useGymCheckInMutations = (options?: IOptions) => {
         const gymId = variables.params.path.gymId;
 
         // 캐시된 gym 목록에서 gymId에 해당하는 gym 이름 찾기
-        const cachedGymQueries = queryClient.getQueriesData<any>({
+        const cachedGymQueries = queryClient.getQueriesData<unknown>({
           queryKey: ["get", "/api/v1/gyms"],
         });
         let gymName: string | undefined;
         for (const [, data] of cachedGymQueries) {
-          const gym = data?.payload?.items?.find((g: any) => g.id === gymId);
+          const payload = (data as { payload?: { items?: unknown[] } } | null)
+            ?.payload;
+          const items = payload?.items ?? [];
+          const gym = items.find((g) => {
+            const gg = g as { id?: string; name?: string } | null;
+            return gg?.id === gymId;
+          }) as { id?: string; name?: string } | undefined;
           if (gym) {
             gymName = gym.name;
             break;
@@ -48,13 +54,14 @@ const useGymCheckInMutations = (options?: IOptions) => {
         const previous = queryClient.getQueryData(meQueryKey);
 
         if (gymName) {
-          queryClient.setQueryData(meQueryKey, (old: any) => {
-            if (!old?.payload) return old;
+          queryClient.setQueryData(meQueryKey, (old: unknown) => {
+            const prev = old as { payload?: Record<string, unknown> } | null;
+            if (!prev?.payload) return old;
             const now = new Date();
             return {
-              ...old,
+              ...prev,
               payload: {
-                ...old.payload,
+                ...prev.payload,
                 activeCheckIn: {
                   id: "optimistic",
                   gymId,
@@ -90,9 +97,10 @@ const useGymCheckInMutations = (options?: IOptions) => {
       onMutate: async () => {
         await queryClient.cancelQueries({ queryKey: meQueryKey });
         const previous = queryClient.getQueryData(meQueryKey);
-        queryClient.setQueryData(meQueryKey, (old: any) => {
-          if (!old?.payload) return old;
-          return { ...old, payload: { ...old.payload, activeCheckIn: null } };
+        queryClient.setQueryData(meQueryKey, (old: unknown) => {
+          const prev = old as { payload?: Record<string, unknown> } | null;
+          if (!prev?.payload) return old;
+          return { ...prev, payload: { ...prev.payload, activeCheckIn: null } };
         });
         return { previous };
       },

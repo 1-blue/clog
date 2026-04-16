@@ -9,7 +9,6 @@ import { openapi } from "#web/apis/openapi";
 import { ROUTES } from "#web/constants";
 import useMe from "#web/hooks/useMe";
 import { extractCheckoutCreatedSessionId } from "#web/libs/api/extractCheckoutCreatedSessionId";
-import { createClient } from "#web/libs/supabase/client";
 import { cn } from "#web/libs/utils";
 
 interface IProps {
@@ -30,7 +29,6 @@ const GymCheckInBar: React.FC<IProps> = ({
   const router = useRouter();
   const pathname = usePathname();
   const queryClient = useQueryClient();
-  const supabase = createClient();
   const { queryKey: meQueryKey } = openapi.queryOptions(
     "get",
     "/api/v1/users/me",
@@ -98,14 +96,11 @@ const GymCheckInBar: React.FC<IProps> = ({
     checkInMutation.isPending || checkOutMutation.isPending;
 
   const handleCheckOut = async () => {
+    if (!isLoggedIn) {
+      goLogin();
+      return;
+    }
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) {
-        goLogin();
-        return;
-      }
       checkOutMutation.mutate({
         params: { path: { gymId } },
       });
@@ -125,13 +120,6 @@ const GymCheckInBar: React.FC<IProps> = ({
     }
 
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) {
-        goLogin();
-        return;
-      }
       checkInMutation.mutate({ params: { path: { gymId } } });
     } catch {
       toast.error("체크인에 실패했습니다.");

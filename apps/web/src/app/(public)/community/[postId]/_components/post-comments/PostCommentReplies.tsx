@@ -3,7 +3,7 @@
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
 import { User } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 
 import type { components } from "#web/@types/openapi";
@@ -30,12 +30,6 @@ const ReplyRow: React.FC<IReplyRowProps> = ({
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(reply.content);
   const { updateCommentMutation } = usePostDetailMutations();
-
-  useEffect(() => {
-    if (!editing) {
-      setDraft(reply.content);
-    }
-  }, [reply.content, editing]);
 
   const handleSave = () => {
     const trimmed = draft.trim();

@@ -4,10 +4,9 @@ import { useEffect } from "react";
 
 import { WEB_URL } from "../../constants";
 
-// 외부 브라우저에서 OAuth 완료 후 clog://auth/callback 딥링크로 돌아왔을 때 처리
+// 외부 브라우저 OAuth 후 앱으로 복귀 — 웹 세션은 브라우저 쿠키에만 있을 수 있어 WebView를 홈으로 다시 연다.
 const AuthCallback = () => {
-  const { code, next } = useLocalSearchParams<{
-    code?: string;
+  const { next } = useLocalSearchParams<{
     next?: string;
   }>();
 
@@ -15,19 +14,11 @@ const AuthCallback = () => {
     const nextSafe =
       next && next.startsWith("/") && !next.startsWith("//") ? next : "/";
 
-    if (code) {
-      const callbackUrl = new URL(`${WEB_URL}/auth/callback`);
-      callbackUrl.searchParams.set("code", code);
-      callbackUrl.searchParams.set("next", nextSafe);
-
-      router.replace({
-        pathname: "/",
-        params: { authCallbackUrl: callbackUrl.toString() },
-      });
-    } else {
-      router.replace("/");
-    }
-  }, [code, next]);
+    router.replace({
+      pathname: "/",
+      params: { authCallbackUrl: `${WEB_URL}${nextSafe}` },
+    });
+  }, [next]);
 
   // 라우트 전환 중 깜빡임 방지
   return <View style={{ flex: 1, backgroundColor: "#151515" }} />;

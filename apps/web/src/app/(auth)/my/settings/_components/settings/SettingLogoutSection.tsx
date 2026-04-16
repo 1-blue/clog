@@ -15,12 +15,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "#web/components/ui/dialog";
+import { signOut } from "next-auth/react";
+
 import { ROUTES } from "#web/constants";
-import { createClient } from "#web/libs/supabase/client";
 
 const SettingLogoutSection = () => {
   const router = useRouter();
-  const supabase = createClient();
 
   const [deletePending, setDeletePending] = useState(false);
 
@@ -33,7 +33,7 @@ const SettingLogoutSection = () => {
         return;
       }
 
-      await supabase.auth.signOut();
+      await signOut({ redirect: false });
       toast.success("회원 탈퇴가 완료되었습니다.");
       router.push(ROUTES.LOGIN.path);
       router.refresh();

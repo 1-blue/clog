@@ -175,10 +175,16 @@ enum GymMembershipBrand {
 model User {
   /// 유저 고유 ID
   id                         String      @id @default(uuid()) @db.Uuid
+  /// NextAuth OAuth 표시 이름
+  name                       String?
   /// 이메일
   email                      String      @unique
-  /// 닉네임
-  nickname                   String
+  /// 이메일 인증 시각 (NextAuth)
+  emailVerified              DateTime?   @map("email_verified")
+  /// OAuth 프로필 이미지 URL (NextAuth)
+  image                      String?
+  /// 닉네임 (신규 가입 시 어댑터 생성 직후 `createUser` 이벤트에서 채움)
+  nickname                   String      @default("")
   /// 자기소개
   bio                        String?
   /// 프로필 이미지 URL
@@ -206,10 +212,12 @@ model User {
 
   /// 홈짐
   homeGym         Gym?              @relation("homeGym", fields: [homeGymId], references: [id], onDelete: SetNull)
-  /// OAuth 계정 목록
+  /// OAuth 계정 목록 (NextAuth)
   accounts        Account[]
+  /// NextAuth DB 세션
+  authSessions    Session[]       @relation("AuthSession")
   /// 클라이밍 세션 목록
-  sessions        ClimbingSession[]
+  climbingSessions ClimbingSession[]
   /// 암장 리뷰 목록
   reviews         GymReview[]
   /// 게시글 목록
@@ -301,30 +309,46 @@ model ApiErrorLog {
   @@map("api_error_logs")
 }
 
-/// OAuth 계정
+/// OAuth 계정 (NextAuth Prisma Adapter)
 model Account {
-  /// 계정 고유 ID
-  id                String   @id @default(uuid()) @db.Uuid
-  /// 유저 ID
-  userId            String   @map("user_id") @db.Uuid
-  /// OAuth 제공자
-  provider          Provider
-  /// 제공자 계정 ID
-  providerAccountId String   @map("provider_account_id")
-  /// 액세스 토큰
-  accessToken       String?  @map("access_token")
-  /// 리프레시 토큰
-  refreshToken      String?  @map("refresh_token")
-  /// 토큰 만료일
-  expiresAt         Int?     @map("expires_at")
-  /// 생성일
-  createdAt         DateTime @default(now()) @map("created_at")
+  id                String  @id @default(uuid()) @db.Uuid
+  userId            String  @map("user_id") @db.Uuid
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @map("refresh_token") @db.Text
+  access_token      String? @map("access_token") @db.Text
+  expires_at        Int?    @map("expires_at")
+  token_type        String? @map("token_type")
+  scope             String?
+  id_token          String? @map("id_token") @db.Text
+  session_state     String? @map("session_state")
 
-  /// 유저
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
   @@map("accounts")
+}
+
+/// NextAuth DB 세션
+model Session {
+  id           String   @id @default(uuid()) @db.Uuid
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id") @db.Uuid
+  expires      DateTime
+  user         User     @relation("AuthSession", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("nextauth_sessions")
+}
+
+/// NextAuth 이메일 로그인 등 검증 토큰
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
 }
 
 /// 팔로우 관계
