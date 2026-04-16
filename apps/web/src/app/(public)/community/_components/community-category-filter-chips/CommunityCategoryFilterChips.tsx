@@ -1,7 +1,12 @@
 "use client";
 
-import { categoryToKoreanMap, communityCategoryEnum, type CommunityCategory } from "@clog/utils";
 import { useSearchParams } from "next/navigation";
+
+import {
+  categoryToKoreanMap,
+  communityCategoryEnum,
+  type CommunityCategory,
+} from "@clog/contracts";
 
 import FilterChip from "#web/components/shared/FilterChip";
 import useReplaceQueryParams from "#web/hooks/useReplaceQueryParams";

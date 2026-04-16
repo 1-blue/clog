@@ -4,7 +4,7 @@ import { Skeleton } from "#web/components/ui/skeleton";
 const SettingsMainSkeleton = () => {
   return (
     <div className="pb-8">
-      <TopBar showQuickActions={false} title="설정" />
+      <TopBar title="설정" />
       <div className="mx-auto flex max-w-lg flex-col gap-8 pt-4">
         {/* 프로필 요약 카드 (내 프로필 링크 + 카드 내 로그아웃) */}
         <div className="overflow-hidden rounded-2xl border border-outline-variant/50 bg-surface-container-low ring-1 ring-outline-variant/30">

@@ -3,7 +3,7 @@
 import { UserRound } from "lucide-react";
 import { useState } from "react";
 
-import { difficultyToKoreanMap, type Difficulty } from "@clog/utils";
+import { difficultyToKoreanMap, type Difficulty } from "@clog/contracts";
 
 import type { components } from "#web/@types/openapi";
 import ImageLightboxDialog from "#web/components/shared/image-carousel-lightbox/ImageLightboxDialog";

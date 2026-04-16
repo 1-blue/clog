@@ -1,6 +1,5 @@
 "use client";
 
-import type { FC } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
@@ -16,6 +15,7 @@ import {
   XIcon,
   type LucideIcon,
 } from "lucide-react";
+import type { FC } from "react";
 import { useRouter } from "next/navigation";
 
 import { fetchClient } from "#web/apis/openapi";
@@ -43,9 +43,7 @@ interface IProps {
   showCloseButton?: boolean;
 }
 
-const NotificationListSection: FC<IProps> = ({
-  showCloseButton = false,
-}) => {
+const NotificationListSection: FC<IProps> = ({ showCloseButton = false }) => {
   const router = useRouter();
   const { markReadMutation, patchReadMutation, deleteMutation } =
     useNotificationMutations();

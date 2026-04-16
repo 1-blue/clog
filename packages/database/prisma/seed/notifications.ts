@@ -65,7 +65,8 @@ export async function seedNotifications(
       userId: user1.id,
       type: "AUTO_CHECKOUT" as const,
       title: "자동 체크아웃",
-      message: "더클라임 강남점에서 체크인 시간이 종료되어 자동 체크아웃되었습니다.",
+      message:
+        "더클라임 강남점에서 체크인 시간이 종료되어 자동 체크아웃되었습니다.",
     },
   ];
 

@@ -1,0 +1,23 @@
+{
+  "name": "@clog/contracts",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint .",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist node_modules .turbo"
+  },
+  "dependencies": {
+    "@asteasolutions/zod-to-openapi": "^8.5.0",
+    "@clog/db": "workspace:*",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@clog/eslint-config": "workspace:*",
+    "@clog/typescript-config": "workspace:*",
+    "typescript": "^5.9.3"
+  }
+}

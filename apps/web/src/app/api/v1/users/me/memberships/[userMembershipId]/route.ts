@@ -1,12 +1,7 @@
-import { prisma } from "@clog/db";
-import { patchUserMembershipBodySchema } from "@clog/utils";
+import { patchUserMembershipBodySchema } from "@clog/contracts";
+import { prisma } from "@clog/db/prisma";
 
-import {
-  errorResponse,
-  json,
-  jsonWithToast,
-  requireAuth,
-} from "#web/libs/api";
+import { errorResponse, json, jsonWithToast, requireAuth } from "#web/libs/api";
 import { catchApiError } from "#web/libs/api/errorCatch";
 import { seoulYmdToDate } from "#web/libs/membership/membershipDates";
 import { serializeUserMembership } from "#web/libs/membership/serializeUserMembership";
@@ -20,9 +15,7 @@ const membershipInclude = {
 /** 내 회원권 상세 */
 export const GET = async (
   _request: Request,
-  {
-    params,
-  }: { params: Promise<{ userMembershipId: string }> },
+  { params }: { params: Promise<{ userMembershipId: string }> },
 ) => {
   const { userMembershipId } = await params;
   const { userId, error } = await requireAuth();
@@ -46,9 +39,7 @@ export const GET = async (
 /** 내 회원권 수정 */
 export const PATCH = async (
   request: Request,
-  {
-    params,
-  }: { params: Promise<{ userMembershipId: string }> },
+  { params }: { params: Promise<{ userMembershipId: string }> },
 ) => {
   const { userMembershipId } = await params;
   const { userId, error } = await requireAuth();
@@ -85,9 +76,7 @@ export const PATCH = async (
 /** 내 회원권 삭제 */
 export const DELETE = async (
   _request: Request,
-  {
-    params,
-  }: { params: Promise<{ userMembershipId: string }> },
+  { params }: { params: Promise<{ userMembershipId: string }> },
 ) => {
   const { userMembershipId } = await params;
   const { userId, error } = await requireAuth();

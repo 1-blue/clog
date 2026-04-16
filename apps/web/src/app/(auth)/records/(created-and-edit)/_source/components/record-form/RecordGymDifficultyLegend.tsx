@@ -1,6 +1,6 @@
 "use client";
 
-import type { Difficulty } from "@clog/utils";
+import type { Difficulty } from "@clog/db";
 
 import {
   getDifficultyChipPresentation,

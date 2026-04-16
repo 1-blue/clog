@@ -1,6 +1,5 @@
-import type { Difficulty } from "@clog/utils";
-
-import { prisma } from "@clog/db";
+import type { Difficulty } from "@clog/db";
+import { prisma } from "@clog/db/prisma";
 
 import {
   isDifficultyStrictlyHigher,
@@ -21,7 +20,12 @@ export const bumpUserMaxDifficultyFromRoutes = async (
   });
   if (!user) return;
 
-  if (isDifficultyStrictlyHigher(sessionMax, user.maxDifficulty as Difficulty | null)) {
+  if (
+    isDifficultyStrictlyHigher(
+      sessionMax,
+      user.maxDifficulty as Difficulty | null,
+    )
+  ) {
     await prisma.user.update({
       where: { id: userId },
       data: { maxDifficulty: sessionMax },

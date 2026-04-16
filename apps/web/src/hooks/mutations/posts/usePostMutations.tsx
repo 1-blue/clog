@@ -12,7 +12,11 @@ type PostPayload = components["schemas"]["Post"];
 const getCreatedPostPayload = (result: unknown): PostPayload | undefined => {
   if (!result || typeof result !== "object") return undefined;
   const r = result as Record<string, unknown>;
-  if (r.payload && typeof r.payload === "object" && "id" in (r.payload as object)) {
+  if (
+    r.payload &&
+    typeof r.payload === "object" &&
+    "id" in (r.payload as object)
+  ) {
     return r.payload as PostPayload;
   }
   const inner = r.data as Record<string, unknown> | undefined;

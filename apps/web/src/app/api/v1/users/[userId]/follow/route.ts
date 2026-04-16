@@ -1,6 +1,6 @@
 import { NotificationType } from "@prisma/client";
 
-import { prisma } from "@clog/db";
+import { prisma } from "@clog/db/prisma";
 
 import { ROUTES } from "#web/constants";
 import { errorResponse, json, requireAuth } from "#web/libs/api";

@@ -8,7 +8,7 @@ import {
   type AttemptResult,
   type Difficulty,
   type PerceivedDifficulty,
-} from "@clog/utils";
+} from "@clog/contracts";
 
 import type { components } from "#web/@types/openapi";
 import {

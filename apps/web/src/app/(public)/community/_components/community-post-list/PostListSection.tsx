@@ -3,7 +3,7 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 
-import { communityCategoryEnum, type CommunityCategory } from "@clog/utils";
+import { communityCategoryEnum, type CommunityCategory } from "@clog/contracts";
 
 import { fetchClient } from "#web/apis/openapi";
 import InfiniteScroll from "#web/components/shared/InfiniteScroll";

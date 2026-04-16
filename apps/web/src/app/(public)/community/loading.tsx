@@ -2,7 +2,14 @@ import { cn } from "#web/libs/utils";
 
 import PostListSkeleton from "./_components/community-post-list/PostListSkeleton";
 
-const chipSkeletonWidths = ["w-14", "w-16", "w-18", "w-16", "w-20", "w-14"] as const;
+const chipSkeletonWidths = [
+  "w-14",
+  "w-16",
+  "w-18",
+  "w-16",
+  "w-20",
+  "w-14",
+] as const;
 
 /** `(public)/layout`의 `max-w-3xl px-2.5`에 맞춤 — `CommunityMain`과 동일한 상단·필터·리스트 골격 */
 const CommunityLoading = () => {

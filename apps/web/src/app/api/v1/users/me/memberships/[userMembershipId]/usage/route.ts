@@ -1,8 +1,11 @@
 import { differenceInCalendarDays, differenceInCalendarWeeks } from "date-fns";
 
-import { prisma } from "@clog/db";
-import type { TMembershipPlanCode } from "@clog/utils";
-import { initialUsesForCountPlanCode, isCountPlanCode } from "@clog/utils";
+import {
+  initialUsesForCountPlanCode,
+  isCountPlanCode,
+  type TMembershipPlanCode,
+} from "@clog/contracts";
+import { prisma } from "@clog/db/prisma";
 
 import { errorResponse, json, requireAuth } from "#web/libs/api";
 import { catchApiError } from "#web/libs/api/errorCatch";
@@ -14,9 +17,7 @@ import {
 /** 회원권 사용 기록·통계 (클라이밍 세션 연동) */
 export const GET = async (
   _request: Request,
-  {
-    params,
-  }: { params: Promise<{ userMembershipId: string }> },
+  { params }: { params: Promise<{ userMembershipId: string }> },
 ) => {
   const { userMembershipId } = await params;
   const { userId, error } = await requireAuth();

@@ -1,5 +1,5 @@
-import { prisma } from "@clog/db";
-import { createPostSchema, postQuerySchema } from "@clog/utils";
+import { createPostSchema, postQuerySchema } from "@clog/contracts";
+import { prisma } from "@clog/db/prisma";
 
 import {
   getAuthUserId,

@@ -148,10 +148,7 @@ const FormHelper: React.FC<IProps> = ({
   };
 
   return (
-    <Field
-      data-invalid={hasError ? true : undefined}
-      className={className}
-    >
+    <Field data-invalid={hasError ? true : undefined} className={className}>
       {renderLabelRow()}
 
       {description && (
@@ -166,9 +163,7 @@ const FormHelper: React.FC<IProps> = ({
 
       <FieldContent>{renderControl()}</FieldContent>
 
-      {hasError && (
-        <FieldError id={errorId}>{errorMsg}</FieldError>
-      )}
+      {hasError && <FieldError id={errorId}>{errorMsg}</FieldError>}
     </Field>
   );
 };

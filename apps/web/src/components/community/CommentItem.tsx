@@ -3,8 +3,8 @@
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
 import { User } from "lucide-react";
-import Link from "next/link";
 import React from "react";
+import Link from "next/link";
 
 import { ROUTES } from "#web/constants";
 

@@ -8,8 +8,8 @@ import {
   ScrollView,
   StyleSheet,
   ToastAndroid,
-  View,
   useWindowDimensions,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { WebView, type WebViewNavigation } from "react-native-webview";
@@ -17,8 +17,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { WEB_URL } from "../../constants";
 import {
-  Notifications,
   ensurePushNotificationHandler,
+  Notifications,
   registerForPushNotificationsOnce,
 } from "../../libs/pushNotifications";
 import LoadingOverlay from "./LoadingOverlay";
@@ -102,10 +102,7 @@ true;
     null,
   );
 
-  const webOriginPrefix = useMemo(
-    () => WEB_URL.replace(/\/$/, ""),
-    [],
-  );
+  const webOriginPrefix = useMemo(() => WEB_URL.replace(/\/$/, ""), []);
 
   useEffect(() => {
     if (!isAndroid) return;

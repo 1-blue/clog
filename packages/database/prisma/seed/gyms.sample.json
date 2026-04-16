@@ -28,7 +28,12 @@
     "암장_key": "list[].key — 시드 맵·OPEN_HOURS 키 등에서 쓰이는 전체 키(예: seoulforest_guro). 브랜드 접두사와 membershipBrand가 일치하는지 확인."
   },
   "_허용값": {
-    "GymMembershipBrand": ["THE_CLIMB", "SEOULFOREST", "CLIMBINGPARK", "STANDALONE"],
+    "GymMembershipBrand": [
+      "THE_CLIMB",
+      "SEOULFOREST",
+      "CLIMBINGPARK",
+      "STANDALONE"
+    ],
     "region": [
       "SEOUL",
       "GYEONGGI",
@@ -51,7 +56,19 @@
     "dayType": ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"],
     "openClose": "HH:mm 24시간제. 자정 종료는 \"24:00\" 권장.",
     "facilities": ["PARKING", "SHOWER", "LOCKER", "REST_AREA", "TRAINING"],
-    "difficulty": ["V0", "V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "V10"],
+    "difficulty": [
+      "V0",
+      "V1",
+      "V2",
+      "V3",
+      "V4",
+      "V5",
+      "V6",
+      "V7",
+      "V8",
+      "V9",
+      "V10"
+    ],
     "key접두사_기본매핑": "theclimb_→THE_CLIMB, seoulforest_→SEOULFOREST, climbingpark_→CLIMBINGPARK, 그 외→STANDALONE(명시적 membershipBrand와 함께 검증 권장)",
     "이미지_S3": "seed/ 이후 theclimb/·seoulforest/·climbing_park/ 등 브랜드 폴더 규칙"
   },
@@ -1406,14 +1423,19 @@
         }
       ]
     },
-    "b_bloc":{
+    "b_bloc": {
       "membershipBrand": "B_BLOC",
       "difficultyColors": [
         { "difficulty": "V1", "color": "#FFFFFF", "label": "흰색", "order": 0 },
         { "difficulty": "V2", "color": "#F5D800", "label": "노랑", "order": 1 },
         { "difficulty": "V3", "color": "#FF7F00", "label": "주황", "order": 2 },
         { "difficulty": "V4", "color": "#E91E8C", "label": "분홍", "order": 3 },
-        { "difficulty": "V5", "color": "#2196F3", "label": "하늘색", "order": 4 },
+        {
+          "difficulty": "V5",
+          "color": "#2196F3",
+          "label": "하늘색",
+          "order": 4
+        },
         { "difficulty": "V6", "color": "#9E9E9E", "label": "회색", "order": 5 },
         { "difficulty": "V7", "color": "#4CAF50", "label": "초록", "order": 6 },
         { "difficulty": "V8", "color": "#E53935", "label": "빨강", "order": 7 },

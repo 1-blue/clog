@@ -1,5 +1,5 @@
-import * as Device from "expo-device";
 import Constants, { ExecutionEnvironment } from "expo-constants";
+import * as Device from "expo-device";
 import { Platform } from "react-native";
 
 /**
@@ -89,7 +89,8 @@ const registerForPushNotificationsAsync =
       };
     }
 
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
     if (existingStatus !== "granted") {
       const { status } = await Notifications.requestPermissionsAsync();
@@ -107,13 +108,15 @@ const registerForPushNotificationsAsync =
     if (!projectId) {
       return {
         ok: false,
-        reason: "EAS projectId를 찾을 수 없습니다. app.json extra.eas.projectId를 확인하세요.",
+        reason:
+          "EAS projectId를 찾을 수 없습니다. app.json extra.eas.projectId를 확인하세요.",
       };
     }
 
     try {
-      const { data: expoPushToken } =
-        await Notifications.getExpoPushTokenAsync({ projectId });
+      const { data: expoPushToken } = await Notifications.getExpoPushTokenAsync(
+        { projectId },
+      );
       return { ok: true, expoPushToken };
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);

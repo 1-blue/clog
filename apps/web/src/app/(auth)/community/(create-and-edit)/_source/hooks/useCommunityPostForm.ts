@@ -5,10 +5,10 @@ import { useForm, type UseFormProps } from "react-hook-form";
 import { z } from "zod";
 
 import {
-  communityCategoryEnum,
   COMMUNITY_POST_TAG_MAX_COUNT,
   COMMUNITY_POST_TAG_MAX_LENGTH,
-} from "@clog/utils";
+  communityCategoryEnum,
+} from "@clog/contracts";
 
 const communityPostFormSchema = z.object({
   category: communityCategoryEnum,

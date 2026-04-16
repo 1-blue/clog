@@ -1,9 +1,10 @@
-import { prisma } from "@clog/db";
 import { PushPlatform } from "@prisma/client";
+
 import {
   deletePushDeviceQuerySchema,
   registerPushDeviceSchema,
-} from "@clog/utils";
+} from "@clog/contracts";
+import { prisma } from "@clog/db/prisma";
 
 import { getSearchParams, json, requireAuth } from "#web/libs/api";
 import { catchApiError } from "#web/libs/api/errorCatch";

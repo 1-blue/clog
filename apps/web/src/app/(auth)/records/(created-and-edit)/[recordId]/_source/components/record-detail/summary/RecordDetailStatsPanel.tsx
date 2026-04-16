@@ -2,7 +2,7 @@
 
 import { Flame, Timer, Trophy } from "lucide-react";
 
-import { attemptResultToKoreanMap, type AttemptResult } from "@clog/utils";
+import { attemptResultToKoreanMap, type AttemptResult } from "@clog/contracts";
 
 import type { components } from "#web/@types/openapi";
 import type { TGymDifficultyColor } from "#web/app/(auth)/records/(created-and-edit)/_source/utils/gym-difficulty-presentation";

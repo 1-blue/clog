@@ -1,3 +1,4 @@
+import type { TMembershipPlanCode } from "@clog/contracts";
 import type {
   Gym,
   GymMembershipPlan,
@@ -5,13 +6,11 @@ import type {
   UserMembership,
 } from "@clog/db";
 
-import type { TMembershipPlanCode } from "@clog/utils";
-
 import {
   computeMembershipValidity,
   isSessionDateWithinMembership,
-  type IMembershipPauseRow,
   toSeoulYmd,
+  type IMembershipPauseRow,
 } from "#web/libs/membership/membershipDates";
 
 export type TUserMembershipWithRelations = UserMembership & {
@@ -25,10 +24,12 @@ export const serializeUserMembership = (
   now: Date = new Date(),
 ) => {
   const planCode = row.plan.code as TMembershipPlanCode;
-  const pauses: IMembershipPauseRow[] = row.pauses.map((p: MembershipPause) => ({
-    startDate: p.startDate,
-    endDate: p.endDate,
-  }));
+  const pauses: IMembershipPauseRow[] = row.pauses.map(
+    (p: MembershipPause) => ({
+      startDate: p.startDate,
+      endDate: p.endDate,
+    }),
+  );
 
   const { effectiveEndAt, lastValidYmd } = computeMembershipValidity({
     planCode,

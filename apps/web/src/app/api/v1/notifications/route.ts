@@ -1,5 +1,5 @@
-import { prisma } from "@clog/db";
-import { notificationQuerySchema } from "@clog/utils";
+import { notificationQuerySchema } from "@clog/contracts";
+import { prisma } from "@clog/db/prisma";
 
 import {
   errorResponse,

@@ -3,7 +3,7 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback } from "react";
 
-import type { TStatisticsPeriod } from "@clog/utils";
+import type { TStatisticsPeriod } from "@clog/contracts";
 
 import { cn } from "#web/libs/utils";
 
@@ -80,7 +80,7 @@ const PeriodControl: React.FC<IProps> = ({
           type="button"
           className={cn(
             "rounded-full p-1 hover:bg-surface-container-high",
-            !canShift && "invisible pointer-events-none",
+            !canShift && "pointer-events-none invisible",
             canShift && !canGoPrev && "pointer-events-none opacity-30",
           )}
           aria-label="이전 기간"
@@ -94,7 +94,7 @@ const PeriodControl: React.FC<IProps> = ({
           type="button"
           className={cn(
             "rounded-full p-1 hover:bg-surface-container-high",
-            !canShift && "invisible pointer-events-none",
+            !canShift && "pointer-events-none invisible",
             canShift && !canGoNext && "pointer-events-none opacity-30",
           )}
           aria-label="다음 기간"

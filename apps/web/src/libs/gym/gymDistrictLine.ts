@@ -1,4 +1,4 @@
-import { regionToKoreanMap, type Region } from "@clog/utils";
+import { regionToKoreanMap, type Region } from "@clog/contracts";
 
 /** 카드용 짧은 지역 표기 (예: 서울 강남구) */
 export const gymDistrictLine = (region: Region, address: string) => {

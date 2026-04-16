@@ -3,12 +3,12 @@ import { Suspense } from "react";
 import type { Metadata, NextPage } from "next";
 import { notFound } from "next/navigation";
 
+import RecordFormPageSkeleton from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordFormPageSkeleton";
 import { getRecordPayloadCached } from "#web/app/(auth)/records/(created-and-edit)/_source/utils/getRecordPayloadCached";
 import {
   prefetchGymsForRecordForm,
   prefetchRecordById,
 } from "#web/app/(auth)/records/(created-and-edit)/_source/utils/record-form-prefetch";
-import RecordFormPageSkeleton from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordFormPageSkeleton";
 import { getQueryClient } from "#web/libs/getQueryClient";
 import { getSharedMetadata } from "#web/libs/sharedMetadata";
 

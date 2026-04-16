@@ -20,8 +20,7 @@ interface INotificationPanelContext {
 const NotificationPanelContext =
   createContext<INotificationPanelContext | null>(null);
 
-export const useNotificationPanel = () =>
-  useContext(NotificationPanelContext);
+export const useNotificationPanel = () => useContext(NotificationPanelContext);
 
 const NotificationPanelDialog = () => {
   const ctx = useNotificationPanel();

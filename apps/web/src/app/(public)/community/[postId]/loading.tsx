@@ -3,7 +3,7 @@ import PostDetailTopBar from "./_components/PostDetailTopBar";
 
 const PostDetailLoading = () => {
   return (
-    <div className="min-h-screen bg-background pb-40 text-on-background">
+    <div className="text-on-background min-h-screen bg-background pb-40">
       <PostDetailTopBar />
       <PostDetailLoadingBody />
     </div>

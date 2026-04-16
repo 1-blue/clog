@@ -75,11 +75,7 @@ const MembershipDetailMain: React.FC<IProps> = ({ userMembershipId }) => {
 
   return (
     <div className="flex min-h-dvh flex-col bg-background pb-10">
-      <TopBar
-        className="border-outline-variant bg-surface-container/80"
-        showQuickActions={false}
-        title={membership.gym.name}
-      />
+      <TopBar title={membership.gym.name} />
 
       <div className="mx-auto flex w-full max-w-lg flex-col gap-6 pt-4">
         <section className="rounded-2xl border border-outline-variant/20 bg-surface-container-low p-5">

@@ -1,0 +1,34 @@
+import { schemas } from "../../../schemas/shared";
+import { adminRegistry, z } from "../../registry";
+
+const ListResponse = z.object({
+  payload: z.object({
+    items: z.array(z.any()),
+    nextCursor: z.string().nullable(),
+  }),
+});
+
+adminRegistry.registerPath({
+  method: "get",
+  path: "/api/v1/admin/posts",
+  tags: ["Admin - Posts"],
+  summary: "게시글 목록",
+  request: {
+    query: z.object({ cursor: schemas.cursor, limit: schemas.limit }),
+  },
+  responses: {
+    200: {
+      description: "목록",
+      content: { "application/json": { schema: ListResponse } },
+    },
+  },
+});
+
+adminRegistry.registerPath({
+  method: "delete",
+  path: "/api/v1/admin/posts/{postId}",
+  tags: ["Admin - Posts"],
+  summary: "게시글 삭제",
+  request: { params: z.object({ postId: z.string().uuid() }) },
+  responses: { 200: { description: "삭제됨" } },
+});

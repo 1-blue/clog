@@ -1,4 +1,4 @@
-import type { Difficulty } from "./schemas/enums";
+import type { Difficulty } from "@clog/db";
 
 /**
  * 난이도(V0→V1→…) 순서와 1:1 매핑.
@@ -91,7 +91,9 @@ const RAINBOW: IRouteRainbowStyle[] = [
 
 export const ROUTE_RAINBOW_LENGTH = RAINBOW.length;
 
-export const getRouteRainbowStyle = (routeIndex: number): IRouteRainbowStyle => {
+export const getRouteRainbowStyle = (
+  routeIndex: number,
+): IRouteRainbowStyle => {
   const i =
     ((routeIndex % ROUTE_RAINBOW_LENGTH) + ROUTE_RAINBOW_LENGTH) %
     ROUTE_RAINBOW_LENGTH;

@@ -8,10 +8,13 @@ import {
   difficultyToKoreanMap,
   type AttemptResult,
   type Difficulty,
-} from "@clog/utils";
+} from "@clog/contracts";
 
 const DIFFICULTIES = Object.keys(difficultyToKoreanMap) as Difficulty[];
-const RESULTS = Object.entries(attemptResultToKoreanMap) as [AttemptResult, string][];
+const RESULTS = Object.entries(attemptResultToKoreanMap) as [
+  AttemptResult,
+  string,
+][];
 
 interface IProps {
   selectedDifficulty: Difficulty;

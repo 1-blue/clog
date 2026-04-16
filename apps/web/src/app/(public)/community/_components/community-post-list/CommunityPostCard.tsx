@@ -5,10 +5,7 @@ import { ko } from "date-fns/locale";
 import { Bookmark, Eye, MessageCircle, ThumbsUp, User } from "lucide-react";
 import Link from "next/link";
 
-import {
-  categoryToKoreanMap,
-  postCategoryMap,
-} from "@clog/utils";
+import { categoryToKoreanMap, postCategoryMap } from "@clog/contracts";
 
 import type { components } from "#web/@types/openapi";
 import { Badge } from "#web/components/ui/badge";
@@ -42,10 +39,8 @@ const CommunityPostCard: React.FC<IProps> = ({
   const commentCount = post.commentCount;
   const viewCount = post.viewCount;
 
-  const isLiked =
-    forceLiked ?? (post.likes?.length ?? 0) > 0;
-  const isBookmarked =
-    forceBookmarked ?? (post.bookmarks?.length ?? 0) > 0;
+  const isLiked = forceLiked ?? (post.likes?.length ?? 0) > 0;
+  const isBookmarked = forceBookmarked ?? (post.bookmarks?.length ?? 0) > 0;
   const bookmarkCount = post.bookmarks?.length;
 
   const authorNickname = post.author.nickname;

@@ -4,8 +4,8 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { Heart } from "lucide-react";
 import Link from "next/link";
 
-import CommunityPostCard from "#web/app/(public)/community/_components/community-post-list/CommunityPostCard";
 import { fetchClient } from "#web/apis/openapi";
+import CommunityPostCard from "#web/app/(public)/community/_components/community-post-list/CommunityPostCard";
 import EmptyState from "#web/components/shared/EmptyState";
 import InfiniteScroll from "#web/components/shared/InfiniteScroll";
 import { ROUTES } from "#web/constants";

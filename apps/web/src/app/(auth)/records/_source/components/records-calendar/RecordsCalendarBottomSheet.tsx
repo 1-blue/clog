@@ -2,8 +2,8 @@
 
 import { format } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useSearchParams } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 import { Sheet, SheetContent } from "#web/components/ui/sheet";
 import useReplaceQueryParams from "#web/hooks/useReplaceQueryParams";

@@ -1,8 +1,8 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 import { openapi } from "#web/apis/openapi";
 import { ROUTES } from "#web/constants";
@@ -15,7 +15,10 @@ interface IOptions {
 const useGymCheckInMutations = (options?: IOptions) => {
   const queryClient = useQueryClient();
   const router = useRouter();
-  const { queryKey: meQueryKey } = openapi.queryOptions("get", "/api/v1/users/me");
+  const { queryKey: meQueryKey } = openapi.queryOptions(
+    "get",
+    "/api/v1/users/me",
+  );
 
   /** 혼잡도 랭킹·암장 목록 등 visitorCount 반영 */
   const invalidateGymListQueries = () =>
@@ -108,7 +111,8 @@ const useGymCheckInMutations = (options?: IOptions) => {
             description: "방문 기록이 만들어졌어요.",
             action: {
               label: "기록 수정",
-              onClick: () => router.push(ROUTES.RECORDS.DETAIL.EDIT.path(createdId)),
+              onClick: () =>
+                router.push(ROUTES.RECORDS.DETAIL.EDIT.path(createdId)),
             },
           });
         } else {

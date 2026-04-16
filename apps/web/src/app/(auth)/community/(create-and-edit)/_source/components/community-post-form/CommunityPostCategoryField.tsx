@@ -1,7 +1,8 @@
 "use client";
 
-import { categoryToKoreanMap, type CommunityCategory } from "@clog/utils";
 import { useFormContext, useWatch } from "react-hook-form";
+
+import { categoryToKoreanMap, type CommunityCategory } from "@clog/contracts";
 
 import type { TCommunityPostFormData } from "../../hooks/useCommunityPostForm";
 
@@ -23,7 +24,10 @@ const CommunityPostCategoryField: React.FC = () => {
             type="button"
             key={key}
             onClick={() =>
-              setValue("category", key, { shouldValidate: true, shouldDirty: true })
+              setValue("category", key, {
+                shouldValidate: true,
+                shouldDirty: true,
+              })
             }
             className={`rounded-full px-4 py-2 text-xs font-medium transition-colors ${
               category === key

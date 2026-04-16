@@ -1,10 +1,8 @@
 "use client";
 
+import { useWatch, type UseFormReturn } from "react-hook-form";
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { UseFormReturn } from "react-hook-form";
-import { useWatch } from "react-hook-form";
 
-import type { TRecordFormData } from "./useRecordForm";
 import {
   formValuesToDraftSlice,
   getDefaultRecordCreateFormValues,
@@ -12,6 +10,7 @@ import {
   readRecordCreateDraftBucket,
   upsertRecordCreateDraftForDate,
 } from "../utils/record-create-draft-storage";
+import type { TRecordFormData } from "./useRecordForm";
 
 const DEBOUNCE_MS = 400;
 
@@ -47,7 +46,9 @@ export const useRecordCreateDraftPersistence = (
       const draft = bucket?.byDate[y];
       if (draft) {
         const base = getDefaultRecordCreateFormValues(y);
-        reset(mergeDefaultsWithDraft(base, draft), { keepDefaultValues: false });
+        reset(mergeDefaultsWithDraft(base, draft), {
+          keepDefaultValues: false,
+        });
       }
     }
 

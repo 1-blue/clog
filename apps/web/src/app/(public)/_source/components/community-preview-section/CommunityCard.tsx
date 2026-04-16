@@ -3,7 +3,7 @@ import { ko } from "date-fns/locale";
 import { Bookmark, FileText, Heart, MessageCircle } from "lucide-react";
 import Link from "next/link";
 
-import { categoryToKoreanMap, postCategoryMap } from "@clog/utils";
+import { categoryToKoreanMap, postCategoryMap } from "@clog/contracts";
 
 import { components } from "#web/@types/openapi";
 import { Badge } from "#web/components/ui/badge";

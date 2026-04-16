@@ -1,23 +1,21 @@
-import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "@prisma/client";
-
-export { PrismaClient } from "@prisma/client";
+export {
+  Provider,
+  Role,
+  Region,
+  Difficulty,
+  DayType,
+  GymFacilityType,
+  GymReviewFeature,
+  GymPerceivedDifficulty,
+  ClimbingAttemptResult,
+  PostCategory,
+  NotificationType,
+  MembershipPlanCode,
+  GymMembershipBrand,
+  PushPlatform,
+  AdminAuditAction,
+} from "@prisma/client";
 export type * from "@prisma/client";
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined;
-};
-
-function createPrismaClient() {
-  const connectionString = process.env.DATABASE_URL;
-  if (!connectionString) {
-    throw new Error("DATABASE_URL 환경 변수가 필요합니다.");
-  }
-
-  const adapter = new PrismaPg({ connectionString });
-  return new PrismaClient({ adapter });
-}
-
-export const prisma = globalForPrisma.prisma ?? createPrismaClient();
-
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+// zod-prisma-types generator output — 모델 schema 값만 선별 re-export
+export * from "./zod-models.js";

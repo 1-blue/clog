@@ -1,12 +1,7 @@
-import { prisma } from "@clog/db";
-import { updateReviewSchema } from "@clog/utils";
+import { updateReviewSchema } from "@clog/contracts";
+import { prisma } from "@clog/db/prisma";
 
-import {
-  errorResponse,
-  json,
-  jsonWithToast,
-  requireAuth,
-} from "#web/libs/api";
+import { errorResponse, json, jsonWithToast, requireAuth } from "#web/libs/api";
 import { catchApiError } from "#web/libs/api/errorCatch";
 import { normalizeReviewJsonBody } from "#web/libs/reviewBody";
 
@@ -34,9 +29,7 @@ const syncGymReviewStatsInTx = async (
 /** 리뷰 단건 (공개) */
 export const GET = async (
   _request: Request,
-  {
-    params,
-  }: { params: Promise<{ gymId: string; reviewId: string }> },
+  { params }: { params: Promise<{ gymId: string; reviewId: string }> },
 ) => {
   const { gymId, reviewId } = await params;
 
@@ -59,9 +52,7 @@ export const GET = async (
 /** 리뷰 삭제 */
 export const DELETE = async (
   request: Request,
-  {
-    params,
-  }: { params: Promise<{ gymId: string; reviewId: string }> },
+  { params }: { params: Promise<{ gymId: string; reviewId: string }> },
 ) => {
   const { gymId, reviewId } = await params;
   const { userId, error } = await requireAuth();
@@ -94,9 +85,7 @@ export const DELETE = async (
 /** 리뷰 수정 */
 export const PATCH = async (
   request: Request,
-  {
-    params,
-  }: { params: Promise<{ gymId: string; reviewId: string }> },
+  { params }: { params: Promise<{ gymId: string; reviewId: string }> },
 ) => {
   const { gymId, reviewId } = await params;
   const { userId, error } = await requireAuth();

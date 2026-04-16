@@ -3,14 +3,14 @@
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
 import { User } from "lucide-react";
-import Link from "next/link";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 import type { components } from "#web/@types/openapi";
 import { Button } from "#web/components/ui/button";
 import { Textarea } from "#web/components/ui/textarea";
-import usePostDetailMutations from "#web/hooks/mutations/posts/usePostDetailMutations";
 import { ROUTES } from "#web/constants";
+import usePostDetailMutations from "#web/hooks/mutations/posts/usePostDetailMutations";
 
 import CommentOwnerMenu from "./CommentOwnerMenu";
 
@@ -76,7 +76,7 @@ const ReplyRow: React.FC<IReplyRowProps> = ({
           </div>
         )}
       </Link>
-      <div className="min-w-0 flex-1 flex flex-col gap-1">
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
         <div className="flex items-start justify-between gap-2">
           <Link
             href={ROUTES.USERS.PROFILE.path(reply.author.id)}

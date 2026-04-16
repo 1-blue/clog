@@ -155,11 +155,7 @@ const MembershipNewMain = () => {
 
   return (
     <div className="flex min-h-dvh flex-col bg-background pb-10">
-      <TopBar
-        className="border-outline-variant bg-surface-container/80"
-        showQuickActions={false}
-        title="회원권 등록"
-      />
+      <TopBar title="회원권 등록" />
 
       <div className="mx-auto flex w-full max-w-lg flex-col gap-6 pt-4">
         <FormHelper label="암장" cloneChild={false}>

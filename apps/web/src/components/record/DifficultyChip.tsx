@@ -1,6 +1,6 @@
 import React from "react";
 
-import { difficultyToKoreanMap, type Difficulty } from "@clog/utils";
+import { difficultyToKoreanMap, type Difficulty } from "@clog/contracts";
 
 import { cn } from "#web/libs/utils";
 

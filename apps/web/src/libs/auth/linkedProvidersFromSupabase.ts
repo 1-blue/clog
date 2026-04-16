@@ -13,7 +13,5 @@ export const linkedProvidersFromSupabase = (
   return [...set];
 };
 
-export const formatLinkedProviders = (
-  providers: TLinkedProvider[],
-): string =>
+export const formatLinkedProviders = (providers: TLinkedProvider[]): string =>
   providers.length > 0 ? providers.join(", ") : "알 수 없음";

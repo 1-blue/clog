@@ -1,11 +1,7 @@
-import { prisma } from "@clog/db";
-import { patchNotificationSchema } from "@clog/utils";
+import { patchNotificationSchema } from "@clog/contracts";
+import { prisma } from "@clog/db/prisma";
 
-import {
-  errorResponse,
-  jsonWithToast,
-  requireAuth,
-} from "#web/libs/api";
+import { errorResponse, jsonWithToast, requireAuth } from "#web/libs/api";
 import { catchApiError } from "#web/libs/api/errorCatch";
 
 /** 알림 단건 읽음 */

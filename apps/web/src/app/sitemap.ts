@@ -1,8 +1,10 @@
 import { MetadataRoute } from "next";
 
-import { prisma } from "@clog/db";
+import { prisma } from "@clog/db/prisma";
 
 import { DEFAULT_SITEMAP, ISitemap, ROUTES } from "#web/constants";
+
+export const runtime = "nodejs";
 
 const baseUrl = () =>
   (process.env.NEXT_PUBLIC_CLIENT_URL ?? "https://clog.story-dict.com").replace(

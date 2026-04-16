@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type UseFormProps } from "react-hook-form";
 import { z } from "zod";
 
-import { createReviewSchema } from "@clog/utils";
+import { createReviewSchema } from "@clog/contracts";
 
 /** 프론트 전용 폼 스키마 — API 스키마에서 UX 맞춤 확장 */
 const gymReviewFormSchema = createReviewSchema.extend({

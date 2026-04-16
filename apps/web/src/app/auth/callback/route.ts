@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { createClient } from "#web/libs/supabase/server";
 import { syncSupabaseUserToPrisma } from "#web/libs/auth/syncSupabaseUserToPrisma";
+import { createClient } from "#web/libs/supabase/server";
 
 /** OAuth PKCE 콜백 — Supabase 대시보드 Redirect URL에 동일 경로 등록 필요 */
 export async function GET(request: NextRequest) {

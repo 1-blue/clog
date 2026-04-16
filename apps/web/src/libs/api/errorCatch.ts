@@ -1,6 +1,6 @@
 import { ZodError } from "zod";
 
-import { prisma } from "@clog/db";
+import { prisma } from "@clog/db/prisma";
 
 import { errorResponse, getAuthUserId } from "#web/libs/api";
 import { notifySlackApiError } from "#web/libs/slack/notifications";

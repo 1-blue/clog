@@ -1,0 +1,27 @@
+// Prisma 모델 zod 스키마만 선별 re-export — type 별칭(예: `User`, `Gym`)은
+// `@prisma/client` 의 relation 포함 타입과 이름 충돌하므로 값 schema 만 꺼낸다.
+export {
+  AccountSchema,
+  AdminAuditLogSchema,
+  ApiErrorLogSchema,
+  ClimbingRouteSchema,
+  ClimbingSessionSchema,
+  FollowSchema,
+  GymBookmarkSchema,
+  GymCheckInSchema,
+  GymDifficultyColorSchema,
+  GymImageSchema,
+  GymMembershipPlanSchema,
+  GymOpenHourSchema,
+  GymReviewSchema,
+  GymSchema,
+  MembershipPauseSchema,
+  NotificationSchema,
+  PostBookmarkSchema,
+  PostCommentSchema,
+  PostLikeSchema,
+  PostSchema,
+  UserMembershipSchema,
+  UserPushDeviceSchema,
+  UserSchema,
+} from "./zod/index.js";

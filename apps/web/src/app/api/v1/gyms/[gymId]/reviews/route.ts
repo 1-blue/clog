@@ -1,5 +1,5 @@
-import { prisma } from "@clog/db";
-import { createReviewSchema, reviewQuerySchema } from "@clog/utils";
+import { createReviewSchema, reviewQuerySchema } from "@clog/contracts";
+import { prisma } from "@clog/db/prisma";
 
 import {
   errorResponse,
@@ -55,6 +55,13 @@ export const POST = async (
     const raw = await request.json();
     const body = normalizeReviewJsonBody(raw);
     const data = createReviewSchema.parse(body);
+
+    const gym = await prisma.gym.findUnique({
+      where: { id: gymId },
+      select: { isClosed: true },
+    });
+    if (!gym) return errorResponse("암장을 찾을 수 없습니다.", 404);
+    if (gym.isClosed) return errorResponse("폐업한 암장입니다.", 400);
 
     // 중복 리뷰 체크
     const existing = await prisma.gymReview.findUnique({

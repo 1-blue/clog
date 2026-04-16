@@ -1,5 +1,6 @@
-import { prisma } from "@clog/db";
 import { z } from "zod";
+
+import { prisma } from "@clog/db/prisma";
 
 import {
   errorResponse,

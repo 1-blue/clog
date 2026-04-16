@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { useEffect } from "react";
 import { View } from "react-native";
+import { useEffect } from "react";
 
 import { WEB_URL } from "../../constants";
 

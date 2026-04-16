@@ -1,4 +1,4 @@
-import { prisma } from "@clog/db";
+import { prisma } from "@clog/db/prisma";
 
 /** 활성 체크인: 아직 종료되지 않았고 자동 체크아웃 시각이 아직 지나지 않음 */
 export function activeCheckInWhere() {
@@ -49,7 +49,8 @@ const getSeoulMonthBounds = (
   const month = Number(parts.find((p) => p.type === "month")?.value);
   const monthIndex = month - 1;
 
-  const monthStartUtc = Date.UTC(year, monthIndex, 1, 0, 0, 0) - SEOUL_OFFSET_MS;
+  const monthStartUtc =
+    Date.UTC(year, monthIndex, 1, 0, 0, 0) - SEOUL_OFFSET_MS;
   const nextMonthStartUtc =
     Date.UTC(year, monthIndex + 1, 1, 0, 0, 0) - SEOUL_OFFSET_MS;
 

@@ -4,9 +4,9 @@ import type { Metadata, NextPage } from "next";
 import { notFound } from "next/navigation";
 
 import { fetchClient, openapi } from "#web/apis/openapi";
+import { requireAuth } from "#web/libs/api";
 import { getQueryClient } from "#web/libs/getQueryClient";
 import { getSharedMetadata } from "#web/libs/sharedMetadata";
-import { requireAuth } from "#web/libs/api";
 
 import GymReviewSkeleton from "../../_source/components/gym-review/skeleton/GymReviewSkeleton";
 import GymReviewEditMain from "./_source/components/GymReviewEditMain";
@@ -27,20 +27,18 @@ const getGymMeta = cache(async (gymId: string) => {
 });
 
 /** 리뷰 소유권 확인 (서버측 IDOR 방지) */
-const verifyReviewOwnership = cache(
-  async (gymId: string, reviewId: string) => {
-    const { userId } = await requireAuth();
-    if (!userId) return false;
+const verifyReviewOwnership = cache(async (gymId: string, reviewId: string) => {
+  const { userId } = await requireAuth();
+  if (!userId) return false;
 
-    const { data, error } = await fetchClient.GET(
-      "/api/v1/gyms/{gymId}/reviews/{reviewId}",
-      { params: { path: { gymId, reviewId } } },
-    );
-    if (error || !data?.payload) return false;
+  const { data, error } = await fetchClient.GET(
+    "/api/v1/gyms/{gymId}/reviews/{reviewId}",
+    { params: { path: { gymId, reviewId } } },
+  );
+  if (error || !data?.payload) return false;
 
-    return (data.payload as { userId?: string }).userId === userId;
-  },
-);
+  return (data.payload as { userId?: string }).userId === userId;
+});
 
 export const generateMetadata = async ({
   params,

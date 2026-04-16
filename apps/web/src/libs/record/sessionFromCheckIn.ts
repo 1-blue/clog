@@ -8,8 +8,7 @@ export const CHECKIN_MIN_SESSION_MS = 30 * 60 * 1000;
 export const isCheckInEligibleForSession = (
   startedAt: Date,
   endedAt: Date,
-): boolean =>
-  endedAt.getTime() - startedAt.getTime() >= CHECKIN_MIN_SESSION_MS;
+): boolean => endedAt.getTime() - startedAt.getTime() >= CHECKIN_MIN_SESSION_MS;
 
 type TTx = Omit<
   Prisma.TransactionClient,

@@ -1,4 +1,4 @@
-import type { TMembershipPlanCode } from "@clog/utils";
+import type { TMembershipPlanCode } from "@clog/contracts";
 
 const LABELS: Record<TMembershipPlanCode, string> = {
   PERIOD_1M: "1개월 정기",

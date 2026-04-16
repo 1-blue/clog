@@ -3,11 +3,11 @@
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
 import { Bookmark, Heart, MessageCircle, User } from "lucide-react";
+import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React from "react";
 
-import { categoryToKoreanMap, type CommunityCategory } from "@clog/utils";
+import { categoryToKoreanMap, type CommunityCategory } from "@clog/contracts";
 
 import { ROUTES } from "#web/constants";
 import { cn } from "#web/libs/utils";

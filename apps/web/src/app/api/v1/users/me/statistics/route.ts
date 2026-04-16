@@ -1,11 +1,10 @@
+import { format, getDay, getHours } from "date-fns";
+
+import { meStatisticsQuerySchema } from "@clog/contracts";
 import type { ClimbingAttemptResult, Difficulty } from "@clog/db";
-import { getDay, getHours } from "date-fns";
-import { format } from "date-fns";
+import { prisma } from "@clog/db/prisma";
 
-import { prisma } from "@clog/db";
-import { meStatisticsQuerySchema } from "@clog/utils";
-
-import { json, getSearchParams, requireAuth } from "#web/libs/api";
+import { getSearchParams, json, requireAuth } from "#web/libs/api";
 import { catchApiError } from "#web/libs/api/errorCatch";
 import {
   buildTrendBuckets,
@@ -16,6 +15,7 @@ import {
   resolvePreviousStatisticsRange,
   resolveStatisticsRange,
 } from "#web/libs/statistics/meStatistics";
+
 const ALL_DIFFICULTIES: Difficulty[] = [
   "V0",
   "V1",
@@ -39,7 +39,10 @@ const avgDifficultySends = (
 ): number | null => {
   const sends = routes.filter((r) => isSendLike(r.result));
   if (sends.length === 0) return null;
-  const sum = sends.reduce((acc, r) => acc + difficultyToLevel(r.difficulty), 0);
+  const sum = sends.reduce(
+    (acc, r) => acc + difficultyToLevel(r.difficulty),
+    0,
+  );
   return sum / sends.length;
 };
 
@@ -166,7 +169,10 @@ export const GET = async (request: Request) => {
           (sendsByBucketKey.get(monthKey) ?? 0) + sends,
         );
       } else {
-        sendsByBucketKey.set(dayKey, (sendsByBucketKey.get(dayKey) ?? 0) + sends);
+        sendsByBucketKey.set(
+          dayKey,
+          (sendsByBucketKey.get(dayKey) ?? 0) + sends,
+        );
       }
     }
 
@@ -254,8 +260,7 @@ export const GET = async (request: Request) => {
         sendDeltaPercent,
         uniqueGyms: gymIds.size,
         sessionCount: currentSessions.length,
-        workoutMinutesTotal:
-          workoutSessions > 0 ? workoutMinutesTotal : null,
+        workoutMinutesTotal: workoutSessions > 0 ? workoutMinutesTotal : null,
       },
       trend: {
         buckets: trendBuckets,
@@ -283,17 +288,11 @@ function buildInsights(params: {
   prevAvgSendDifficulty: number | null;
   currAvgSendDifficulty: number | null;
 }): { variant: "primary" | "tertiary"; message: string }[] {
-  const {
-    prevAvgSendDifficulty,
-    currAvgSendDifficulty,
-    sessionsWithTime,
-  } = params;
+  const { prevAvgSendDifficulty, currAvgSendDifficulty, sessionsWithTime } =
+    params;
   const out: { variant: "primary" | "tertiary"; message: string }[] = [];
 
-  if (
-    prevAvgSendDifficulty !== null &&
-    currAvgSendDifficulty !== null
-  ) {
+  if (prevAvgSendDifficulty !== null && currAvgSendDifficulty !== null) {
     const diff = currAvgSendDifficulty - prevAvgSendDifficulty;
     if (diff >= 0.4) {
       out.push({

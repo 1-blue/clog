@@ -4,7 +4,7 @@ import { ChevronRight, LogOut } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { difficultyToKoreanMap, type Difficulty } from "@clog/utils";
+import { difficultyToKoreanMap, type Difficulty } from "@clog/contracts";
 
 import type { components } from "#web/@types/openapi";
 import { Avatar, AvatarFallback, AvatarImage } from "#web/components/ui/avatar";

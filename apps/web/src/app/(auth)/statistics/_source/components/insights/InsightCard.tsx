@@ -16,8 +16,7 @@ const InsightCard: React.FC<IProps> = ({ variant, message }) => {
     <div
       className={cn(
         "flex gap-4 rounded-2xl border-l-4 p-5",
-        variant === "primary" &&
-          "border-primary bg-primary/5 text-on-surface",
+        variant === "primary" && "border-primary bg-primary/5 text-on-surface",
         variant === "tertiary" &&
           "border-tertiary bg-tertiary/5 text-on-surface",
       )}

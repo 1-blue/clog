@@ -2,9 +2,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type UseFormProps } from "react-hook-form";
 import { z } from "zod";
 
+import { attemptResultEnum, difficultyEnum } from "@clog/contracts";
 import {
-  attemptResultEnum,
-  difficultyEnum,
   normalizeSessionTimeRange,
   SESSION_MAX_MINUTES,
   SESSION_MIN_MINUTES,
@@ -35,7 +34,10 @@ const recordFormSchema = z.object({
   memo: z.string().max(500).optional(),
   isPublic: z.boolean(),
   routes: z.array(routeFormSchema).min(0),
-  imageUrls: z.array(z.string()).max(10, "사진은 최대 10장까지 추가할 수 있어요").optional(),
+  imageUrls: z
+    .array(z.string())
+    .max(10, "사진은 최대 10장까지 추가할 수 있어요")
+    .optional(),
   /** 빈 문자열이면 미연결 */
   userMembershipId: z.string().optional(),
   /** 빈 문자열이면 체크인 미연결 */

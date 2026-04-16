@@ -7,7 +7,7 @@ import {
   attemptResultToKoreanMap,
   type AttemptResult,
   type Difficulty,
-} from "@clog/utils";
+} from "@clog/contracts";
 
 import { ROUTES } from "#web/constants";
 

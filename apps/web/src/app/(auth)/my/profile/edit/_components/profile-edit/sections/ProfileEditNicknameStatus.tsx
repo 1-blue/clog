@@ -17,13 +17,13 @@ const ProfileEditNicknameStatus = ({
 }: IProps) => {
   const trimmed = debouncedNickname.trim();
   const shouldCheck =
-    trimmed.length >= 1 &&
-    trimmed.length <= 20 &&
-    trimmed !== baselineNickname;
+    trimmed.length >= 1 && trimmed.length <= 20 && trimmed !== baselineNickname;
 
   if (trimmed === baselineNickname) {
     return (
-      <p className="mt-1.5 text-xs text-on-surface-variant">현재 닉네임입니다.</p>
+      <p className="mt-1.5 text-xs text-on-surface-variant">
+        현재 닉네임입니다.
+      </p>
     );
   }
   if (trimmed.length === 0) {

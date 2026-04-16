@@ -1,5 +1,5 @@
-import { prisma } from "@clog/db";
-import { createSessionSchema, recordQuerySchema } from "@clog/utils";
+import { createSessionSchema, recordQuerySchema } from "@clog/contracts";
+import { prisma } from "@clog/db/prisma";
 
 import {
   errorResponse,
@@ -13,11 +13,11 @@ import {
   applyMembershipOnSessionCreate,
   sessionDateForValidation,
 } from "#web/libs/membership/sessionMembership";
+import { resolveSessionImageUrlsForDb } from "#web/libs/record/resolveSessionImageUrls";
 import {
   assertGymCheckInLinkable,
   gymCheckInLinkErrorMessage,
 } from "#web/libs/record/sessionFromCheckIn";
-import { resolveSessionImageUrlsForDb } from "#web/libs/record/resolveSessionImageUrls";
 import { bumpUserMaxDifficultyFromRoutes } from "#web/libs/user/updateUserMaxDifficulty";
 
 const membershipErrorMessage = (e: unknown): string | null => {
@@ -96,6 +96,13 @@ export const POST = async (request: Request) => {
   try {
     const body = await request.json();
     const data = createSessionSchema.parse(body);
+
+    const targetGym = await prisma.gym.findUnique({
+      where: { id: data.gymId },
+      select: { isClosed: true },
+    });
+    if (!targetGym) return errorResponse("암장을 찾을 수 없습니다.", 404);
+    if (targetGym.isClosed) return errorResponse("폐업한 암장입니다.", 400);
 
     const session = await prisma.$transaction(async (tx) => {
       if (data.gymCheckInId) {

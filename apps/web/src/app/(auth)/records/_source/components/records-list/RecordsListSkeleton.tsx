@@ -6,9 +6,9 @@ const RecordsListSkeleton = () => (
     {/* RecordsCalendar — Calendar className과 동일 */}
     <div className="mx-auto mt-4 w-full max-w-sm rounded-2xl bg-surface-container p-4">
       <div className="relative flex h-10 items-center justify-center px-12">
-        <Skeleton className="absolute left-0 top-0 size-9 shrink-0 rounded-full" />
+        <Skeleton className="absolute top-0 left-0 size-9 shrink-0 rounded-full" />
         <Skeleton className="h-5 w-28" />
-        <Skeleton className="absolute right-0 top-0 size-9 shrink-0 rounded-full" />
+        <Skeleton className="absolute top-0 right-0 size-9 shrink-0 rounded-full" />
       </div>
 
       <div className="mt-1 flex justify-evenly">

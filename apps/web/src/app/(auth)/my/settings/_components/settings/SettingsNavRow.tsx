@@ -1,7 +1,6 @@
 "use client";
 
-import type { LucideIcon } from "lucide-react";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 
 import { cn } from "#web/libs/utils";

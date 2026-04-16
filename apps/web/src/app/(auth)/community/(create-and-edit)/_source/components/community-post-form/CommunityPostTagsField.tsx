@@ -1,12 +1,13 @@
 "use client";
 
+import { X } from "lucide-react";
+import { Controller, useFormContext } from "react-hook-form";
+import { useCallback, useRef, useState } from "react";
+
 import {
   COMMUNITY_POST_TAG_MAX_COUNT,
   COMMUNITY_POST_TAG_MAX_LENGTH,
-} from "@clog/utils";
-import { X } from "lucide-react";
-import { useCallback, useRef, useState } from "react";
-import { Controller, useFormContext } from "react-hook-form";
+} from "@clog/contracts";
 
 import FormHelper from "#web/components/shared/FormHelper";
 import { Badge } from "#web/components/ui/badge";
@@ -159,7 +160,9 @@ const CommunityPostTagsField: React.FC = () => {
                       onClick={() => {
                         clearErrors("tags");
                         setHint(null);
-                        field.onChange(field.value.filter((_, i) => i !== index));
+                        field.onChange(
+                          field.value.filter((_, i) => i !== index),
+                        );
                       }}
                     >
                       <X className="size-3.5" aria-hidden />

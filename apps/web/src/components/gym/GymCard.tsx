@@ -2,7 +2,7 @@ import { Mountain, Star } from "lucide-react";
 import React from "react";
 import Link from "next/link";
 
-import { regionToKoreanMap } from "@clog/utils";
+import { regionToKoreanMap } from "@clog/contracts";
 
 import { components } from "#web/@types/openapi";
 import { Badge } from "#web/components/ui/badge";
@@ -48,6 +48,7 @@ const GymCard: React.FC<IProps> = ({ gym }) => {
         <div>
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="font-semibold text-on-surface">{gym.name}</h3>
+            {gym.isClosed ? <Badge variant="destructive">폐업</Badge> : null}
             <CongestionBadge visitorCount={gym.visitorCount} />
             <span className="text-xs text-on-surface-variant">
               {gym.visitorCount}명

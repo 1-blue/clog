@@ -11,6 +11,7 @@
     "dev": {
       "dependsOn": [
         "@clog/utils#build",
+        "@clog/contracts#build",
         "@clog/db#db:generate",
         "@clog/db#build"
       ],
@@ -18,7 +19,7 @@
       "persistent": true
     },
     "build": {
-      "dependsOn": ["^build", "^db:generate", "db:generate"], 
+      "dependsOn": ["^build", "^db:generate", "db:generate"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
     "lint": {

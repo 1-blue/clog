@@ -7,7 +7,7 @@ import {
   attemptResultToKoreanMap,
   type AttemptResult,
   type Difficulty,
-} from "@clog/utils";
+} from "@clog/contracts";
 
 import type { IRecordSessionRouteEntry } from "#web/app/(auth)/records/(created-and-edit)/_source/types/record-session-types";
 import {

@@ -25,9 +25,11 @@ packages/database/prisma/schema.prisma → Prisma enum 정의 (source of truth)
 ```
 
 ### 의존성 방향
+
 ```
 @clog/db → @clog/utils (의존)
 ```
+
 - `@clog/utils`는 `@clog/db`에 의존하지 않음 (순환 의존 방지)
 - enum 값 목록은 `@clog/utils/schemas/enums.ts`에 Zod enum으로 정의
 - Prisma schema와 Zod enum의 값은 반드시 동기화 유지
@@ -54,6 +56,7 @@ export type MyNewEnum = z.infer<typeof myNewEnumEnum>;
 ```
 
 **규칙:**
+
 - Zod enum 변수명: `{camelCase}Enum` (예: `perceivedDifficultyEnum`)
 - 타입명: PascalCase (예: `PerceivedDifficulty`)
 - Prisma enum과 값 목록 완전히 일치시킬 것
@@ -73,6 +76,7 @@ export const myNewEnumToKoreanMap: Record<MyNewEnum, string> = {
 ```
 
 **맵핑 파일 네이밍 규칙:**
+
 - 파일명: 케밥케이스 (예: `perceived-difficulty.ts`)
 - 변수명: `{camelCase}ToKoreanMap` (예: `perceivedDifficultyToKoreanMap`)
 - 타입: `Record<EnumType, string>`
@@ -100,15 +104,15 @@ pnpm db:generate
 import { schemas } from "./shared";
 
 // 사용 가능한 공용 validators:
-schemas.email      // z.string().min(1).email()
-schemas.password   // z.string().min(8) + 대/소문자/숫자/특수문자
-schemas.nickname   // z.string().min(1).max(20)
-schemas.phone      // z.string().regex(한국 전화번호)
-schemas.uuid       // z.string().uuid()
-schemas.cursor     // z.string().uuid().optional()
-schemas.limit      // z.coerce.number().int().min(1).max(50).default(20)
-schemas.url        // z.string().url()
-schemas.imageUrls  // z.array(z.string().url()).optional()
+schemas.email; // z.string().min(1).email()
+schemas.password; // z.string().min(8) + 대/소문자/숫자/특수문자
+schemas.nickname; // z.string().min(1).max(20)
+schemas.phone; // z.string().regex(한국 전화번호)
+schemas.uuid; // z.string().uuid()
+schemas.cursor; // z.string().uuid().optional()
+schemas.limit; // z.coerce.number().int().min(1).max(50).default(20)
+schemas.url; // z.string().url()
+schemas.imageUrls; // z.array(z.string().url()).optional()
 ```
 
 ### 도메인 스키마 작성 패턴
@@ -146,6 +150,7 @@ export const myDomainQuerySchema = z.object({
 ```
 
 **스키마 파일 규칙:**
+
 - 파일명: `{domain}.schema.ts` (예: `review.schema.ts`)
 - "읽기" 스키마 불필요 — Prisma 타입 사용
 - 생성/수정/쿼리 스키마만 정의
@@ -197,28 +202,30 @@ export const schemas = {
 ```
 
 **규칙:**
+
 - 2개 이상 도메인 스키마에서 반복되는 필드만 공용으로 추출
 - 에러 메시지는 한국어
 - `schemas` 객체에 추가 후 `as const` 유지
 
 ## 현재 등록된 enum 목록
 
-| Prisma Enum | Zod Enum | 한글 맵핑 |
-|---|---|---|
-| Provider | providerEnum | - |
-| Role | roleEnum | - |
-| Region | regionEnum | regionToKoreanMap |
-| Difficulty | difficultyEnum | difficultyToKoreanMap |
-| CommunityCategory | communityCategoryEnum | categoryToKoreanMap |
-| NotificationType | notificationTypeEnum | - |
-| FacilityType | facilityTypeEnum | facilityTypeToKoreanMap |
-| AttemptResult | attemptResultEnum | attemptResultToKoreanMap |
+| Prisma Enum         | Zod Enum                | 한글 맵핑                      |
+| ------------------- | ----------------------- | ------------------------------ |
+| Provider            | providerEnum            | -                              |
+| Role                | roleEnum                | -                              |
+| Region              | regionEnum              | regionToKoreanMap              |
+| Difficulty          | difficultyEnum          | difficultyToKoreanMap          |
+| CommunityCategory   | communityCategoryEnum   | categoryToKoreanMap            |
+| NotificationType    | notificationTypeEnum    | -                              |
+| FacilityType        | facilityTypeEnum        | facilityTypeToKoreanMap        |
+| AttemptResult       | attemptResultEnum       | attemptResultToKoreanMap       |
 | PerceivedDifficulty | perceivedDifficultyEnum | perceivedDifficultyToKoreanMap |
-| GymReviewFeature | gymReviewFeatureEnum | gymReviewFeatureToKoreanMap |
+| GymReviewFeature    | gymReviewFeatureEnum    | gymReviewFeatureToKoreanMap    |
 
 ## 체크리스트
 
 새 enum 추가 시:
+
 - [ ] Prisma schema에 enum 추가
 - [ ] `schemas/enums.ts`에 Zod enum + type 추가
 - [ ] `mappings/{name}.ts`에 한글 맵핑 추가
@@ -227,6 +234,7 @@ export const schemas = {
 - [ ] Prisma enum과 Zod enum 값 동기화 확인
 
 새 폼 스키마 추가 시:
+
 - [ ] `schemas/{domain}.schema.ts` 생성
 - [ ] `schemas/shared.ts`의 공용 validators 활용
 - [ ] `schemas/index.ts`에 export 추가

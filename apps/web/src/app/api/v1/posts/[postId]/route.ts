@@ -1,5 +1,6 @@
-import { prisma, type Role } from "@clog/db";
-import { updatePostSchema } from "@clog/utils";
+import { updatePostSchema } from "@clog/contracts";
+import type { Role } from "@clog/db";
+import { prisma } from "@clog/db/prisma";
 
 import {
   errorResponse,

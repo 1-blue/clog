@@ -15,7 +15,7 @@ import {
   subYears,
 } from "date-fns";
 
-import type { TStatisticsPeriod } from "@clog/utils";
+import type { TStatisticsPeriod } from "@clog/contracts";
 
 import { STATISTICS_DATA_START } from "#web/libs/statistics/meStatistics";
 
@@ -55,7 +55,10 @@ export const canShiftStatisticsPrev = (
     );
   }
   if (period === "month") {
-    return !isBefore(startOfMonth(shifted), startOfMonth(STATISTICS_DATA_START));
+    return !isBefore(
+      startOfMonth(shifted),
+      startOfMonth(STATISTICS_DATA_START),
+    );
   }
   return !isBefore(startOfYear(shifted), startOfYear(STATISTICS_DATA_START));
 };
@@ -69,7 +72,10 @@ export const canShiftStatisticsNext = (
   const shifted = shiftAnchor(period, anchor, 1);
   const now = new Date();
   if (period === "week") {
-    return !isAfter(startOfWeek(shifted, WEEK_OPTS), startOfWeek(now, WEEK_OPTS));
+    return !isAfter(
+      startOfWeek(shifted, WEEK_OPTS),
+      startOfWeek(now, WEEK_OPTS),
+    );
   }
   if (period === "month") {
     return !isAfter(startOfMonth(shifted), startOfMonth(now));
