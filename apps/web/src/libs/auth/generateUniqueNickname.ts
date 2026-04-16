@@ -1,4 +1,4 @@
-import { prisma } from "@clog/db";
+import { prisma } from "@clog/db/prisma";
 
 const ADJECTIVES = [
   "심연의",

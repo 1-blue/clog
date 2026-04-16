@@ -1,8 +1,9 @@
-import { prisma, type Prisma } from "@clog/db";
 import {
   createUserMembershipBodySchema,
   userMembershipListQuerySchema,
-} from "@clog/utils";
+} from "@clog/contracts";
+import type { Prisma } from "@clog/db";
+import { prisma } from "@clog/db/prisma";
 
 import {
   errorResponse,

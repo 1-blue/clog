@@ -1,5 +1,5 @@
-import { prisma } from "@clog/db";
-import { updateUserSchema } from "@clog/utils";
+import { updateUserSchema } from "@clog/contracts";
+import { prisma } from "@clog/db/prisma";
 
 import {
   errorResponse,
@@ -11,9 +11,9 @@ import {
 import { catchApiError } from "#web/libs/api/errorCatch";
 import { linkedProvidersFromSupabase } from "#web/libs/auth/linkedProvidersFromSupabase";
 import { syncSupabaseUserToPrisma } from "#web/libs/auth/syncSupabaseUserToPrisma";
-import { createClient } from "#web/libs/supabase/server";
 import { closeExpiredCheckInsAndNotify } from "#web/libs/gym/closeExpiredCheckInsAndNotify";
 import { notifySlackUserWithdrawal } from "#web/libs/slack/notifications";
+import { createClient } from "#web/libs/supabase/server";
 import { getUserProfileStats } from "#web/libs/user/profileStats";
 
 const meInclude = {
@@ -110,9 +110,7 @@ export const DELETE = async (request: Request) => {
     });
     if (!prismaUser) return errorResponse("유저를 찾을 수 없습니다.", 404);
 
-    const providers = linkedProvidersFromSupabase(
-      authData.user?.identities,
-    );
+    const providers = linkedProvidersFromSupabase(authData.user?.identities);
 
     /** Prisma 모델은 onDelete: Cascade이므로 유저 삭제 시 관련 데이터 자동 삭제 */
     await prisma.user.delete({ where: { id: userId! } });

@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import React from "react";
 
-import type { FacilityType } from "@clog/utils";
+import type { FacilityType } from "@clog/contracts";
 
 const FACILITY_INFO: Record<FacilityType, { icon: LucideIcon; label: string }> =
   {

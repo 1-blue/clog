@@ -1,5 +1,6 @@
-import { prisma } from "@clog/db";
 import type { User } from "@supabase/supabase-js";
+
+import { prisma } from "@clog/db/prisma";
 
 import {
   DEFAULT_COVER_IMAGE_URL,

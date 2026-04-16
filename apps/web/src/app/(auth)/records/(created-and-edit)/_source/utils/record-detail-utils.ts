@@ -3,7 +3,7 @@ import {
   difficultyToKoreanMap,
   type AttemptResult,
   type Difficulty,
-} from "@clog/utils";
+} from "@clog/contracts";
 
 import {
   getDifficultyLabelForGym,

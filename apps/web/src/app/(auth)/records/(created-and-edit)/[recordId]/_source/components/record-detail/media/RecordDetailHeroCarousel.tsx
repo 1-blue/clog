@@ -16,7 +16,10 @@ interface IProps {
 }
 
 /** 사용자 등록 사진만 표시. 없으면 null (커버/플레이스홀더 없음) */
-const RecordDetailHeroCarousel: React.FC<IProps> = ({ imageUrls, className }) => {
+const RecordDetailHeroCarousel: React.FC<IProps> = ({
+  imageUrls,
+  className,
+}) => {
   const [open, setOpen] = useState(false);
   const [startIndex, setStartIndex] = useState(0);
 

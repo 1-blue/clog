@@ -1,7 +1,12 @@
-import { prisma } from "@clog/db";
-import { nicknameAvailabilityQuerySchema } from "@clog/utils";
+import { nicknameAvailabilityQuerySchema } from "@clog/contracts";
+import { prisma } from "@clog/db/prisma";
 
-import { errorResponse, getSearchParams, json, requireAuth } from "#web/libs/api";
+import {
+  errorResponse,
+  getSearchParams,
+  json,
+  requireAuth,
+} from "#web/libs/api";
 import { catchApiError } from "#web/libs/api/errorCatch";
 
 /** 닉네임 사용 가능 여부 (본인 현재 닉네임은 항상 사용 가능으로 간주) */

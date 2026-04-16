@@ -1,6 +1,6 @@
 import { useSearchParams } from "next/navigation";
 
-import { regionEnum, regionToKoreanMap, type Region } from "@clog/utils";
+import { regionEnum, regionToKoreanMap, type Region } from "@clog/contracts";
 
 import FilterChip from "#web/components/shared/FilterChip";
 import useReplaceQueryParams from "#web/hooks/useReplaceQueryParams";

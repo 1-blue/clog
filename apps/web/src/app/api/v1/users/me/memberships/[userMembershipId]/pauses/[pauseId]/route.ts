@@ -1,13 +1,12 @@
-import { prisma } from "@clog/db";
-import { patchMembershipPauseBodySchema } from "@clog/utils";
+import { patchMembershipPauseBodySchema } from "@clog/contracts";
+import { prisma } from "@clog/db/prisma";
 
-import {
-  errorResponse,
-  jsonWithToast,
-  requireAuth,
-} from "#web/libs/api";
+import { errorResponse, jsonWithToast, requireAuth } from "#web/libs/api";
 import { catchApiError } from "#web/libs/api/errorCatch";
-import { seoulYmdToDate, toSeoulYmd } from "#web/libs/membership/membershipDates";
+import {
+  seoulYmdToDate,
+  toSeoulYmd,
+} from "#web/libs/membership/membershipDates";
 import { serializeUserMembership } from "#web/libs/membership/serializeUserMembership";
 
 const membershipInclude = {
@@ -49,12 +48,14 @@ export const PATCH = async (
     const body = await request.json();
     const data = patchMembershipPauseBodySchema.parse(body);
 
-    const nextStart =
-      data.startDateYmd ?? toSeoulYmd(pause.startDate);
+    const nextStart = data.startDateYmd ?? toSeoulYmd(pause.startDate);
     const nextEnd = data.endDateYmd ?? toSeoulYmd(pause.endDate);
 
     if (nextStart > nextEnd) {
-      return errorResponse("일시정지 시작일이 종료일보다 늦을 수 없습니다.", 400);
+      return errorResponse(
+        "일시정지 시작일이 종료일보다 늦을 수 없습니다.",
+        400,
+      );
     }
 
     for (const p of membership.pauses) {
@@ -83,7 +84,10 @@ export const PATCH = async (
       include: membershipInclude,
     });
 
-    return jsonWithToast(serializeUserMembership(row), "일시정지를 수정했어요.");
+    return jsonWithToast(
+      serializeUserMembership(row),
+      "일시정지를 수정했어요.",
+    );
   } catch (e) {
     return catchApiError(request, e, "일시정지 수정에 실패했습니다.", {
       userId: userId!,
@@ -122,7 +126,10 @@ export const DELETE = async (
       include: membershipInclude,
     });
 
-    return jsonWithToast(serializeUserMembership(row), "일시정지를 삭제했어요.");
+    return jsonWithToast(
+      serializeUserMembership(row),
+      "일시정지를 삭제했어요.",
+    );
   } catch (e) {
     return catchApiError(_request, e, "일시정지 삭제에 실패했습니다.", {
       userId: userId!,

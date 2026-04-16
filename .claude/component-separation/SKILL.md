@@ -189,6 +189,9 @@ records/new/
 ### Props 타입
 
 ```tsx
+// 페이지 컴포넌트 (params가 있는 경우)
+import type { NextPage } from "next";
+
 // 일반 컴포넌트 (props 있음)
 interface IProps {
   gymId: string;
@@ -204,13 +207,14 @@ interface IProps {
   onLoadMore: () => void;
   hasMore: boolean;
 }
-const InfiniteScroll: React.FC<React.PropsWithChildren<IProps>> = ({ onLoadMore, hasMore, children }) => {
+const InfiniteScroll: React.FC<React.PropsWithChildren<IProps>> = ({
+  onLoadMore,
+  hasMore,
+  children,
+}) => {
   // ...
 };
 export default InfiniteScroll;
-
-// 페이지 컴포넌트 (params가 있는 경우)
-import type { NextPage } from "next";
 
 interface IProps {
   params: Promise<{ gymId: string }>;

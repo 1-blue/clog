@@ -5,11 +5,10 @@ import { notFound } from "next/navigation";
 
 import { openapi } from "#web/apis/openapi";
 import { getRecordPayloadCached } from "#web/app/(auth)/records/(created-and-edit)/_source/utils/getRecordPayloadCached";
-import { getQueryClient } from "#web/libs/getQueryClient";
-import { getSharedMetadata } from "#web/libs/sharedMetadata";
-
 import RecordDetailMain from "#web/app/(auth)/records/(created-and-edit)/[recordId]/_source/components/record-detail/RecordDetailMain";
 import RecordDetailSkeleton from "#web/app/(auth)/records/(created-and-edit)/[recordId]/_source/components/record-detail/skeleton/RecordDetailSkeleton";
+import { getQueryClient } from "#web/libs/getQueryClient";
+import { getSharedMetadata } from "#web/libs/sharedMetadata";
 
 export const revalidate = 0;
 

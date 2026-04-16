@@ -1,11 +1,7 @@
-import { prisma } from "@clog/db";
-import { updateCommentSchema } from "@clog/utils";
+import { updateCommentSchema } from "@clog/contracts";
+import { prisma } from "@clog/db/prisma";
 
-import {
-  errorResponse,
-  jsonWithToast,
-  requireAuth,
-} from "#web/libs/api";
+import { errorResponse, jsonWithToast, requireAuth } from "#web/libs/api";
 import { catchApiError } from "#web/libs/api/errorCatch";
 
 const authorInclude = {
@@ -15,9 +11,7 @@ const authorInclude = {
 /** 댓글 수정 */
 export const PATCH = async (
   request: Request,
-  {
-    params,
-  }: { params: Promise<{ postId: string; commentId: string }> },
+  { params }: { params: Promise<{ postId: string; commentId: string }> },
 ) => {
   const { postId, commentId } = await params;
   const { userId, error } = await requireAuth();
@@ -52,9 +46,7 @@ export const PATCH = async (
 /** 댓글 삭제 (대댓글은 DB Cascade) */
 export const DELETE = async (
   _request: Request,
-  {
-    params,
-  }: { params: Promise<{ postId: string; commentId: string }> },
+  { params }: { params: Promise<{ postId: string; commentId: string }> },
 ) => {
   const { postId, commentId } = await params;
   const { userId, error } = await requireAuth();

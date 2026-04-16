@@ -1,8 +1,7 @@
 import { z } from "zod";
 
+import { attemptResultEnum, difficultyEnum } from "@clog/contracts";
 import {
-  attemptResultEnum,
-  difficultyEnum,
   normalizeSessionTimeRange,
   RECORD_CREATE_DRAFT_LOCAL_STORAGE_KEY,
 } from "@clog/utils";
@@ -21,7 +20,10 @@ const draftRouteSchema = z.object({
 export const recordCreateDraftSliceSchema = z.object({
   gymId: z.string().optional(),
   gymName: z.string().optional(),
-  dateYmd: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  dateYmd: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
   startMinutes: z.number().int().optional(),
   endMinutes: z.number().int().optional(),
   memo: z.string().optional(),
@@ -32,7 +34,9 @@ export const recordCreateDraftSliceSchema = z.object({
   gymCheckInId: z.string().optional(),
 });
 
-export type TRecordCreateDraftSlice = z.infer<typeof recordCreateDraftSliceSchema>;
+export type TRecordCreateDraftSlice = z.infer<
+  typeof recordCreateDraftSliceSchema
+>;
 
 const bucketSchema = z.object({
   v: z.literal(1),
@@ -57,20 +61,23 @@ export const getDefaultRecordCreateFormValues = (
   gymCheckInId: "",
 });
 
-export const readRecordCreateDraftBucket = (): TRecordCreateDraftBucket | null => {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = localStorage.getItem(RECORD_CREATE_DRAFT_LOCAL_STORAGE_KEY);
-    if (!raw) return null;
-    const parsed: unknown = JSON.parse(raw);
-    const r = bucketSchema.safeParse(parsed);
-    return r.success ? r.data : null;
-  } catch {
-    return null;
-  }
-};
+export const readRecordCreateDraftBucket =
+  (): TRecordCreateDraftBucket | null => {
+    if (typeof window === "undefined") return null;
+    try {
+      const raw = localStorage.getItem(RECORD_CREATE_DRAFT_LOCAL_STORAGE_KEY);
+      if (!raw) return null;
+      const parsed: unknown = JSON.parse(raw);
+      const r = bucketSchema.safeParse(parsed);
+      return r.success ? r.data : null;
+    } catch {
+      return null;
+    }
+  };
 
-export const writeRecordCreateDraftBucket = (bucket: TRecordCreateDraftBucket) => {
+export const writeRecordCreateDraftBucket = (
+  bucket: TRecordCreateDraftBucket,
+) => {
   if (typeof window === "undefined") return;
   try {
     localStorage.setItem(

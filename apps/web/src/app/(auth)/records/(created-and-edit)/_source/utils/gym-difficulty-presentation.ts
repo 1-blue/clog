@@ -1,13 +1,13 @@
+import { difficultyToKoreanMap, type Difficulty } from "@clog/contracts";
+import { getRouteRainbowStyleForDifficulty } from "@clog/utils";
+
 import type { components } from "#web/@types/openapi";
-import {
-  difficultyToKoreanMap,
-  getRouteRainbowStyleForDifficulty,
-  type Difficulty,
-} from "@clog/utils";
 
 export type TGymDifficultyColor = components["schemas"]["GymDifficultyColor"];
 
-const parseHexRgb = (hex: string): { r: number; g: number; b: number } | null => {
+const parseHexRgb = (
+  hex: string,
+): { r: number; g: number; b: number } | null => {
   const raw = hex.replace("#", "").trim();
   if (raw.length !== 6) return null;
   const r = Number.parseInt(raw.slice(0, 2), 16);

@@ -9,7 +9,7 @@ import Link from "next/link";
 import {
   gymReviewFeatureToKoreanMap,
   perceivedDifficultyToKoreanMap,
-} from "@clog/utils";
+} from "@clog/contracts";
 
 import type { components } from "#web/@types/openapi";
 import ImageStripLightbox from "#web/components/shared/ImageStripLightbox";

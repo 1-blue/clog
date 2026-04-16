@@ -1,4 +1,4 @@
-import { prisma } from "@clog/db";
+import { prisma } from "@clog/db/prisma";
 
 import { errorResponse, json } from "#web/libs/api";
 import { catchApiError } from "#web/libs/api/errorCatch";

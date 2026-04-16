@@ -15,7 +15,7 @@ const PostDetailMain = ({ postId }: IProps) => {
   const [replyParentId, setReplyParentId] = useState<string | null>(null);
 
   return (
-    <div className="min-h-screen bg-background text-on-background pb-40">
+    <div className="text-on-background min-h-screen bg-background pb-40">
       <PostViewRecorder postId={postId} />
       <PostDetailTopBar />
       <Suspense fallback={<PostDetailLoadingBody />}>

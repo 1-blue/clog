@@ -1,4 +1,4 @@
-import { prisma } from "@clog/db";
+import { prisma } from "@clog/db/prisma";
 
 import { errorResponse, jsonWithToast, requireAuth } from "#web/libs/api";
 import { catchApiError } from "#web/libs/api/errorCatch";
@@ -69,10 +69,7 @@ export const POST = async (
       at: now,
     });
 
-    return jsonWithToast(
-      { ok: true, createdSessionId },
-      "체크아웃했어요.",
-    );
+    return jsonWithToast({ ok: true, createdSessionId }, "체크아웃했어요.");
   } catch (error) {
     if (error instanceof Error && error.message === "NO_ACTIVE_CHECKIN") {
       return errorResponse("이 암장에서 활성 체크인이 없습니다.", 400);

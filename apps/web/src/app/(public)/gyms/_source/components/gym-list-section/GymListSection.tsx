@@ -4,7 +4,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { SearchX } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 
-import { regionEnum, type Region } from "@clog/utils";
+import { regionEnum, type Region } from "@clog/contracts";
 
 import { fetchClient } from "#web/apis/openapi";
 import GymCard from "#web/components/gym/GymCard";

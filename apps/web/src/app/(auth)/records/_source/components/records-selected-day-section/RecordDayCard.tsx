@@ -2,7 +2,7 @@ import { CheckCircle2, Clock, Mountain } from "lucide-react";
 import { useMemo } from "react";
 import Link from "next/link";
 
-import type { Difficulty } from "@clog/utils";
+import type { Difficulty } from "@clog/db";
 
 import type { components } from "#web/@types/openapi";
 import { getDifficultyChipPresentation } from "#web/app/(auth)/records/(created-and-edit)/_source/utils/gym-difficulty-presentation";
@@ -50,8 +50,7 @@ const RecordDayCard: React.FC<IProps> = ({ record }) => {
   );
   const totalRoutes = record.routes.length;
 
-  const heroImage =
-    record.imageUrls[0] ?? record.gym.logoImageUrl ?? undefined;
+  const heroImage = record.imageUrls[0] ?? record.gym.logoImageUrl ?? undefined;
 
   const difficultyDotColor = useMemo(() => {
     const colors = record.gym.difficultyColors;

@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+import type { Metadata } from "next";
 
 import { openapi } from "#web/apis/openapi";
 import { getQueryClient } from "#web/libs/getQueryClient";

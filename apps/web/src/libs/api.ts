@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+import { prisma } from "@clog/db/prisma";
+
 import { createClient } from "#web/libs/supabase/server";
 
 /** 성공 응답 */
@@ -38,6 +40,23 @@ export const requireAuth = async () => {
     return { userId: null, error: errorResponse("로그인이 필요합니다.", 401) };
   }
   return { userId, error: null };
+};
+
+/** 관리자 권한 필수 체크 - 실패 시 401/403 응답 반환 */
+export const requireAdmin = async () => {
+  const { userId, error } = await requireAuth();
+  if (error) return { userId: null, error };
+  const user = await prisma.user.findUnique({
+    where: { id: userId! },
+    select: { role: true },
+  });
+  if (user?.role !== "ADMIN") {
+    return {
+      userId: null,
+      error: errorResponse("관리자 권한이 필요합니다.", 403),
+    };
+  }
+  return { userId: userId!, error: null };
 };
 
 /** URL 검색 파라미터 파싱 */

@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-import { regionToKoreanMap, type Region } from "@clog/utils";
+import { regionToKoreanMap, type Region } from "@clog/contracts";
 
 import type { components } from "#web/@types/openapi";
 import {
@@ -185,7 +185,7 @@ const GymBasicInfoSection: React.FC<IProps> = ({ gym }) => {
             <p className="mb-1 text-sm font-medium text-on-surface-variant">
               세팅 주기
             </p>
-            <p className="text-base leading-relaxed whitespace-pre-wrap font-semibold text-on-surface">
+            <p className="text-base leading-relaxed font-semibold whitespace-pre-wrap text-on-surface">
               {settingScheduleMemo}
             </p>
           </div>

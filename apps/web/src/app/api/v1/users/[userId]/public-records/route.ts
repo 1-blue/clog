@@ -1,5 +1,5 @@
-import { prisma } from "@clog/db";
-import { recordQuerySchema } from "@clog/utils";
+import { recordQuerySchema } from "@clog/contracts";
+import { prisma } from "@clog/db/prisma";
 
 import { errorResponse, getSearchParams, paginatedJson } from "#web/libs/api";
 import { catchApiError } from "#web/libs/api/errorCatch";

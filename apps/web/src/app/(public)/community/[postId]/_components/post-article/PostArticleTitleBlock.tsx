@@ -9,7 +9,7 @@ import {
   categoryToKoreanMap,
   postCategoryMap,
   type CommunityCategory,
-} from "@clog/utils";
+} from "@clog/contracts";
 
 import { Badge } from "#web/components/ui/badge";
 import { buttonVariants } from "#web/components/ui/button-variants";

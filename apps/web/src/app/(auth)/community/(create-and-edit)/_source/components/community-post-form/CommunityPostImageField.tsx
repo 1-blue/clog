@@ -16,7 +16,10 @@ const CommunityPostImageField: React.FC = () => {
       <MultiImageUploader
         urls={imageUrls}
         onUrlsChange={(urls) =>
-          setValue("imageUrls", urls, { shouldValidate: true, shouldDirty: true })
+          setValue("imageUrls", urls, {
+            shouldValidate: true,
+            shouldDirty: true,
+          })
         }
         maxFiles={10}
       />

@@ -1,5 +1,6 @@
 import { NotificationType, type Notification } from "@prisma/client";
-import { prisma } from "@clog/db";
+
+import { prisma } from "@clog/db/prisma";
 
 import { ROUTES } from "#web/constants";
 import { sendExpoPush } from "#web/libs/expo/sendExpoPush";

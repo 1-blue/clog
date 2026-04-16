@@ -4,7 +4,7 @@
  */
 const GymInfoSkeleton: React.FC = () => {
   return (
-    <div className="animate-pulse relative pb-[calc(5.75rem+env(safe-area-inset-bottom))]">
+    <div className="relative animate-pulse pb-[calc(5.75rem+env(safe-area-inset-bottom))]">
       {/* TopBar — 뒤로 + 제목 + 공유 슬롯 */}
       <header className="sticky top-0 z-40 -mx-2.5 flex h-14 items-center justify-between border-b border-outline-variant/30 px-2.5 backdrop-blur-xl">
         <div className="flex min-w-0 flex-1 items-center gap-2">

@@ -3,8 +3,8 @@
 import { UserRound } from "lucide-react";
 import Link from "next/link";
 
-import { openapi } from "#web/apis/openapi";
 import type { components } from "#web/@types/openapi";
+import { openapi } from "#web/apis/openapi";
 import { ROUTES } from "#web/constants";
 import { cn } from "#web/libs/utils";
 

@@ -1,17 +1,11 @@
 "use client";
 
-import {
-  Check,
-  Instagram,
-  MapPin,
-  User,
-  Youtube,
-} from "lucide-react";
+import { Check, Instagram, MapPin, User, Youtube } from "lucide-react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { difficultyToKoreanMap, type Difficulty } from "@clog/utils";
+import { difficultyToKoreanMap, type Difficulty } from "@clog/contracts";
 
 import { openapi } from "#web/apis/openapi";
 import TopBar from "#web/components/layout/TopBar";

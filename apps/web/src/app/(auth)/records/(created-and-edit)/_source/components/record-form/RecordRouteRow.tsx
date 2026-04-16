@@ -5,13 +5,15 @@ import { Minus, Plus, Trash2 } from "lucide-react";
 import {
   attemptResultToKoreanMap,
   difficultyToKoreanMap,
-  getRouteRainbowStyleForDifficulty,
   type AttemptResult,
   type Difficulty,
-} from "@clog/utils";
+} from "@clog/contracts";
+import { getRouteRainbowStyleForDifficulty } from "@clog/utils";
 
-import type { TGymDifficultyColor } from "#web/app/(auth)/records/(created-and-edit)/_source/utils/gym-difficulty-presentation";
-import { getDifficultyChipPresentation } from "#web/app/(auth)/records/(created-and-edit)/_source/utils/gym-difficulty-presentation";
+import {
+  getDifficultyChipPresentation,
+  type TGymDifficultyColor,
+} from "#web/app/(auth)/records/(created-and-edit)/_source/utils/gym-difficulty-presentation";
 import { cn } from "#web/libs/utils";
 
 interface IProps {
@@ -89,7 +91,7 @@ const RecordRouteRow = ({
         >
           <Minus className="size-4" strokeWidth={2} />
         </button>
-        <span className="min-w-7 text-center text-sm font-semibold tabular-nums text-on-surface">
+        <span className="min-w-7 text-center text-sm font-semibold text-on-surface tabular-nums">
           {attempts}
         </span>
         <button

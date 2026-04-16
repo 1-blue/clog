@@ -16,8 +16,7 @@ const badgeColorClassMap: Record<TBadgeColor, string> = {
   primary: "border border-primary/35 bg-primary/15 text-primary",
   secondary: "border border-secondary/35 bg-secondary/15 text-secondary",
   tertiary: "border border-tertiary/35 bg-tertiary/15 text-tertiary",
-  danger:
-    "border border-destructive/35 bg-destructive/15 text-destructive",
+  danger: "border border-destructive/35 bg-destructive/15 text-destructive",
   primaryContainer:
     "border border-primary-container/45 bg-primary-container/25 text-on-primary-container",
   gear: "border border-white/15 bg-white/5 text-on-surface",

@@ -1,9 +1,9 @@
-import { prisma } from "@clog/db";
 import { NotificationType } from "@prisma/client";
-import { commentQuerySchema, createCommentSchema } from "@clog/utils";
+
+import { commentQuerySchema, createCommentSchema } from "@clog/contracts";
+import { prisma } from "@clog/db/prisma";
 
 import { ROUTES } from "#web/constants";
-import { sendExpoPush } from "#web/libs/expo/sendExpoPush";
 import {
   getSearchParams,
   jsonWithToast,
@@ -11,6 +11,7 @@ import {
   requireAuth,
 } from "#web/libs/api";
 import { catchApiError } from "#web/libs/api/errorCatch";
+import { sendExpoPush } from "#web/libs/expo/sendExpoPush";
 
 /** 댓글 목록 (무한스크롤) */
 export const GET = async (

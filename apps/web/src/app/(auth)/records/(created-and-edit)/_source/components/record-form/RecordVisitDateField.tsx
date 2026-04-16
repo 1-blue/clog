@@ -27,10 +27,7 @@ interface IProps {
 const visitCalendarNavButtonClass =
   "inline-flex size-10 shrink-0 items-center justify-center rounded-full text-on-surface transition-colors hover:bg-surface-container-high focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-30 [&_svg]:size-5";
 
-const RecordVisitDateField = ({
-  className,
-  onBeforeDateYmdChange,
-}: IProps) => {
+const RecordVisitDateField = ({ className, onBeforeDateYmdChange }: IProps) => {
   const [open, setOpen] = useState(false);
   const { control, setValue } = useFormContext<TRecordFormData>();
   const dateYmd = useWatch({ control, name: "dateYmd" });

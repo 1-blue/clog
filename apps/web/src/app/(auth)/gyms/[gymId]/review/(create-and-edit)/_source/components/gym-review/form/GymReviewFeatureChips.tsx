@@ -6,7 +6,7 @@ import { useFormContext, useWatch } from "react-hook-form";
 import {
   gymReviewFeatureToKoreanMap,
   type GymReviewFeature,
-} from "@clog/utils";
+} from "@clog/contracts";
 
 import { Label } from "#web/components/ui/label";
 import { cn } from "#web/libs/utils";

@@ -1,5 +1,5 @@
+import { categoryToKoreanMap } from "@clog/contracts";
 import type { PostCategory } from "@clog/db";
-import { categoryToKoreanMap } from "@clog/utils";
 
 import { ROUTES } from "#web/constants/routes";
 

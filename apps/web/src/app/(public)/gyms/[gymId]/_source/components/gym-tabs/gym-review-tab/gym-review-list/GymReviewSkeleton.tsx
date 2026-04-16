@@ -43,7 +43,7 @@ const GymReviewSkeleton: React.FC = () => {
             {Array.from({ length: 5 }).map((_, i) => (
               <div
                 key={i}
-                className="h-2 min-w-0 flex-1 max-w-14 rounded bg-surface-container-low"
+                className="h-2 max-w-14 min-w-0 flex-1 rounded bg-surface-container-low"
               />
             ))}
           </div>

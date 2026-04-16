@@ -7,8 +7,8 @@ import { usePathname, useRouter } from "next/navigation";
 
 import { openapi } from "#web/apis/openapi";
 import { ROUTES } from "#web/constants";
-import { extractCheckoutCreatedSessionId } from "#web/libs/api/extractCheckoutCreatedSessionId";
 import useMe from "#web/hooks/useMe";
+import { extractCheckoutCreatedSessionId } from "#web/libs/api/extractCheckoutCreatedSessionId";
 import { createClient } from "#web/libs/supabase/client";
 import { cn } from "#web/libs/utils";
 
@@ -77,7 +77,8 @@ const GymCheckInBar: React.FC<IProps> = ({
             description: "방문 기록이 만들어졌어요.",
             action: {
               label: "기록 수정",
-              onClick: () => router.push(ROUTES.RECORDS.DETAIL.EDIT.path(createdId)),
+              onClick: () =>
+                router.push(ROUTES.RECORDS.DETAIL.EDIT.path(createdId)),
             },
           });
         } else {
@@ -151,8 +152,8 @@ const GymCheckInBar: React.FC<IProps> = ({
             <span className="font-semibold text-on-surface">
               {me.activeCheckIn.gymName}
             </span>
-            에서 체크인 중이에요. 먼저 해당 암장에서 체크아웃한 뒤 여기서 체크인할
-            수 있어요.
+            에서 체크인 중이에요. 먼저 해당 암장에서 체크아웃한 뒤 여기서
+            체크인할 수 있어요.
           </p>
         ) : null}
         {hasActiveCheckIn ? (

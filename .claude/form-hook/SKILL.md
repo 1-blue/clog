@@ -30,9 +30,7 @@ const featureFormSchema = someApiSchema.extend({
 
 export type TFeatureFormData = z.infer<typeof featureFormSchema>;
 
-const useFeatureForm = (
-  props?: Partial<UseFormProps<TFeatureFormData>>,
-) => {
+const useFeatureForm = (props?: Partial<UseFormProps<TFeatureFormData>>) => {
   return useForm<TFeatureFormData>({
     resolver: zodResolver(featureFormSchema),
     defaultValues: {
@@ -60,11 +58,15 @@ export default useFeatureForm;
 "use client";
 
 import { FormProvider } from "react-hook-form";
+
 import useFeatureForm, { type TFeatureFormData } from "./useFeatureForm";
 
 const FeatureMain = () => {
   const methods = useFeatureForm();
-  const { handleSubmit, formState: { isValid } } = methods;
+  const {
+    handleSubmit,
+    formState: { isValid },
+  } = methods;
 
   const onSubmit = (data: TFeatureFormData) => {
     mutation.mutate({ body: data });
@@ -93,6 +95,7 @@ const FeatureMain = () => {
 "use client";
 
 import { useFormContext, useWatch } from "react-hook-form";
+
 import type { TFeatureFormData } from "../useFeatureForm";
 
 const ChildComponent = () => {
@@ -100,7 +103,9 @@ const ChildComponent = () => {
   const value = useWatch({ control, name: "fieldName" });
 
   return (
-    <button onClick={() => setValue("fieldName", newValue, { shouldValidate: true })}>
+    <button
+      onClick={() => setValue("fieldName", newValue, { shouldValidate: true })}
+    >
       {value}
     </button>
   );
@@ -115,6 +120,7 @@ Textarea, Input 등 HTML 요소를 직접 사용하는 경우.
 "use client";
 
 import { Controller, useFormContext } from "react-hook-form";
+
 import type { TFeatureFormData } from "../useFeatureForm";
 
 const TextFieldComponent = () => {

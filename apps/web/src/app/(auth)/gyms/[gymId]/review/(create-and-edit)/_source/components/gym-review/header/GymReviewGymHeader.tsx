@@ -2,7 +2,7 @@
 
 import { MapPin } from "lucide-react";
 
-import { regionToKoreanMap, type Region } from "@clog/utils";
+import { regionToKoreanMap, type Region } from "@clog/contracts";
 
 import type { components } from "#web/@types/openapi";
 
@@ -21,7 +21,7 @@ const GymReviewGymHeader = ({ gym }: IProps) => {
       <p className="text-center text-xs font-medium text-on-surface-variant">
         {regionLine}
       </p>
-      <h2 className="mt-1 text-center text-xl font-bold leading-snug text-on-surface">
+      <h2 className="mt-1 text-center text-xl leading-snug font-bold text-on-surface">
         {gym.name}
       </h2>
       <div className="mt-3 flex items-start justify-center gap-1.5 text-center text-sm text-on-surface-variant">

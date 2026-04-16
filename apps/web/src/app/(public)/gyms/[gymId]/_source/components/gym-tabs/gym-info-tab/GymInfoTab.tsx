@@ -1,10 +1,10 @@
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 
-import type { FacilityType } from "@clog/utils";
+import type { FacilityType } from "@clog/contracts";
 
-import RecordGymDifficultyLegend from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordGymDifficultyLegend";
 import type { components } from "#web/@types/openapi";
+import RecordGymDifficultyLegend from "#web/app/(auth)/records/(created-and-edit)/_source/components/record-form/RecordGymDifficultyLegend";
 import FacilityChip from "#web/components/gym/FacilityChip";
 import GymMapActionBar from "#web/components/gym/GymMapActionBar";
 import KakaoMapEmbed from "#web/components/gym/KakaoMapEmbed";

@@ -1,4 +1,4 @@
-import { prisma } from "@clog/db";
+import { prisma } from "@clog/db/prisma";
 
 import { errorResponse, getAuthUserId, json } from "#web/libs/api";
 import { catchApiError } from "#web/libs/api/errorCatch";
@@ -47,10 +47,7 @@ export const GET = async (
 
     const scope =
       currentUserId && currentUserId === userId ? "owner" : "public";
-    const { visitCount, sendCount } = await getUserProfileStats(
-      userId,
-      scope,
-    );
+    const { visitCount, sendCount } = await getUserProfileStats(userId, scope);
     const {
       levels: activityHeatmap,
       dayKeys: activityHeatmapDays,

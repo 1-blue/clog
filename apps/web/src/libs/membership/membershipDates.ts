@@ -2,12 +2,12 @@ import { addMonths } from "date-fns";
 
 import {
   COUNT_PASS_VALIDITY_MONTHS,
-  type TMembershipPlanCode,
   initialUsesForCountPlanCode,
   isCountPlanCode,
   isPeriodPlanCode,
   periodMonthsForPlanCode,
-} from "@clog/utils";
+  type TMembershipPlanCode,
+} from "@clog/contracts";
 
 /** yyyy-MM-dd 문자열을 서울 당일 00:00:00(+09:00) 시각의 Date로 변환 */
 export const seoulYmdToDate = (ymd: string): Date =>
@@ -107,7 +107,10 @@ export const isSessionDateWithinMembership = (input: {
     pauses: input.pauses,
   });
   const d = input.sessionDate;
-  return d.getTime() >= input.startedAt.getTime() && d.getTime() <= effectiveEndAt.getTime();
+  return (
+    d.getTime() >= input.startedAt.getTime() &&
+    d.getTime() <= effectiveEndAt.getTime()
+  );
 };
 
 export const initialRemainingUsesForPlan = (

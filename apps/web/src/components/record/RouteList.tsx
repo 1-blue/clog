@@ -7,7 +7,7 @@ import {
   attemptResultToKoreanMap,
   type AttemptResult,
   type Difficulty,
-} from "@clog/utils";
+} from "@clog/contracts";
 
 import DifficultyChip from "#web/components/record/DifficultyChip";
 

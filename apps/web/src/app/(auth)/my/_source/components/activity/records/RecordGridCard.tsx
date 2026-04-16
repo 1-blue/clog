@@ -3,10 +3,10 @@
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { CheckCircle2, Clock, Mountain } from "lucide-react";
-import Link from "next/link";
 import { useMemo } from "react";
+import Link from "next/link";
 
-import type { Difficulty } from "@clog/utils";
+import type { Difficulty } from "@clog/db";
 
 import type { components } from "#web/@types/openapi";
 import { getDifficultyChipPresentation } from "#web/app/(auth)/records/(created-and-edit)/_source/utils/gym-difficulty-presentation";
@@ -57,8 +57,7 @@ const RecordGridCard = ({ record, className }: IProps) => {
   );
   const totalRoutes = record.routes.length;
 
-  const heroImage =
-    record.imageUrls[0] ?? record.gym.logoImageUrl ?? undefined;
+  const heroImage = record.imageUrls[0] ?? record.gym.logoImageUrl ?? undefined;
 
   const difficultyDotColor = useMemo(() => {
     const colors = record.gym.difficultyColors;
@@ -99,7 +98,7 @@ const RecordGridCard = ({ record, className }: IProps) => {
         )}
         <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/75 via-black/10 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 p-3">
-          <p className="line-clamp-2 text-sm font-bold leading-snug text-white drop-shadow">
+          <p className="line-clamp-2 text-sm leading-snug font-bold text-white drop-shadow">
             {record.gym.name}
           </p>
           <p className="mt-0.5 text-xs font-medium text-white/90 drop-shadow">

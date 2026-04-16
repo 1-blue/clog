@@ -2,7 +2,7 @@
 
 import { Suspense, useCallback, useMemo, useState } from "react";
 
-import type { TStatisticsPeriod } from "@clog/utils";
+import type { TStatisticsPeriod } from "@clog/contracts";
 
 import {
   formatRangeLabel,

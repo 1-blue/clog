@@ -1,13 +1,12 @@
-import { prisma } from "@clog/db";
-import { createMembershipPauseBodySchema } from "@clog/utils";
+import { createMembershipPauseBodySchema } from "@clog/contracts";
+import { prisma } from "@clog/db/prisma";
 
-import {
-  errorResponse,
-  jsonWithToast,
-  requireAuth,
-} from "#web/libs/api";
+import { errorResponse, jsonWithToast, requireAuth } from "#web/libs/api";
 import { catchApiError } from "#web/libs/api/errorCatch";
-import { seoulYmdToDate, toSeoulYmd } from "#web/libs/membership/membershipDates";
+import {
+  seoulYmdToDate,
+  toSeoulYmd,
+} from "#web/libs/membership/membershipDates";
 import { serializeUserMembership } from "#web/libs/membership/serializeUserMembership";
 
 const membershipInclude = {
@@ -27,9 +26,7 @@ const rangesOverlapInclusive = (
 /** 일시정지 추가 */
 export const POST = async (
   request: Request,
-  {
-    params,
-  }: { params: Promise<{ userMembershipId: string }> },
+  { params }: { params: Promise<{ userMembershipId: string }> },
 ) => {
   const { userMembershipId } = await params;
   const { userId, error } = await requireAuth();
@@ -46,20 +43,16 @@ export const POST = async (
     const data = createMembershipPauseBodySchema.parse(body);
 
     if (data.startDateYmd > data.endDateYmd) {
-      return errorResponse("일시정지 시작일이 종료일보다 늦을 수 없습니다.", 400);
+      return errorResponse(
+        "일시정지 시작일이 종료일보다 늦을 수 없습니다.",
+        400,
+      );
     }
 
     for (const p of membership.pauses) {
       const ps = toSeoulYmd(p.startDate);
       const pe = toSeoulYmd(p.endDate);
-      if (
-        rangesOverlapInclusive(
-          data.startDateYmd,
-          data.endDateYmd,
-          ps,
-          pe,
-        )
-      ) {
+      if (rangesOverlapInclusive(data.startDateYmd, data.endDateYmd, ps, pe)) {
         return errorResponse("이미 일시정지가 겹치는 기간이 있어요.", 400);
       }
     }

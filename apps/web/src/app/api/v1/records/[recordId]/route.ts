@@ -1,5 +1,5 @@
-import { prisma } from "@clog/db";
-import { updateSessionSchema } from "@clog/utils";
+import { updateSessionSchema } from "@clog/contracts";
+import { prisma } from "@clog/db/prisma";
 
 import { errorResponse, json, jsonWithToast, requireAuth } from "#web/libs/api";
 import { catchApiError } from "#web/libs/api/errorCatch";
@@ -9,11 +9,11 @@ import {
   refundMembershipOnSessionDelete,
   sessionDateForValidation,
 } from "#web/libs/membership/sessionMembership";
+import { resolveSessionImageUrlsForDb } from "#web/libs/record/resolveSessionImageUrls";
 import {
   assertGymCheckInLinkable,
   gymCheckInLinkErrorMessage,
 } from "#web/libs/record/sessionFromCheckIn";
-import { resolveSessionImageUrlsForDb } from "#web/libs/record/resolveSessionImageUrls";
 import { recomputeUserMaxDifficulty } from "#web/libs/user/updateUserMaxDifficulty";
 
 const membershipErrorMessage = (e: unknown): string | null => {
@@ -162,7 +162,11 @@ export const PATCH = async (
 
       const nextImageUrls =
         data.imageUrls !== undefined
-          ? await resolveSessionImageUrlsForDb(tx, existing.gymId, data.imageUrls)
+          ? await resolveSessionImageUrlsForDb(
+              tx,
+              existing.gymId,
+              data.imageUrls,
+            )
           : undefined;
 
       return tx.climbingSession.update({

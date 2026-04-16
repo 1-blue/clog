@@ -1,8 +1,8 @@
 "use client";
 
 import { Check, ChevronDown, Ticket } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { components } from "#web/@types/openapi";
 import { openapi } from "#web/apis/openapi";
@@ -123,9 +123,7 @@ const RecordMembershipField: React.FC<IProps> = ({
     const eligible = (rawList as TUserMembership[]).filter(
       (m) => m.plan.code !== "COUNT_DAY",
     );
-    const atPurchaseGym = eligible.find(
-      (m) => m.gymId === gymId && m.isActive,
-    );
+    const atPurchaseGym = eligible.find((m) => m.gymId === gymId && m.isActive);
     setValue("userMembershipId", atPurchaseGym?.id ?? "", {
       shouldDirty: false,
     });
@@ -173,7 +171,7 @@ const RecordMembershipField: React.FC<IProps> = ({
                 <Ticket className="size-5 text-primary" strokeWidth={2} />
               </span>
               <span className="min-w-0 flex-1 text-left">
-                <span className="block font-medium leading-tight text-on-surface">
+                <span className="block leading-tight font-medium text-on-surface">
                   {triggerLines.title}
                 </span>
                 {triggerLines.subtitle ? (
@@ -206,7 +204,7 @@ const RecordMembershipField: React.FC<IProps> = ({
                 <Ticket className="size-4 text-tertiary" strokeWidth={2} />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block font-medium leading-tight text-on-surface">
+                <span className="block leading-tight font-medium text-on-surface">
                   {dailyTitle}
                 </span>
                 {dailySubtitle ? (
@@ -216,7 +214,10 @@ const RecordMembershipField: React.FC<IProps> = ({
                 ) : null}
               </span>
               {!userMembershipId ? (
-                <Check className="size-4 shrink-0 self-center text-primary" strokeWidth={2} />
+                <Check
+                  className="size-4 shrink-0 self-center text-primary"
+                  strokeWidth={2}
+                />
               ) : (
                 <span className="size-4 shrink-0 self-center" />
               )}
@@ -235,7 +236,7 @@ const RecordMembershipField: React.FC<IProps> = ({
                     <Ticket className="size-4 text-tertiary" strokeWidth={2} />
                   </span>
                   <span className="min-w-0 flex-1 text-left">
-                    <span className="block font-medium leading-tight text-on-surface">
+                    <span className="block leading-tight font-medium text-on-surface">
                       {gymMembershipBrandLabel(m.gym.membershipBrand)}
                     </span>
                     <span className="mt-0.5 block text-xs leading-snug text-on-surface-variant">
@@ -243,7 +244,10 @@ const RecordMembershipField: React.FC<IProps> = ({
                     </span>
                   </span>
                   {selected ? (
-                    <Check className="size-4 shrink-0 self-center text-primary" strokeWidth={2} />
+                    <Check
+                      className="size-4 shrink-0 self-center text-primary"
+                      strokeWidth={2}
+                    />
                   ) : (
                     <span className="size-4 shrink-0 self-center" />
                   )}

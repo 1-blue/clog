@@ -1,6 +1,6 @@
 import React from "react";
 
-import type { Difficulty } from "@clog/utils";
+import type { Difficulty } from "@clog/db";
 
 import DifficultyChip from "#web/components/record/DifficultyChip";
 import { Avatar, AvatarFallback, AvatarImage } from "#web/components/ui/avatar";

@@ -47,11 +47,7 @@ const GymHeroSection: React.FC<IProps> = ({ gym }) => {
   return (
     <section className="relative -mx-2.5 -mt-14 h-[min(440px,55vh)] w-[calc(100%+1.25rem)] overflow-hidden bg-surface-container-high">
       {coverUrl ? (
-        <img
-          src={coverUrl}
-          alt={gym.name}
-          className="size-full object-cover"
-        />
+        <img src={coverUrl} alt={gym.name} className="size-full object-cover" />
       ) : (
         <div className="flex size-full items-center justify-center">
           <Mountain

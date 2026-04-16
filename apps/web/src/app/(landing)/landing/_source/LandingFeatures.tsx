@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  BarChart3,
-  Building2,
-  MapPin,
-  MessagesSquare,
-} from "lucide-react";
+import { BarChart3, Building2, MapPin, MessagesSquare } from "lucide-react";
 import { motion } from "motion/react";
 
 import { cn } from "#web/libs/utils";
@@ -61,9 +56,10 @@ const LandingFeatures: React.FC = () => {
         <h2 className="text-2xl font-bold tracking-tight text-on-surface sm:text-3xl lg:text-4xl">
           클로그가 할 수 있는 일
         </h2>
-        <p className="mx-auto mt-4 max-w-2xl text-pretty text-sm leading-relaxed text-on-surface-variant sm:text-base">
-          데스크톱 브라우저와 모바일 모두 같은 계정으로 접속할 수 있어요. 집에서는 대시보드를,
-          암장에서는 체크인과 기록을—화면 크기만 바뀌고 경험은 이어져요.
+        <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-pretty text-on-surface-variant sm:text-base">
+          데스크톱 브라우저와 모바일 모두 같은 계정으로 접속할 수 있어요.
+          집에서는 대시보드를, 암장에서는 체크인과 기록을—화면 크기만 바뀌고
+          경험은 이어져요.
         </p>
       </motion.div>
 

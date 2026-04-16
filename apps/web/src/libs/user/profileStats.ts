@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import {
   eachDayOfInterval,
   endOfWeek,
@@ -8,8 +9,7 @@ import {
   startOfWeek,
 } from "date-fns";
 
-import { prisma } from "@clog/db";
-import { Prisma } from "@prisma/client";
+import { prisma } from "@clog/db/prisma";
 
 export type ProfileStatsScope = "owner" | "public";
 

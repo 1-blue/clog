@@ -2,6 +2,18 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator zod {
+  provider                         = "zod-prisma-types"
+  output                           = "../src/zod"
+  useMultipleFiles                 = false
+  writeBarrelFiles                 = false
+  createInputTypes                 = false
+  createModelTypes                 = true
+  addInputTypeValidation           = false
+  createOptionalDefaultValuesTypes = false
+  coerceDate                       = true
+}
+
 datasource db {
   provider = "postgresql"
 }
@@ -224,6 +236,8 @@ model User {
   userMemberships UserMembership[]
   /// Expo 푸시 등록 기기
   pushDevices     UserPushDevice[]
+  /// 어드민 감사 로그 (수행 주체)
+  adminAuditLogs  AdminAuditLog[]  @relation("adminAuditActor")
 
   @@map("users")
 }
@@ -387,6 +401,12 @@ model Gym {
   updatedAt       DateTime @updatedAt @map("updated_at")
   /// 회원권 브랜드(체인). STANDALONE은 구매 지점과 세션 지점이 같아야 함
   membershipBrand GymMembershipBrand @map("membership_brand")
+  /// 폐업 여부 (소프트 상태). true 이면 쓰기(체크인/리뷰/세션) 차단, 조회는 허용
+  isClosed        Boolean  @default(false) @map("is_closed")
+  /// 폐업 처리 시각 (null이면 운영 중)
+  closedAt        DateTime? @map("closed_at")
+  /// 폐업 사유 (관리자 메모)
+  closedReason    String?  @map("closed_reason")
 
   /// 홈짐으로 등록한 유저 목록
   homeGymUsers     User[]               @relation("homeGym")
@@ -412,6 +432,7 @@ model Gym {
   userMemberships  UserMembership[]
 
   @@index([membershipBrand])
+  @@index([isClosed])
   @@map("gyms")
 }
 
@@ -863,4 +884,52 @@ model Notification {
   @@index([userId])
   @@index([commentId])
   @@map("notifications")
+}
+
+// ============================================
+// 어드민 감사 로그
+// ============================================
+
+/// 어드민 감사 로그 액션
+enum AdminAuditAction {
+  CREATE      /// 생성
+  UPDATE      /// 수정
+  DELETE      /// 삭제
+  CLOSE       /// 폐업 처리
+  REOPEN      /// 폐업 해제
+  ROLE_CHANGE /// 권한 변경
+}
+
+/// 어드민 변경 감사 로그 — 모든 어드민 mutation 은 트랜잭션 내부에서 이 로그와 함께 기록
+model AdminAuditLog {
+  /// 로그 ID
+  id          String            @id @default(uuid()) @db.Uuid
+  /// 수행 어드민 ID
+  actorId     String            @map("actor_id") @db.Uuid
+  /// 액션
+  action      AdminAuditAction
+  /// 대상 엔티티명 (예: "Gym", "User", "Post")
+  targetType  String            @map("target_type")
+  /// 대상 레코드 ID (UUID 아닐 수도 있어 String)
+  targetId    String            @map("target_id")
+  /// 대상 요약 라벨 (예: 암장 이름, 유저 닉네임)
+  targetLabel String?           @map("target_label")
+  /// 변경 전 값 (CREATE 시 null)
+  before      Json?
+  /// 변경 후 값 (DELETE 시 null)
+  after       Json?
+  /// 자유 메모 (관리자 입력 가능, 폐업 사유 등)
+  note        String?
+  /// 요청 메타 (user-agent, ip, traceId 등)
+  requestMeta Json?             @map("request_meta")
+  /// 생성일
+  createdAt   DateTime          @default(now()) @map("created_at")
+
+  /// 수행 어드민
+  actor       User              @relation("adminAuditActor", fields: [actorId], references: [id], onDelete: Restrict)
+
+  @@index([actorId])
+  @@index([targetType, targetId])
+  @@index([createdAt])
+  @@map("admin_audit_logs")
 }

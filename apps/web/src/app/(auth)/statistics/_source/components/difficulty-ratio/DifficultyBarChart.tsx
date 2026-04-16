@@ -9,7 +9,8 @@ import {
   ChartTooltipContent,
 } from "#web/components/ui/chart";
 
-type TRow = components["schemas"]["MeStatisticsPayload"]["difficultyDistribution"][number];
+type TRow =
+  components["schemas"]["MeStatisticsPayload"]["difficultyDistribution"][number];
 
 const chartConfig = {
   count: {
@@ -36,10 +37,7 @@ const DifficultyBarChart: React.FC<IProps> = ({ rows }) => {
 
   return (
     <div className="w-full overflow-x-auto">
-      <div
-        className="mx-auto"
-        style={{ minWidth: CHART_MIN_WIDTH_PX }}
-      >
+      <div className="mx-auto" style={{ minWidth: CHART_MIN_WIDTH_PX }}>
         <ChartContainer config={chartConfig} className="h-[220px] w-full">
           <BarChart
             data={chartData}

@@ -22,18 +22,17 @@ interface IProps {
 
 const FollowListSheet: React.FC<IProps> = ({ userId, type, onClose }) => {
   const followersQuery = useInfiniteQuery({
-    queryKey: [
-      "get",
-      "/api/v1/users/{userId}/followers",
-      { userId },
-    ],
+    queryKey: ["get", "/api/v1/users/{userId}/followers", { userId }],
     queryFn: async ({ pageParam }) => {
-      const { data } = await fetchClient.GET("/api/v1/users/{userId}/followers", {
-        params: {
-          path: { userId },
-          query: { cursor: pageParam, limit: 20 },
+      const { data } = await fetchClient.GET(
+        "/api/v1/users/{userId}/followers",
+        {
+          params: {
+            path: { userId },
+            query: { cursor: pageParam, limit: 20 },
+          },
         },
-      });
+      );
       return data!.payload;
     },
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
@@ -42,18 +41,17 @@ const FollowListSheet: React.FC<IProps> = ({ userId, type, onClose }) => {
   });
 
   const followingQuery = useInfiniteQuery({
-    queryKey: [
-      "get",
-      "/api/v1/users/{userId}/following",
-      { userId },
-    ],
+    queryKey: ["get", "/api/v1/users/{userId}/following", { userId }],
     queryFn: async ({ pageParam }) => {
-      const { data } = await fetchClient.GET("/api/v1/users/{userId}/following", {
-        params: {
-          path: { userId },
-          query: { cursor: pageParam, limit: 20 },
+      const { data } = await fetchClient.GET(
+        "/api/v1/users/{userId}/following",
+        {
+          params: {
+            path: { userId },
+            query: { cursor: pageParam, limit: 20 },
+          },
         },
-      });
+      );
       return data!.payload;
     },
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,

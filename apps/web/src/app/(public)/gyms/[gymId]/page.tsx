@@ -1,8 +1,9 @@
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import { schemas } from "@clog/utils";
 import { cache } from "react";
 import type { Metadata, NextPage } from "next";
 import { notFound } from "next/navigation";
+
+import { schemas } from "@clog/contracts";
 
 import { openapi } from "#web/apis/openapi";
 import { getQueryClient } from "#web/libs/getQueryClient";

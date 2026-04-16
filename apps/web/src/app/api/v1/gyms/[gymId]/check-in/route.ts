@@ -1,4 +1,4 @@
-import { prisma } from "@clog/db";
+import { prisma } from "@clog/db/prisma";
 
 import { errorResponse, jsonWithToast, requireAuth } from "#web/libs/api";
 import { catchApiError } from "#web/libs/api/errorCatch";
@@ -18,6 +18,7 @@ export const POST = async (
   try {
     const gym = await prisma.gym.findUnique({ where: { id: gymId } });
     if (!gym) return errorResponse("암장을 찾을 수 없습니다.", 404);
+    if (gym.isClosed) return errorResponse("폐업한 암장입니다.", 400);
 
     const user = await prisma.user.findUnique({
       where: { id: userId! },

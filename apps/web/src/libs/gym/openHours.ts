@@ -353,8 +353,7 @@ const minutesUntilOpen = (
   // 익일 마감 (예: 20:00~02:00)
   // - now가 open~24:00 or 00:00~close 구간이면 영업 중
   // - now가 close~open 구간이면 다음 오픈까지 (open - now)
-  const isOpenNow =
-    nowMinutes >= openM || nowMinutes < closeM;
+  const isOpenNow = nowMinutes >= openM || nowMinutes < closeM;
   if (isOpenNow) return 0;
   return openM - nowMinutes;
 };

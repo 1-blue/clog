@@ -1,7 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 import { useNotificationPanel } from "#web/components/notifications/NotificationPanelProvider";
 import { ROUTES } from "#web/constants";

@@ -1,6 +1,7 @@
-import { prisma } from "@clog/db";
 import { PushPlatform } from "@prisma/client";
 import Expo from "expo-server-sdk";
+
+import { prisma } from "@clog/db/prisma";
 
 const expo = new Expo({
   accessToken: process.env.EXPO_ACCESS_TOKEN,
@@ -63,8 +64,7 @@ export const sendExpoPush = async (input: TSendExpoPushInput) => {
 
       const err = ticket.details?.error;
       const tokenFromDetails = ticket.details?.expoPushToken;
-      const tokenFromMsg =
-        typeof msg.to === "string" ? msg.to : undefined;
+      const tokenFromMsg = typeof msg.to === "string" ? msg.to : undefined;
       const token = tokenFromDetails ?? tokenFromMsg;
 
       if (err === "DeviceNotRegistered" && token) {

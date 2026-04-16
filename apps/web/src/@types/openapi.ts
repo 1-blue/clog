@@ -4,3401 +4,4039 @@
  */
 
 export interface paths {
-    "/api/v1/gyms": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 암장 목록 (무한스크롤) */
-        get: operations["getGyms"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+  "/api/v1/admin/gyms": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/gyms/{gymId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    /** 암장 목록 (어드민) */
+    get: {
+      parameters: {
+        query?: {
+          cursor?: string;
+          limit?: number;
+          search?: string;
+          region?: components["schemas"]["Region"];
+          status?: "all" | "active" | "closed";
         };
-        /** 암장 상세 */
-        get: operations["getGym"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/gyms/{gymId}/membership-plans": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 암장 회원권 요금표 (활성 행만) */
-        get: operations["getGymMembershipPlans"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/gyms/{gymId}/check-in": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 암장 체크인 */
-        post: operations["checkInGym"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/gyms/{gymId}/check-out": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 암장 체크아웃 */
-        post: operations["checkOutGym"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/gyms/{gymId}/reviews": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 리뷰 목록 (무한스크롤) */
-        get: operations["getGymReviews"];
-        put?: never;
-        /** 리뷰 작성 */
-        post: operations["createReview"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/gyms/{gymId}/reviews/me": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 내 리뷰 (해당 암장) */
-        get: operations["getMyGymReview"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/gyms/{gymId}/reviews/{reviewId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 리뷰 단건 */
-        get: operations["getGymReviewById"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /** 리뷰 수정 */
-        patch: operations["updateGymReview"];
-        trace?: never;
-    };
-    "/api/v1/records": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 기록 목록 (무한스크롤) */
-        get: operations["getRecords"];
-        put?: never;
-        /** 기록 생성 */
-        post: operations["createRecord"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/records/{recordId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 기록 상세 */
-        get: operations["getRecord"];
-        put?: never;
-        post?: never;
-        /** 기록 삭제 */
-        delete: operations["deleteRecord"];
-        options?: never;
-        head?: never;
-        /** 기록 수정 */
-        patch: operations["updateRecord"];
-        trace?: never;
-    };
-    "/api/v1/posts": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 게시글 목록 (무한스크롤) */
-        get: operations["getPosts"];
-        put?: never;
-        /** 게시글 작성 */
-        post: operations["createPost"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/posts/{postId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 게시글 상세 */
-        get: operations["getPost"];
-        put?: never;
-        post?: never;
-        /** 게시글 삭제 */
-        delete: operations["deletePost"];
-        options?: never;
-        head?: never;
-        /** 게시글 수정 */
-        patch: operations["updatePost"];
-        trace?: never;
-    };
-    "/api/v1/posts/{postId}/view": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 게시글 조회수 증가 (세션당 1회 호출 권장) */
-        post: operations["recordPostView"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/posts/{postId}/like": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 좋아요 토글 */
-        post: operations["togglePostLike"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/posts/{postId}/bookmark": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 북마크 토글 */
-        post: operations["togglePostBookmark"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/posts/{postId}/comments": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 댓글 목록 (무한스크롤) */
-        get: operations["getPostComments"];
-        put?: never;
-        /** 댓글 작성 */
-        post: operations["createComment"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/posts/{postId}/comments/{commentId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /** 댓글 삭제 */
-        delete: operations["deleteComment"];
-        options?: never;
-        head?: never;
-        /** 댓글 수정 */
-        patch: operations["updateComment"];
-        trace?: never;
-    };
-    "/api/v1/users/me": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 내 정보 (비로그인 시에도 200, payload null) */
-        get: operations["getMe"];
-        put?: never;
-        post?: never;
-        /** 회원 탈퇴 */
-        delete: operations["deleteMe"];
-        options?: never;
-        head?: never;
-        /** 내 정보 수정 */
-        patch: operations["updateMe"];
-        trace?: never;
-    };
-    "/api/v1/users/me/check-ins": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 내 체크인 목록 (linkableOnly=true면 30분 이상·미연결·종료된 체크인만) */
-        get: operations["getMyCheckIns"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/users/me/push-device": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Expo 푸시 토큰 등록·갱신 */
-        post: operations["registerPushDevice"];
-        /** Expo 푸시 토큰 삭제 */
-        delete: operations["deletePushDevice"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/users/me/memberships": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 내 회원권 목록 */
-        get: operations["getMyMemberships"];
-        put?: never;
-        /** 내 회원권 등록 */
-        post: operations["createMyMembership"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/users/me/memberships/{userMembershipId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 내 회원권 상세 */
-        get: operations["getMyMembershipById"];
-        put?: never;
-        post?: never;
-        /** 내 회원권 삭제 */
-        delete: operations["deleteMyMembership"];
-        options?: never;
-        head?: never;
-        /** 내 회원권 수정 */
-        patch: operations["patchMyMembership"];
-        trace?: never;
-    };
-    "/api/v1/users/me/memberships/{userMembershipId}/usage": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 회원권 사용 내역·통계 */
-        get: operations["getMyMembershipUsage"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/users/me/memberships/{userMembershipId}/pauses": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 회원권 일시정지 추가 */
-        post: operations["createMembershipPause"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/users/me/memberships/{userMembershipId}/pauses/{pauseId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /** 회원권 일시정지 삭제 */
-        delete: operations["deleteMembershipPause"];
-        options?: never;
-        head?: never;
-        /** 회원권 일시정지 수정 */
-        patch: operations["patchMembershipPause"];
-        trace?: never;
-    };
-    "/api/v1/users/me/nickname-availability": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 닉네임 사용 가능 여부 (본인 현재 닉네임 제외) */
-        get: operations["getMyNicknameAvailability"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/users/me/followers": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 내 팔로워 목록 */
-        get: operations["getMyFollowers"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/users/me/following": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 내 팔로잉 목록 */
-        get: operations["getMyFollowing"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/users/me/bookmarked-posts": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 저장한 게시글 (무한스크롤) */
-        get: operations["getMyBookmarkedPosts"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/users/me/liked-posts": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 좋아요한 게시글 (무한스크롤) */
-        get: operations["getMyLikedPosts"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/users/me/statistics": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 내 통계 (기간별) */
-        get: operations["getMyStatistics"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/users/{userId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 유저 프로필 */
-        get: operations["getUser"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/users/{userId}/follow": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 팔로우 토글 */
-        post: operations["toggleFollow"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/users/{userId}/followers": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 특정 유저 팔로워 목록 */
-        get: operations["getUserFollowers"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/users/{userId}/following": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 특정 유저 팔로잉 목록 */
-        get: operations["getUserFollowing"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/users/{userId}/public-records": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 유저 공개 기록 목록 (프로필 그리드) */
-        get: operations["getUserPublicRecords"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/stats/completion-week": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 최근 7일 완등 추이 (홈 차트) */
-        get: operations["getCompletionWeekStats"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/notifications": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 알림 목록 (무한스크롤) */
-        get: operations["getNotifications"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/notifications/read": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /** 알림 읽음 처리 */
-        patch: operations["markNotificationsRead"];
-        trace?: never;
-    };
-    "/api/v1/notifications/unread-count": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 미읽음 알림 개수 */
-        get: operations["getNotificationsUnreadCount"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/notifications/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description 목록 */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              payload: {
+                items: unknown[];
+                nextCursor: string | null;
+              };
             };
-            cookie?: never;
+          };
         };
-        get?: never;
-        put?: never;
-        post?: never;
-        /** 알림 단건 삭제 (영구) */
-        delete: operations["deleteNotification"];
-        options?: never;
-        head?: never;
-        /** 알림 단건 읽음 */
-        patch: operations["patchNotification"];
-        trace?: never;
-    };
-    "/api/v1/upload/presigned": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+        /** @description 관리자 권한 필요 */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
         };
-        get?: never;
-        put?: never;
-        /** S3 Presigned URL 발급 */
-        post: operations["getPresignedUrl"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
     };
+    put?: never;
+    /** 암장 생성 */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          "application/json": {
+            name: string;
+            region: components["schemas"]["Region"];
+            address: string;
+            phone: string;
+            latitude: number;
+            longitude: number;
+            description: string;
+            coverImageUrl: string;
+            logoImageUrl: string;
+            membershipBrand: components["schemas"]["GymMembershipBrand"];
+            website?: string | null;
+            instagramId?: string | null;
+            notice?: string | null;
+            difficultyImageUrl?: string | null;
+            settingScheduleMemo?: string | null;
+            visitorCapacity?: number;
+            facilities?: components["schemas"]["FacilityType"][];
+          };
+        };
+      };
+      responses: {
+        /** @description 생성된 암장 */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              payload?: unknown;
+            };
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/gyms/{gymId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** 암장 수정 */
+    patch: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          gymId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          "application/json": {
+            name?: string;
+            region?: components["schemas"]["Region"];
+            address?: string;
+            phone?: string;
+            latitude?: number;
+            longitude?: number;
+            description?: string;
+            coverImageUrl?: string;
+            logoImageUrl?: string;
+            membershipBrand?: components["schemas"]["GymMembershipBrand"];
+            website?: string | null;
+            instagramId?: string | null;
+            notice?: string | null;
+            difficultyImageUrl?: string | null;
+            settingScheduleMemo?: string | null;
+            visitorCapacity?: number;
+            facilities?: components["schemas"]["FacilityType"][];
+          };
+        };
+      };
+      responses: {
+        /** @description 수정된 암장 */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              payload?: unknown;
+            };
+          };
+        };
+      };
+    };
+    trace?: never;
+  };
+  "/api/v1/admin/gyms/{gymId}/close": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 암장 폐업 처리 */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          gymId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          "application/json": {
+            closedReason: string;
+          };
+        };
+      };
+      responses: {
+        /** @description 폐업 처리됨 */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              payload?: unknown;
+            };
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/gyms/{gymId}/reopen": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 암장 폐업 해제 */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          gymId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description 재오픈 */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              payload?: unknown;
+            };
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/users": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 유저 목록 */
+    get: {
+      parameters: {
+        query?: {
+          cursor?: string;
+          limit?: number;
+          search?: string;
+          role?: components["schemas"]["Role"];
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description 유저 목록 */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              payload: {
+                items: unknown[];
+                nextCursor: string | null;
+              };
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/users/{userId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** 유저 삭제 */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          userId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description 삭제됨 */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    /** 유저 수정 */
+    patch: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          userId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          "application/json": {
+            nickname?: string;
+            role?: components["schemas"]["Role"];
+            /** Format: uuid */
+            homeGymId?: string | null;
+          };
+        };
+      };
+      responses: {
+        /** @description 수정된 유저 */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              payload?: unknown;
+            };
+          };
+        };
+      };
+    };
+    trace?: never;
+  };
+  "/api/v1/admin/posts": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 게시글 목록 */
+    get: {
+      parameters: {
+        query?: {
+          cursor?: string;
+          limit?: number;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description 목록 */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              payload: {
+                items: unknown[];
+                nextCursor: string | null;
+              };
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/posts/{postId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** 게시글 삭제 */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          postId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description 삭제됨 */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/reviews": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 리뷰 목록 */
+    get: {
+      parameters: {
+        query?: {
+          cursor?: string;
+          limit?: number;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description 목록 */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              payload: {
+                items: unknown[];
+                nextCursor: string | null;
+              };
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/reviews/{reviewId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** 리뷰 삭제 */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          reviewId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description 삭제됨 */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/error-logs": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 에러 로그 목록 */
+    get: {
+      parameters: {
+        query?: {
+          cursor?: string;
+          limit?: number;
+          method?: string;
+          httpStatus?: number | null;
+          endpoint?: string;
+          from?: string;
+          to?: string;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description 목록 */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              payload: {
+                items: unknown[];
+                nextCursor: string | null;
+              };
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/error-logs/{logId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 에러 로그 상세 */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          logId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description 상세 */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              payload?: unknown;
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/audit-logs": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 감사 로그 목록 */
+    get: {
+      parameters: {
+        query?: {
+          cursor?: string;
+          limit?: number;
+          actorId?: string;
+          action?: components["schemas"]["AdminAuditAction"];
+          targetType?: string;
+          from?: string;
+          to?: string;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description 목록 */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              payload: {
+                items: unknown[];
+                nextCursor: string | null;
+              };
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/audit-logs/{logId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 감사 로그 상세 */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          logId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description 상세 */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              payload?: unknown;
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/check-ins": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 활성 체크인 목록 */
+    get: {
+      parameters: {
+        query?: {
+          cursor?: string;
+          limit?: number;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description 목록 */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              payload: {
+                items: unknown[];
+                nextCursor: string | null;
+              };
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/gyms": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 암장 목록 (무한스크롤) */
+    get: operations["getGyms"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/gyms/{gymId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 암장 상세 */
+    get: operations["getGym"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/gyms/{gymId}/membership-plans": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 암장 회원권 요금표 (활성 행만) */
+    get: operations["getGymMembershipPlans"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/gyms/{gymId}/check-in": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 암장 체크인 */
+    post: operations["checkInGym"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/gyms/{gymId}/check-out": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 암장 체크아웃 */
+    post: operations["checkOutGym"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/gyms/{gymId}/reviews": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 암장 리뷰 목록 */
+    get: operations["getGymReviews"];
+    put?: never;
+    /** 암장 리뷰 작성 */
+    post: operations["createGymReview"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/gyms/{gymId}/reviews/me": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 내 암장 리뷰 조회 */
+    get: operations["getMyGymReview"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/gyms/{gymId}/reviews/{reviewId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 암장 리뷰 상세 */
+    get: operations["getGymReview"];
+    put?: never;
+    post?: never;
+    /** 암장 리뷰 삭제 */
+    delete: operations["deleteGymReview"];
+    options?: never;
+    head?: never;
+    /** 암장 리뷰 수정 */
+    patch: operations["updateGymReview"];
+    trace?: never;
+  };
+  "/api/v1/users/me": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 내 정보 (비로그인 시에도 200, payload null) */
+    get: operations["getMe"];
+    put?: never;
+    post?: never;
+    /** 회원 탈퇴 */
+    delete: operations["deleteMe"];
+    options?: never;
+    head?: never;
+    /** 내 정보 수정 */
+    patch: operations["updateMe"];
+    trace?: never;
+  };
+  "/api/v1/users/me/check-ins": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 내 체크인 목록 (linkableOnly=true면 30분 이상·미연결·종료된 체크인만) */
+    get: operations["getMyCheckIns"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/users/me/push-device": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Expo 푸시 토큰 등록·갱신 */
+    post: operations["registerPushDevice"];
+    /** Expo 푸시 토큰 삭제 */
+    delete: operations["deletePushDevice"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/users/me/memberships": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 내 회원권 목록 */
+    get: operations["getMyMemberships"];
+    put?: never;
+    /** 내 회원권 등록 */
+    post: operations["createMyMembership"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/users/me/memberships/{userMembershipId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 내 회원권 상세 */
+    get: operations["getMyMembershipById"];
+    put?: never;
+    post?: never;
+    /** 내 회원권 삭제 */
+    delete: operations["deleteMyMembership"];
+    options?: never;
+    head?: never;
+    /** 내 회원권 수정 */
+    patch: operations["patchMyMembership"];
+    trace?: never;
+  };
+  "/api/v1/users/me/memberships/{userMembershipId}/usage": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 내 회원권 사용 내역 */
+    get: operations["getMyMembershipUsage"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/users/me/memberships/{userMembershipId}/pauses": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 내 회원권 일시정지 목록 */
+    get: operations["getMyMembershipPauses"];
+    put?: never;
+    /** 내 회원권 일시정지 생성 */
+    post: operations["createMyMembershipPause"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/users/me/memberships/{userMembershipId}/pauses/{pauseId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** 내 회원권 일시정지 삭제 */
+    delete: operations["deleteMyMembershipPause"];
+    options?: never;
+    head?: never;
+    /** 내 회원권 일시정지 수정 */
+    patch: operations["patchMyMembershipPause"];
+    trace?: never;
+  };
+  "/api/v1/users/me/nickname-availability": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 닉네임 사용 가능 여부 */
+    get: operations["checkNicknameAvailability"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/users/me/followers": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 내 팔로워 목록 */
+    get: operations["getMyFollowers"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/users/me/following": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 내 팔로잉 목록 */
+    get: operations["getMyFollowing"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/users/me/bookmarked-posts": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 내 북마크 게시글 */
+    get: operations["getMyBookmarkedPosts"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/users/me/liked-posts": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 내 좋아요 게시글 */
+    get: operations["getMyLikedPosts"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/users/me/statistics": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 내 통계 */
+    get: operations["getMeStatistics"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/users/{userId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 유저 프로필 */
+    get: operations["getUserProfile"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/users/{userId}/follow": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 팔로우 */
+    post: operations["followUser"];
+    /** 언팔로우 */
+    delete: operations["unfollowUser"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/users/{userId}/followers": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 유저 팔로워 목록 */
+    get: operations["getUserFollowers"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/users/{userId}/following": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 유저 팔로잉 목록 */
+    get: operations["getUserFollowing"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/users/{userId}/public-records": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 유저 공개 기록 목록 */
+    get: operations["getUserPublicRecords"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/records": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 기록 목록 (무한스크롤) */
+    get: operations["getRecords"];
+    put?: never;
+    /** 기록 생성 */
+    post: operations["createRecord"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/records/{recordId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 기록 상세 */
+    get: operations["getRecord"];
+    put?: never;
+    post?: never;
+    /** 기록 삭제 */
+    delete: operations["deleteRecord"];
+    options?: never;
+    head?: never;
+    /** 기록 수정 */
+    patch: operations["updateRecord"];
+    trace?: never;
+  };
+  "/api/v1/posts": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 게시글 목록 */
+    get: operations["getPosts"];
+    put?: never;
+    /** 게시글 작성 */
+    post: operations["createPost"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/posts/{postId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 게시글 상세 */
+    get: operations["getPost"];
+    put?: never;
+    post?: never;
+    /** 게시글 삭제 */
+    delete: operations["deletePost"];
+    options?: never;
+    head?: never;
+    /** 게시글 수정 */
+    patch: operations["updatePost"];
+    trace?: never;
+  };
+  "/api/v1/posts/{postId}/comments": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 댓글 목록 */
+    get: operations["getComments"];
+    put?: never;
+    /** 댓글 작성 */
+    post: operations["createComment"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/posts/{postId}/comments/{commentId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** 댓글 삭제 */
+    delete: operations["deleteComment"];
+    options?: never;
+    head?: never;
+    /** 댓글 수정 */
+    patch: operations["updateComment"];
+    trace?: never;
+  };
+  "/api/v1/posts/{postId}/like": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 게시글 좋아요 */
+    post: operations["likePost"];
+    /** 게시글 좋아요 취소 */
+    delete: operations["unlikePost"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/posts/{postId}/bookmark": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 게시글 북마크 */
+    post: operations["bookmarkPost"];
+    /** 게시글 북마크 취소 */
+    delete: operations["unbookmarkPost"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/posts/{postId}/view": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 게시글 조회수 증가 */
+    post: operations["viewPost"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/notifications": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 알림 목록 */
+    get: operations["getNotifications"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/notifications/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** 알림 삭제 */
+    delete: operations["deleteNotification"];
+    options?: never;
+    head?: never;
+    /** 알림 읽음 처리 */
+    patch: operations["patchNotification"];
+    trace?: never;
+  };
+  "/api/v1/notifications/read": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** 알림 전체 읽음 */
+    patch: operations["readAllNotifications"];
+    trace?: never;
+  };
+  "/api/v1/notifications/unread-count": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 안 읽은 알림 개수 */
+    get: operations["getUnreadNotificationCount"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/stats/completion-week": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 완등 주간 통계 */
+    get: operations["getCompletionWeekStats"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/upload/presigned": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** S3 Presigned URL 생성 */
+    post: operations["createPresignedUploadUrl"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: {
-        /**
-         * @description 지역 (서울·경기·인천·부산)
-         * @enum {string}
-         */
-        Region: "SEOUL" | "GYEONGGI" | "INCHEON" | "BUSAN";
-        /**
-         * @description 난이도 (V0~V10)
-         * @enum {string}
-         */
-        Difficulty: "V0" | "V1" | "V2" | "V3" | "V4" | "V5" | "V6" | "V7" | "V8" | "V9" | "V10";
-        /**
-         * @description 영업시간 요일 타입 (MON 월요일 ~ SUN 일요일)
-         * @enum {string}
-         */
-        DayType: "MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT" | "SUN";
-        /**
-         * @description 체감 난이도 (EASY 쉬움, EASY_NORMAL 쉬움~보통, NORMAL 보통, NORMAL_HARD 보통~어려움, HARD 어려움)
-         * @enum {string}
-         */
-        GymPerceivedDifficulty: "EASY" | "EASY_NORMAL" | "NORMAL" | "NORMAL_HARD" | "HARD";
-        /**
-         * @description 게시글 카테고리 (FREE 자유, TIPS 팁/노하우, REVIEW 후기, MEETUP 모임, GEAR 장비)
-         * @enum {string}
-         */
-        CommunityCategory: "FREE" | "TIPS" | "REVIEW" | "MEETUP" | "GEAR";
-        /**
-         * @description 알림 타입 (POST_COMMENT 게시글 댓글, COMMENT_REPLY 답글, FOLLOW 팔로우, AUTO_CHECKOUT 자동 체크아웃 등)
-         * @enum {string}
-         */
-        NotificationType: "COMMENT" | "POST_COMMENT" | "COMMENT_REPLY" | "LIKE" | "FOLLOW" | "SYSTEM" | "GYM_UPDATE" | "AUTO_CHECKOUT";
-        /**
-         * @description 암장 시설 타입 (PARKING 주차장, SHOWER 샤워실, LOCKER 락커, REST_AREA 휴식 공간, TRAINING 트레이닝 시설)
-         * @enum {string}
-         */
-        FacilityType: "PARKING" | "SHOWER" | "LOCKER" | "REST_AREA" | "TRAINING";
-        /**
-         * @description 시도 결과 (SEND 완등, ATTEMPT 시도, FLASH 플래시, ONSIGHT 온사이트)
-         * @enum {string}
-         */
-        AttemptResult: "SEND" | "ATTEMPT" | "FLASH" | "ONSIGHT";
-        /**
-         * @description 암장 리뷰 특징 (COOL_AIR 쾌적한 냉방, WIDE_STRETCH 넓은 스트레칭존, VARIOUS_LEVEL 다양한 난이도,
-         *     KIND_STAFF 친절한 스태프, EASY_PARKING 주차 편리, SHOWER_ROOM 샤워실 완비,
-         *     CLEAN_FACILITY 깨끗한 시설, GOOD_VENT 환기 좋음)
-         * @enum {string}
-         */
-        GymReviewFeature: "COOL_AIR" | "WIDE_STRETCH" | "VARIOUS_LEVEL" | "KIND_STAFF" | "EASY_PARKING" | "SHOWER_ROOM" | "CLEAN_FACILITY" | "GOOD_VENT";
-        /**
-         * @description 유저 권한 (ADMIN 관리자, MANAGER 매니저, GUEST 일반)
-         * @enum {string}
-         */
-        Role: "ADMIN" | "MANAGER" | "GUEST";
-        AuthorSummary: {
-            /** Format: uuid */
-            id: string;
-            nickname: string;
-            profileImage: string | null;
-        };
-        MeStatisticsPayload: {
-            /** @enum {string} */
-            period: "week" | "month" | "year" | "all";
-            /** @description yyyy-MM-dd */
-            anchor: string;
-            range: {
-                /** Format: date-time */
-                start: string;
-                /** Format: date-time */
-                end: string;
-                label: string;
-            };
-            previousRange: {
-                /** Format: date-time */
-                start: string;
-                /** Format: date-time */
-                end: string;
-            } | null;
-            kpis: {
-                totalSends: number;
-                sendDeltaPercent: number | null;
-                uniqueGyms: number;
-                sessionCount: number;
-                workoutMinutesTotal: number | null;
-            };
-            trend: {
-                peakBucketKey: string | null;
-                buckets: {
-                    key: string;
-                    sends: number;
-                    label: string;
-                }[];
-            };
-            difficultyDistribution: {
-                difficulty: components["schemas"]["Difficulty"];
-                count: number;
-            }[];
-            sendAttempt: {
-                sendCount: number;
-                attemptCount: number;
-                totalRoutes: number;
-                percent: number | null;
-            };
-            topGyms: {
-                /** Format: uuid */
-                gymId: string;
-                name: string;
-                address: string;
-                coverImageUrl: string;
-                visitCount: number;
-            }[];
-            insights: {
-                /** @enum {string} */
-                variant: "primary" | "tertiary";
-                message: string;
-            }[];
-        };
-        /** @description 암장 이미지 */
-        GymImage: {
-            /**
-             * Format: uuid
-             * @description 이미지 고유 ID
-             */
-            id: string;
-            /**
-             * Format: uuid
-             * @description 암장 ID
-             */
-            gymId: string;
-            /** @description 이미지 URL */
-            url: string;
-            /** @description 순서 */
-            order: number;
-            /**
-             * Format: date-time
-             * @description 생성일
-             */
-            createdAt: string;
-        };
-        /** @description 암장 영업시간 (요일별 한 슬롯, gym_open_hours) */
-        GymOpenHour: {
-            /**
-             * Format: uuid
-             * @description 고유 ID
-             */
-            id: string;
-            /**
-             * Format: uuid
-             * @description 암장 ID
-             */
-            gymId: string;
-            dayType: components["schemas"]["DayType"];
-            /** @description 오픈 시간 "HH:mm" */
-            open: string;
-            /** @description 마감 시간 "HH:mm" */
-            close: string;
-        };
-        /** @description 암장별 난이도 색상·표시명 (gym_difficulty_colors) */
-        GymDifficultyColor: {
-            /**
-             * Format: uuid
-             * @description 고유 ID
-             */
-            id: string;
-            /**
-             * Format: uuid
-             * @description 암장 ID
-             */
-            gymId: string;
-            difficulty: components["schemas"]["Difficulty"];
-            /** @description HEX 색상 (예: #E05555) */
-            color: string;
-            /** @description 암장 자체 난이도 명칭 */
-            label: string;
-            /** @description 표시 순서 */
-            order: number;
-        };
-        /**
-         * @description 암장 회원권 브랜드(체인). STANDALONE은 구매·세션 지점 일치만 허용
-         * @enum {string}
-         */
-        GymMembershipBrand: "THE_CLIMB" | "SEOULFOREST" | "CLIMBINGPARK" | "SONCLIMB" | "PEAKERS" | "WAVEROCK" | "CLIMB_US" | "DAMJANG" | "B_BLOC" | "ALLEZ" | "STANDALONE";
-        /** @description 암장 (목록/상세 공통 필드; API는 Prisma Gym + 실시간 visitorCount 등) */
-        GymListItem: {
-            /**
-             * Format: uuid
-             * @description 암장 고유 ID
-             */
-            id: string;
-            /** @description 암장 이름 */
-            name: string;
-            /** @description 주소 */
-            address: string;
-            region: components["schemas"]["Region"];
-            /** @description 전화번호 */
-            phone: string;
-            /** @description 영업시간 공지 (예: "명절 당일 휴무") */
-            notice?: string | null;
-            /** @description 요일별 영업시간 (GymOpenHour 관계) */
-            openHours: components["schemas"]["GymOpenHour"][];
-            /** @description 현재 혼잡도 (0~100) */
-            congestion: number;
-            /** @description 현재 추정 이용 인원 (실시간 체크인 집계로 덮어쓸 수 있음) */
-            visitorCount: number;
-            /** @description 이번 달 체크인 횟수 (정렬·목록 전용) */
-            monthlyCheckInCount?: number | null;
-            /** @description 수용 인원 (혼잡도 카드 분모) */
-            visitorCapacity: number;
-            /** @description 위도 */
-            latitude: number;
-            /** @description 경도 */
-            longitude: number;
-            /** @description 설명 */
-            description: string;
-            /** @description 평균 평점 */
-            avgRating: number;
-            /** @description 리뷰 수 */
-            reviewCount: number;
-            /** @description 웹사이트 URL */
-            website?: string | null;
-            /** @description 목록·히어로용 커버 이미지 URL */
-            coverImageUrl: string;
-            /** @description 로고 이미지 URL */
-            logoImageUrl: string;
-            /** @description 난이도표 이미지 URL (브랜드 기본·지점별) */
-            difficultyImageUrl?: string | null;
-            /** @description 세팅 주기·일정 안내 텍스트 */
-            settingScheduleMemo?: string | null;
-            /** @description 인스타그램 아이디 */
-            instagramId?: string | null;
-            /**
-             * Format: date-time
-             * @description 생성일
-             */
-            createdAt: string;
-            /**
-             * Format: date-time
-             * @description 수정일
-             */
-            updatedAt: string;
-            membershipBrand: components["schemas"]["GymMembershipBrand"];
-            /** @description 시설 목록 (스칼라 enum 배열) */
-            facilities: components["schemas"]["FacilityType"][];
-            /** @description 이미지 목록 (목록 API는 take 1 등으로 제한될 수 있음) */
-            images: components["schemas"]["GymImage"][];
-            /** @description 암장별 난이도표 (상세 GET 등에서 포함; 목록은 빈 배열 또는 생략) */
-            difficultyColors?: components["schemas"]["GymDifficultyColor"][];
-        };
-        /** @enum {string} */
-        MembershipPlanCode: "PERIOD_1M" | "PERIOD_3M" | "PERIOD_6M" | "PERIOD_12M" | "COUNT_DAY" | "COUNT_3" | "COUNT_5" | "COUNT_10";
-        /** @description 암장별 회원권 요금표 행 */
-        GymMembershipPlan: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            gymId: string;
-            code: components["schemas"]["MembershipPlanCode"];
-            priceWon: number;
-            sortOrder: number;
-            isActive: boolean;
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: date-time */
-            updatedAt: string;
-        };
-        GymMembershipPlanSummary: {
-            /** Format: uuid */
-            id: string;
-            code: components["schemas"]["MembershipPlanCode"];
-            priceWon: number;
-            sortOrder: number;
-            isActive: boolean;
-        };
-        MembershipPauseItem: {
-            /** Format: uuid */
-            id: string;
-            startDateYmd: string;
-            endDateYmd: string;
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: date-time */
-            updatedAt: string;
-        };
-        /** @description 유저 보유 회원권 (직렬화 응답) */
-        UserMembership: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            userId: string;
-            /** Format: uuid */
-            gymId: string;
-            /** Format: uuid */
-            planId: string;
-            /** Format: date-time */
-            startedAt: string;
-            startedDateYmd: string;
-            remainingUses?: number | null;
-            note?: string | null;
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: date-time */
-            updatedAt: string;
-            plan: components["schemas"]["GymMembershipPlanSummary"];
-            gym: {
-                /** Format: uuid */
-                id: string;
-                name: string;
-                membershipBrand: components["schemas"]["GymMembershipBrand"];
-            };
-            pauses: components["schemas"]["MembershipPauseItem"][];
-            /** Format: date-time */
-            effectiveEndAt: string;
-            lastValidDateYmd: string;
-            isActive: boolean;
-        };
-        CreateUserMembershipBody: {
-            /** Format: uuid */
-            gymId: string;
-            /** Format: uuid */
-            planId: string;
-            startedDateYmd: string;
-            note?: string;
-        };
-        PatchUserMembershipBody: {
-            note?: string | null;
-            startedDateYmd?: string;
-        };
-        CreateMembershipPauseBody: {
-            startDateYmd: string;
-            endDateYmd: string;
-        };
-        PatchMembershipPauseBody: {
-            startDateYmd?: string;
-            endDateYmd?: string;
-        };
-        GymDetail: components["schemas"]["GymListItem"] & {
-            membershipPlans?: components["schemas"]["GymMembershipPlan"][];
-            myCheckIn?: {
-                /** Format: date-time */
-                endsAt: string;
-            } | null;
-        };
-        CheckInResult: {
-            /** Format: date-time */
-            endsAt: string;
-        };
-        CheckOutResult: {
-            ok: boolean;
-            /**
-             * Format: uuid
-             * @description 체크인 30분 이상일 때 자동 생성된 기록(세션) ID, 없으면 null
-             */
-            createdSessionId?: string | null;
-        };
-        MyCheckInItem: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            gymId: string;
-            gymName: string;
-            /** Format: date-time */
-            startedAt: string;
-            /**
-             * Format: date-time
-             * @description 자동 체크아웃 예정 시각
-             */
-            endsAt?: string;
-            /**
-             * Format: date-time
-             * @description linkableOnly 목록에서는 항상 포함(종료 시각)
-             */
-            endedAt?: string | null;
-        };
-        PaginatedGymListItem: {
-            items: components["schemas"]["GymListItem"][];
-            nextCursor: string | null;
-        };
-        /** @description 암장 리뷰 (작성 응답 등, user 미포함일 수 있음) */
-        Review: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            userId: string;
-            /** Format: uuid */
-            gymId: string;
-            /** @description 평점 (1~5) */
-            rating: number;
-            /** @description 리뷰 내용 */
-            content: string;
-            perceivedDifficulty?: components["schemas"]["GymPerceivedDifficulty"];
-            features: components["schemas"]["GymReviewFeature"][];
-            /** @description 이미지 URL 목록 */
-            imageUrls: string[];
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: date-time */
-            updatedAt: string;
-        };
-        /** @description 리뷰 목록 항목 (작성자 user 포함) */
-        ReviewListItem: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            userId: string;
-            /** Format: uuid */
-            gymId: string;
-            rating: number;
-            content: string;
-            perceivedDifficulty?: components["schemas"]["GymPerceivedDifficulty"];
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: date-time */
-            updatedAt: string;
-            user: components["schemas"]["AuthorSummary"];
-            features: components["schemas"]["GymReviewFeature"][];
-            imageUrls: string[];
-        };
-        PaginatedReviewListItem: {
-            items: components["schemas"]["ReviewListItem"][];
-            nextCursor: string | null;
-        };
-        CreateReviewBody: {
-            rating: number;
-            content: string;
-            perceivedDifficulty?: components["schemas"]["GymPerceivedDifficulty"];
-            features?: components["schemas"]["GymReviewFeature"][];
-            imageUrls?: string[];
-        };
-        UpdateReviewBody: components["schemas"]["CreateReviewBody"];
-        /** @description 클라이밍 루트 기록 (routes 테이블) */
-        Route: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            sessionId: string;
-            difficulty: components["schemas"]["Difficulty"];
-            result: components["schemas"]["AttemptResult"];
-            attempts: number;
-            perceivedDifficulty?: components["schemas"]["GymPerceivedDifficulty"];
-            memo?: string | null;
-            order: number;
-            /** Format: date-time */
-            createdAt: string;
-        };
-        GymSummary: {
-            /** Format: uuid */
-            id: string;
-            name: string;
-            /** @description 암장 로고 URL (기록 썸네일 폴백 등) */
-            logoImageUrl?: string | null;
-            /** @description 암장별 난이도 색상 (기록 목록 GET에서 포함) */
-            difficultyColors?: components["schemas"]["GymDifficultyColor"][];
-        };
-        /** @description 클라이밍 세션 목록 항목 (climbing_sessions) */
-        RecordListItem: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            userId: string;
-            /** Format: uuid */
-            gymId: string;
-            /** Format: uuid */
-            userMembershipId?: string | null;
-            /** Format: uuid */
-            gymCheckInId?: string | null;
-            /** Format: date-time */
-            date: string;
-            /** Format: date-time */
-            startTime: string | null;
-            /** Format: date-time */
-            endTime: string | null;
-            memo: string | null;
-            isPublic: boolean;
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: date-time */
-            updatedAt: string;
-            gym: components["schemas"]["GymSummary"];
-            routes: components["schemas"]["Route"][];
-            /** @description 세션 이미지 URL 목록 */
-            imageUrls: string[];
-        };
-        /** @description 기록 상세 (세션 + 작성자) */
-        RecordDetail: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            userId: string;
-            /** Format: uuid */
-            gymId: string;
-            /** Format: uuid */
-            userMembershipId?: string | null;
-            /** Format: uuid */
-            gymCheckInId?: string | null;
-            /** Format: date-time */
-            date: string;
-            /** Format: date-time */
-            startTime: string | null;
-            /** Format: date-time */
-            endTime: string | null;
-            memo: string | null;
-            isPublic: boolean;
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: date-time */
-            updatedAt: string;
-            gym: {
-                /** Format: uuid */
-                id: string;
-                name: string;
-                address: string;
-                /** @description 암장 로고 URL (기록 사진 없을 때 폴백) */
-                logoImageUrl?: string | null;
-            };
-            routes: components["schemas"]["Route"][];
-            imageUrls: string[];
-            user: components["schemas"]["AuthorSummary"];
-            /** @description 작성자 본인 조회 시에만 포함 (타인 열람 시 null) */
-            userMembership?: components["schemas"]["RecordUserMembershipSummary"];
-        };
-        RecordUserMembershipSummary: {
-            /** Format: uuid */
-            id: string;
-            gym: {
-                /** Format: uuid */
-                id: string;
-                name: string;
-            };
-            plan: {
-                code: components["schemas"]["MembershipPlanCode"];
-            };
-        };
-        UserMembershipUsagePayload: {
-            membership: {
-                /** Format: uuid */
-                id: string;
-                /** Format: uuid */
-                gymId: string;
-                planCode: components["schemas"]["MembershipPlanCode"];
-                startedDateYmd: string;
-                lastValidDateYmd: string;
-                remainingUses?: number | null;
-                remainingDays: number;
-                gym: {
-                    /** Format: uuid */
-                    id: string;
-                    name: string;
-                    membershipBrand: components["schemas"]["GymMembershipBrand"];
-                    /** @description 암장 로고 URL (사용 기록 썸네일 등) */
-                    logoImageUrl?: string | null;
-                };
-            };
-            stats: {
-                totalUsed: number;
-                weeklyAverage: number;
-                usageRatePercent?: number | null;
-                initialCount?: number | null;
-            };
-            sessions: {
-                /** Format: uuid */
-                id: string;
-                /** Format: date-time */
-                date: string;
-                gymName: string;
-                /** @description 해당 세션 암장 로고 URL */
-                gymLogoImageUrl?: string | null;
-                routeCount: number;
-            }[];
-        };
-        PaginatedRecordListItem: {
-            items: components["schemas"]["RecordListItem"][];
-            nextCursor: string | null;
-        };
-        CreateRouteBody: {
-            difficulty: components["schemas"]["Difficulty"];
-            result: components["schemas"]["AttemptResult"];
-            /** @default 1 */
-            attempts: number;
-            memo?: string;
-        };
-        CreateSessionBody: {
-            /** Format: uuid */
-            gymId: string;
-            /** Format: uuid */
-            userMembershipId?: string | null;
-            /**
-             * Format: uuid
-             * @description 종료된 체크인과 연결
-             */
-            gymCheckInId?: string;
-            /** Format: date-time */
-            date: string;
-            /** Format: date-time */
-            startTime?: string;
-            /** Format: date-time */
-            endTime?: string;
-            memo?: string;
-            /** @default true */
-            isPublic: boolean;
-            routes?: components["schemas"]["CreateRouteBody"][];
-            imageUrls?: string[];
-        };
-        UpdateSessionBody: {
-            /**
-             * Format: uuid
-             * @description 체크인 연결(null이면 연결 해제)
-             */
-            gymCheckInId?: string | null;
-            /** Format: date-time */
-            date?: string;
-            /** Format: uuid */
-            userMembershipId?: string | null;
-            /** Format: date-time */
-            startTime?: string;
-            /** Format: date-time */
-            endTime?: string;
-            memo?: string | null;
-            isPublic?: boolean;
-            routes?: components["schemas"]["CreateRouteBody"][];
-            imageUrls?: string[];
-        };
-        /** @description 커뮤니티 게시글 (posts) */
-        Post: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            authorId: string;
-            category: components["schemas"]["CommunityCategory"];
-            title: string;
-            content: string;
-            viewCount: number;
-            likeCount: number;
-            commentCount: number;
-            /** @description 태그 문자열 목록 */
-            tags: string[];
-            /** @description 이미지 URL 목록 */
-            imageUrls: string[];
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: date-time */
-            updatedAt: string;
-        };
-        /** @description 게시글 목록 항목 */
-        PostListItem: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            authorId: string;
-            category: components["schemas"]["CommunityCategory"];
-            title: string;
-            content: string;
-            viewCount: number;
-            likeCount: number;
-            commentCount: number;
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: date-time */
-            updatedAt: string;
-            author: components["schemas"]["AuthorSummary"];
-            tags: string[];
-            imageUrls: string[];
-            likes?: {
-                /** Format: uuid */
-                id: string;
-            }[];
-            bookmarks?: {
-                /** Format: uuid */
-                id: string;
-            }[];
-        };
-        /** @description 게시글 상세 */
-        PostDetail: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            authorId: string;
-            category: components["schemas"]["CommunityCategory"];
-            title: string;
-            content: string;
-            viewCount: number;
-            likeCount: number;
-            commentCount: number;
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: date-time */
-            updatedAt: string;
-            author: components["schemas"]["AuthorSummary"];
-            tags: string[];
-            imageUrls: string[];
-            likes?: {
-                /** Format: uuid */
-                id: string;
-            }[];
-            bookmarks?: {
-                /** Format: uuid */
-                id: string;
-            }[];
-        };
-        PaginatedFollowUser: {
-            items: components["schemas"]["AuthorSummary"][];
-            /** Format: uuid */
-            nextCursor: string | null;
-        };
-        PaginatedPostListItem: {
-            items: components["schemas"]["PostListItem"][];
-            nextCursor: string | null;
-        };
-        CreatePostBody: {
-            category: components["schemas"]["CommunityCategory"];
-            title: string;
-            content: string;
-            tags?: string[];
-            imageUrls?: string[];
-        };
-        UpdatePostBody: {
-            title?: string;
-            content?: string;
-            category?: components["schemas"]["CommunityCategory"];
-            tags?: string[];
-            imageUrls?: string[];
-        };
-        CommentWithAuthor: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            postId: string;
-            /** Format: uuid */
-            authorId: string;
-            /** Format: uuid */
-            parentId: string | null;
-            content: string;
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: date-time */
-            updatedAt: string;
-            author: components["schemas"]["AuthorSummary"];
-        };
-        CommentListItem: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            postId: string;
-            /** Format: uuid */
-            authorId: string;
-            /** Format: uuid */
-            parentId: string | null;
-            content: string;
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: date-time */
-            updatedAt: string;
-            author: components["schemas"]["AuthorSummary"];
-            replies: components["schemas"]["CommentWithAuthor"][];
-        };
-        PaginatedCommentListItem: {
-            items: components["schemas"]["CommentListItem"][];
-            nextCursor: string | null;
-        };
-        CreateCommentBody: {
-            content: string;
-            /** Format: uuid */
-            parentId?: string;
-        };
-        UpdateCommentBody: {
-            content: string;
-        };
-        User: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            homeGymId?: string | null;
-            homeGym: components["schemas"]["HomeGymSummary"] | null;
-            /** Format: email */
-            email: string;
-            nickname: string;
-            bio: string | null;
-            profileImage: string | null;
-            coverImage: string | null;
-            instagramId: string | null;
-            youtubeUrl: string | null;
-            maxDifficulty: components["schemas"]["Difficulty"];
-            role: components["schemas"]["Role"];
-            /** @description 체크인 후 자동 체크아웃까지 분 (기본 240) */
-            checkInAutoDurationMinutes: number;
-            /** @description 푸시 알림 수신 허용 */
-            pushNotificationsEnabled: boolean;
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: date-time */
-            updatedAt: string;
-        };
-        UserCounts: {
-            following: number;
-            followers: number;
-            sessions: number;
-        };
-        ActiveCheckIn: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            gymId: string;
-            gymName: string;
-            /** Format: date-time */
-            startedAt: string;
-            /** Format: date-time */
-            endsAt: string;
-        };
-        HomeGymSummary: {
-            /** Format: uuid */
-            id: string;
-            name: string;
-        };
-        UserMe: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            homeGymId?: string | null;
-            homeGym: components["schemas"]["HomeGymSummary"] | null;
-            /** Format: email */
-            email: string;
-            nickname: string;
-            bio: string | null;
-            profileImage: string | null;
-            coverImage: string | null;
-            instagramId: string | null;
-            youtubeUrl: string | null;
-            maxDifficulty: components["schemas"]["Difficulty"];
-            role: components["schemas"]["Role"];
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: date-time */
-            updatedAt: string;
-            _count: components["schemas"]["UserCounts"];
-            /** @description 방문한 서로 다른 암장 수 */
-            visitCount: number;
-            /** @description 완등(SEND) 누적 */
-            sendCount: number;
-            /** @description 체크인 후 자동 체크아웃까지 분 (기본 240) */
-            checkInAutoDurationMinutes: number;
-            /** @description 푸시 알림 수신 허용 */
-            pushNotificationsEnabled: boolean;
-            /** @description Supabase에 연결된 소셜 로그인 (카카오·구글) */
-            linkedProviders: ("KAKAO" | "GOOGLE")[];
-            activeCheckIn: components["schemas"]["ActiveCheckIn"] | null;
-        };
-        UserProfile: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            homeGymId: string | null;
-            homeGym: components["schemas"]["HomeGymSummary"] | null;
-            nickname: string;
-            bio: string | null;
-            profileImage: string | null;
-            coverImage: string | null;
-            instagramId: string | null;
-            youtubeUrl: string | null;
-            maxDifficulty: components["schemas"]["Difficulty"];
-            /** Format: date-time */
-            createdAt: string;
-            _count: components["schemas"]["UserCounts"];
-            visitCount: number;
-            sendCount: number;
-            /** @description 2026-01-01 이후 ~ 오늘, 월요일 시작 주 그리드 활동 강도 (0~4) */
-            activityHeatmap: number[];
-            /** @description 각 히트맵 셀 날짜 (yyyy-MM-dd), activityHeatmap과 동일 순서 */
-            activityHeatmapDays: string[];
-            /** @description 2026-01-01 ~ 오늘 사이 공개 세션 개수 */
-            activityHeatmapSessionCount: number;
-            followers?: {
-                /** Format: uuid */
-                id: string;
-            }[];
-        };
-        UpdateUserBody: {
-            nickname?: string;
-            bio?: string;
-            /** Format: uri */
-            profileImage?: string;
-            /** Format: uri */
-            coverImage?: string;
-            instagramId?: string;
-            /** Format: uri */
-            youtubeUrl?: string;
-            maxDifficulty?: components["schemas"]["Difficulty"];
-            /** @description 체크인 후 자동 체크아웃까지 분 */
-            checkInAutoDurationMinutes?: number;
-            /**
-             * Format: uuid
-             * @description 홈짐 설정 — null이면 해제
-             */
-            homeGymId?: string | null;
-            /** @description 푸시 알림 수신 허용 */
-            pushNotificationsEnabled?: boolean;
-        };
-        /** @enum {string} */
-        PushPlatform: "ANDROID";
-        RegisterPushDeviceBody: {
-            token: string;
-            platform: components["schemas"]["PushPlatform"];
-        };
-        UserPushDevice: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            userId: string;
-            expoPushToken: string;
-            platform: components["schemas"]["PushPlatform"];
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: date-time */
-            updatedAt: string;
-        };
-        Notification: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            userId: string;
-            type: components["schemas"]["NotificationType"];
-            title: string;
-            message: string;
-            isRead: boolean;
-            link?: string | null;
-            /** Format: uuid */
-            commentId?: string | null;
-            /** Format: date-time */
-            createdAt: string;
-        };
-        PaginatedNotification: {
-            items: components["schemas"]["Notification"][];
-            nextCursor: string | null;
-        };
+  schemas: {
+    /** @enum {string} */
+    Region: "SEOUL" | "GYEONGGI" | "INCHEON" | "BUSAN";
+    /** @enum {string} */
+    GymMembershipBrand:
+      | "THE_CLIMB"
+      | "SEOULFOREST"
+      | "CLIMBINGPARK"
+      | "SONCLIMB"
+      | "PEAKERS"
+      | "WAVEROCK"
+      | "CLIMB_US"
+      | "DAMJANG"
+      | "B_BLOC"
+      | "ALLEZ"
+      | "STANDALONE";
+    /** @enum {string} */
+    FacilityType: "PARKING" | "SHOWER" | "LOCKER" | "REST_AREA" | "TRAINING";
+    /** @enum {string} */
+    Role: "ADMIN" | "MANAGER" | "GUEST";
+    /** @enum {string} */
+    AdminAuditAction:
+      | "CREATE"
+      | "UPDATE"
+      | "DELETE"
+      | "CLOSE"
+      | "REOPEN"
+      | "ROLE_CHANGE";
+    PaginatedGymListItem: {
+      items: components["schemas"]["GymListItem"][];
+      nextCursor: string | null;
     };
-    responses: never;
-    parameters: never;
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
+    GymListItem: {
+      /** Format: uuid */
+      id: string;
+      name: string;
+      address: string;
+      region: components["schemas"]["Region"];
+      phone: string;
+      notice: string | null;
+      congestion: number;
+      visitorCapacity: number;
+      latitude: number;
+      longitude: number;
+      description: string;
+      avgRating: number;
+      reviewCount: number;
+      website: string | null;
+      coverImageUrl: string;
+      logoImageUrl: string;
+      difficultyImageUrl: string | null;
+      settingScheduleMemo: string | null;
+      instagramId: string | null;
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      updatedAt: string;
+      membershipBrand: components["schemas"]["GymMembershipBrand"];
+      facilities: components["schemas"]["FacilityType"][];
+      isClosed: boolean;
+      /** Format: date-time */
+      closedAt: string | null;
+      openHours: components["schemas"]["GymOpenHour"][];
+      visitorCount: number;
+      monthlyCheckInCount: number | null;
+      images: components["schemas"]["GymImage"][];
+      difficultyColors?: components["schemas"]["GymDifficultyColor"][];
+    };
+    GymOpenHour: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      gymId: string;
+      dayType: components["schemas"]["DayType"];
+      open: string;
+      close: string;
+    };
+    /** @enum {string} */
+    DayType: "MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT" | "SUN";
+    GymImage: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      gymId: string;
+      url: string;
+      order: number;
+      /** Format: date-time */
+      createdAt: string;
+    };
+    GymDifficultyColor: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      gymId: string;
+      difficulty: components["schemas"]["Difficulty"];
+      color: string;
+      label: string;
+      order: number;
+    };
+    /** @enum {string} */
+    Difficulty:
+      | "V0"
+      | "V1"
+      | "V2"
+      | "V3"
+      | "V4"
+      | "V5"
+      | "V6"
+      | "V7"
+      | "V8"
+      | "V9"
+      | "V10";
+    GymDetail: components["schemas"]["GymListItem"] & {
+      membershipPlans: components["schemas"]["GymMembershipPlan"][];
+      myCheckIn: {
+        /** Format: date-time */
+        endsAt: string;
+      } | null;
+    };
+    GymMembershipPlan: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      gymId: string;
+      code: components["schemas"]["MembershipPlanCode"];
+      priceWon: number;
+      sortOrder: number;
+      isActive: boolean;
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      updatedAt: string;
+    };
+    /** @enum {string} */
+    MembershipPlanCode:
+      | "PERIOD_1M"
+      | "PERIOD_3M"
+      | "PERIOD_6M"
+      | "PERIOD_12M"
+      | "COUNT_DAY"
+      | "COUNT_3"
+      | "COUNT_5"
+      | "COUNT_10";
+    CheckInResult: {
+      /** Format: date-time */
+      endsAt: string;
+    };
+    CheckOutResult: {
+      ok: boolean;
+      /** Format: uuid */
+      createdSessionId: string | null;
+    };
+    PaginatedReviewListItem: {
+      items: components["schemas"]["ReviewListItem"][];
+      nextCursor: string | null;
+    };
+    ReviewListItem: components["schemas"]["Review"] & {
+      user: components["schemas"]["AuthorSummary"];
+    };
+    /** @enum {string} */
+    GymReviewFeature:
+      | "COOL_AIR"
+      | "WIDE_STRETCH"
+      | "VARIOUS_LEVEL"
+      | "KIND_STAFF"
+      | "EASY_PARKING"
+      | "SHOWER_ROOM"
+      | "CLEAN_FACILITY"
+      | "GOOD_VENT";
+    AuthorSummary: {
+      /** Format: uuid */
+      id: string;
+      nickname: string;
+      profileImage: string | null;
+    };
+    Review: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      userId: string;
+      /** Format: uuid */
+      gymId: string;
+      rating: number;
+      content: string;
+      /** @enum {string|null} */
+      perceivedDifficulty?:
+        | "EASY"
+        | "EASY_NORMAL"
+        | "NORMAL"
+        | "NORMAL_HARD"
+        | "HARD"
+        | null;
+      features: components["schemas"]["GymReviewFeature"][];
+      imageUrls: string[];
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      updatedAt: string;
+    };
+    CreateReviewBody: {
+      rating: number;
+      content: string;
+      /** @enum {string} */
+      perceivedDifficulty?:
+        | "EASY"
+        | "EASY_NORMAL"
+        | "NORMAL"
+        | "NORMAL_HARD"
+        | "HARD";
+      features?: components["schemas"]["GymReviewFeature"][];
+      imageUrls?: string[];
+    };
+    UpdateReviewBody: {
+      rating: number;
+      content: string;
+      /** @enum {string} */
+      perceivedDifficulty?:
+        | "EASY"
+        | "EASY_NORMAL"
+        | "NORMAL"
+        | "NORMAL_HARD"
+        | "HARD";
+      features?: components["schemas"]["GymReviewFeature"][];
+      imageUrls?: string[];
+    };
+    UserMe: {
+      /** Format: uuid */
+      id: string;
+      /** Format: email */
+      email: string;
+      nickname: string;
+      bio: string | null;
+      profileImage: string | null;
+      coverImage: string | null;
+      instagramId: string | null;
+      youtubeUrl: string | null;
+      maxDifficulty: components["schemas"]["Difficulty"] & unknown;
+      role: components["schemas"]["Role"];
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      updatedAt: string;
+      /** Format: uuid */
+      homeGymId: string | null;
+      checkInAutoDurationMinutes: number;
+      pushNotificationsEnabled: boolean;
+      homeGym: components["schemas"]["HomeGymSummary"];
+      _count: components["schemas"]["UserCounts"];
+      visitCount: number;
+      sendCount: number;
+      linkedProviders: ("KAKAO" | "GOOGLE")[];
+      activeCheckIn: components["schemas"]["ActiveCheckIn"];
+    };
+    HomeGymSummary: {
+      /** Format: uuid */
+      id: string;
+      name: string;
+    } | null;
+    UserCounts: {
+      following: number;
+      followers: number;
+      sessions: number;
+    };
+    ActiveCheckIn: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      gymId: string;
+      gymName: string;
+      /** Format: date-time */
+      startedAt: string;
+      /** Format: date-time */
+      endsAt: string;
+    } | null;
+    User: {
+      /** Format: uuid */
+      id: string;
+      /** Format: email */
+      email: string;
+      nickname: string;
+      bio: string | null;
+      profileImage: string | null;
+      coverImage: string | null;
+      instagramId: string | null;
+      youtubeUrl: string | null;
+      maxDifficulty: components["schemas"]["Difficulty"] & unknown;
+      role: components["schemas"]["Role"];
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      updatedAt: string;
+      /** Format: uuid */
+      homeGymId: string | null;
+      checkInAutoDurationMinutes: number;
+      pushNotificationsEnabled: boolean;
+      homeGym: components["schemas"]["HomeGymSummary"];
+    };
+    UpdateUserBody: {
+      nickname?: string;
+      bio?: string;
+      /** Format: uri */
+      profileImage?: string;
+      /** Format: uri */
+      coverImage?: string;
+      instagramId?: string;
+      /** Format: uri */
+      youtubeUrl?: string;
+      maxDifficulty?: components["schemas"]["Difficulty"];
+      checkInAutoDurationMinutes?: number;
+      /** Format: uuid */
+      homeGymId?: string | null;
+      pushNotificationsEnabled?: boolean;
+    };
+    MyCheckInItem: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      gymId: string;
+      gymName: string;
+      /** Format: date-time */
+      startedAt: string;
+      /** Format: date-time */
+      endsAt?: string;
+      /** Format: date-time */
+      endedAt?: string | null;
+    };
+    UserPushDevice: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      userId: string;
+      expoPushToken: string;
+      platform: components["schemas"]["PushPlatform"];
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      updatedAt: string;
+    };
+    /** @enum {string} */
+    PushPlatform: "ANDROID";
+    RegisterPushDeviceBody: {
+      token: string;
+      platform: components["schemas"]["PushPlatform"];
+    };
+    UserMembership: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      userId: string;
+      /** Format: uuid */
+      gymId: string;
+      /** Format: uuid */
+      planId: string;
+      /** Format: date-time */
+      startedAt: string;
+      remainingUses: number | null;
+      note?: string | null;
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      updatedAt: string;
+      startedDateYmd: string;
+      plan: {
+        /** Format: uuid */
+        id: string;
+        code: components["schemas"]["MembershipPlanCode"];
+        priceWon: number;
+        sortOrder: number;
+        isActive: boolean;
+      };
+      gym: {
+        /** Format: uuid */
+        id: string;
+        name: string;
+        membershipBrand: components["schemas"]["GymMembershipBrand"];
+        logoImageUrl?: string | null;
+      };
+      pauses: {
+        /** Format: uuid */
+        id: string;
+        startDateYmd: string;
+        endDateYmd: string;
+        /** Format: date-time */
+        createdAt: string;
+        /** Format: date-time */
+        updatedAt: string;
+      }[];
+      /** Format: date-time */
+      effectiveEndAt: string;
+      lastValidDateYmd: string;
+      isActive: boolean;
+    };
+    CreateUserMembershipBody: {
+      /** Format: uuid */
+      gymId: string;
+      /** Format: uuid */
+      planId: string;
+      startedDateYmd: string;
+      note?: string;
+    };
+    PatchUserMembershipBody: {
+      note?: string | null;
+      startedDateYmd?: string;
+    };
+    UserMembershipUsagePayload: {
+      membership: {
+        /** Format: uuid */
+        id: string;
+        /** Format: uuid */
+        gymId: string;
+        planCode: components["schemas"]["MembershipPlanCode"];
+        startedDateYmd: string;
+        lastValidDateYmd: string;
+        remainingUses: number | null;
+        remainingDays: number;
+        gym: {
+          /** Format: uuid */
+          id: string;
+          name: string;
+          membershipBrand: components["schemas"]["GymMembershipBrand"];
+          logoImageUrl?: string | null;
+        };
+      };
+      stats: {
+        totalUsed: number;
+        weeklyAverage: number;
+        usageRatePercent?: number | null;
+        initialCount?: number | null;
+      };
+      sessions: {
+        /** Format: uuid */
+        id: string;
+        /** Format: date-time */
+        date: string;
+        gymName: string;
+        gymLogoImageUrl?: string | null;
+        routeCount: number;
+      }[];
+    };
+    MembershipPauseItem: {
+      /** Format: uuid */
+      id: string;
+      startDateYmd: string;
+      endDateYmd: string;
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      updatedAt: string;
+    };
+    CreateMembershipPauseBody: {
+      startDateYmd: string;
+      endDateYmd: string;
+    };
+    PatchMembershipPauseBody: {
+      startDateYmd?: string;
+      endDateYmd?: string;
+    };
+    PaginatedFollowUser: {
+      items: components["schemas"]["AuthorSummary"][];
+      /** Format: uuid */
+      nextCursor: string | null;
+    };
+    PaginatedPostListItem: {
+      items: components["schemas"]["PostListItem"][];
+      nextCursor: string | null;
+    };
+    PostListItem: components["schemas"]["Post"] & {
+      author: components["schemas"]["AuthorSummary"];
+      likes?: {
+        /** Format: uuid */
+        id: string;
+      }[];
+      bookmarks?: {
+        /** Format: uuid */
+        id: string;
+      }[];
+    };
+    /** @enum {string} */
+    CommunityCategory: "FREE" | "TIPS" | "REVIEW" | "MEETUP" | "GEAR";
+    Post: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      authorId: string;
+      category: components["schemas"]["CommunityCategory"];
+      title: string;
+      content: string;
+      viewCount: number;
+      likeCount: number;
+      commentCount: number;
+      tags: string[];
+      imageUrls: string[];
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      updatedAt: string;
+    };
+    MeStatisticsPayload: {
+      /** @enum {string} */
+      period: "week" | "month" | "year" | "all";
+      anchor: string;
+      range: {
+        /** Format: date-time */
+        start: string;
+        /** Format: date-time */
+        end: string;
+        label: string;
+      };
+      previousRange: {
+        /** Format: date-time */
+        start: string;
+        /** Format: date-time */
+        end: string;
+      } | null;
+      kpis: {
+        totalSends: number;
+        sendDeltaPercent: number | null;
+        uniqueGyms: number;
+        sessionCount: number;
+        workoutMinutesTotal: number | null;
+      };
+      trend: {
+        peakBucketKey: string | null;
+        buckets: {
+          key: string;
+          sends: number;
+          label: string;
+        }[];
+      };
+      difficultyDistribution: {
+        difficulty: components["schemas"]["Difficulty"];
+        count: number;
+      }[];
+      sendAttempt: {
+        sendCount: number;
+        attemptCount: number;
+        totalRoutes: number;
+        percent: number | null;
+      };
+      topGyms: {
+        /** Format: uuid */
+        gymId: string;
+        name: string;
+        address: string;
+        coverImageUrl: string;
+        visitCount: number;
+      }[];
+      insights: {
+        /** @enum {string} */
+        variant: "primary" | "tertiary";
+        message: string;
+      }[];
+    };
+    UserProfile: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      homeGymId: string | null;
+      homeGym: components["schemas"]["HomeGymSummary"];
+      nickname: string;
+      bio: string | null;
+      profileImage: string | null;
+      coverImage: string | null;
+      instagramId: string | null;
+      youtubeUrl: string | null;
+      maxDifficulty: components["schemas"]["Difficulty"] & unknown;
+      /** Format: date-time */
+      createdAt: string;
+      _count: components["schemas"]["UserCounts"];
+      visitCount: number;
+      sendCount: number;
+      activityHeatmap: number[];
+      activityHeatmapDays: string[];
+      activityHeatmapSessionCount: number;
+      followers?: {
+        /** Format: uuid */
+        id: string;
+      }[];
+    };
+    PaginatedRecordListItem: {
+      items: components["schemas"]["RecordListItem"][];
+      nextCursor: string | null;
+    };
+    RecordListItem: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      userId: string;
+      /** Format: uuid */
+      gymId: string;
+      /** Format: uuid */
+      userMembershipId?: string | null;
+      /** Format: uuid */
+      gymCheckInId?: string | null;
+      /** Format: date-time */
+      date: string;
+      /** Format: date-time */
+      startTime: string | null;
+      /** Format: date-time */
+      endTime: string | null;
+      memo: string | null;
+      isPublic: boolean;
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      updatedAt: string;
+      gym: components["schemas"]["GymSummary"];
+      routes: components["schemas"]["Route"][];
+      imageUrls: string[];
+    };
+    GymSummary: {
+      /** Format: uuid */
+      id: string;
+      name: string;
+      logoImageUrl: string | null;
+      difficultyColors: components["schemas"]["GymDifficultyColor"][];
+    };
+    Route: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      sessionId: string;
+      difficulty: components["schemas"]["Difficulty"];
+      result: components["schemas"]["AttemptResult"];
+      attempts: number;
+      perceivedDifficulty?:
+        | components["schemas"]["GymPerceivedDifficulty"]
+        | unknown;
+      memo?: string | null;
+      order: number;
+      /** Format: date-time */
+      createdAt: string;
+    };
+    /** @enum {string} */
+    AttemptResult: "SEND" | "ATTEMPT" | "FLASH" | "ONSIGHT";
+    /** @enum {string} */
+    GymPerceivedDifficulty:
+      | "EASY"
+      | "EASY_NORMAL"
+      | "NORMAL"
+      | "NORMAL_HARD"
+      | "HARD";
+    RecordDetail: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      userId: string;
+      /** Format: uuid */
+      gymId: string;
+      /** Format: uuid */
+      userMembershipId?: string | null;
+      /** Format: uuid */
+      gymCheckInId?: string | null;
+      /** Format: date-time */
+      date: string;
+      /** Format: date-time */
+      startTime: string | null;
+      /** Format: date-time */
+      endTime: string | null;
+      memo: string | null;
+      isPublic: boolean;
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      updatedAt: string;
+      gym: {
+        /** Format: uuid */
+        id: string;
+        name: string;
+        address: string;
+        logoImageUrl?: string | null;
+      };
+      routes: components["schemas"]["Route"][];
+      imageUrls: string[];
+      user: components["schemas"]["AuthorSummary"];
+      userMembership?: components["schemas"]["RecordUserMembershipSummary"];
+    };
+    RecordUserMembershipSummary: {
+      /** Format: uuid */
+      id: string;
+      gym: {
+        /** Format: uuid */
+        id: string;
+        name: string;
+      };
+      plan: {
+        code: components["schemas"]["MembershipPlanCode"];
+      };
+    } | null;
+    CreateSessionBody: {
+      /** Format: uuid */
+      gymId: string;
+      /** Format: uuid */
+      userMembershipId?: string | null;
+      /** Format: uuid */
+      gymCheckInId?: string;
+      /** Format: date-time */
+      date: string;
+      /** Format: date-time */
+      startTime?: string;
+      /** Format: date-time */
+      endTime?: string;
+      memo?: string;
+      /** @default true */
+      isPublic: boolean;
+      routes?: components["schemas"]["CreateRouteBody"][];
+      imageUrls?: string[];
+    };
+    CreateRouteBody: {
+      difficulty: components["schemas"]["Difficulty"];
+      result: components["schemas"]["AttemptResult"];
+      /** @default 1 */
+      attempts: number;
+      memo?: string;
+    };
+    UpdateSessionBody: {
+      /** Format: uuid */
+      gymCheckInId?: string | null;
+      /** Format: date-time */
+      date?: string;
+      /** Format: uuid */
+      userMembershipId?: string | null;
+      /** Format: date-time */
+      startTime?: string;
+      /** Format: date-time */
+      endTime?: string;
+      memo?: string | null;
+      isPublic?: boolean;
+      routes?: components["schemas"]["CreateRouteBody"][];
+      imageUrls?: string[];
+    };
+    PostDetail: components["schemas"]["Post"] & {
+      author: components["schemas"]["AuthorSummary"];
+      likes?: {
+        /** Format: uuid */
+        id: string;
+      }[];
+      bookmarks?: {
+        /** Format: uuid */
+        id: string;
+      }[];
+    };
+    CreatePostBody: {
+      category: components["schemas"]["CommunityCategory"];
+      title: string;
+      content: string;
+      tags?: string[];
+      imageUrls?: string[];
+    };
+    UpdatePostBody: {
+      title?: string;
+      content?: string;
+      category?: components["schemas"]["CommunityCategory"];
+      tags?: string[];
+      imageUrls?: string[];
+    };
+    PaginatedCommentListItem: {
+      items: components["schemas"]["CommentListItem"][];
+      nextCursor: string | null;
+    };
+    CommentListItem: components["schemas"]["CommentWithAuthor"] & {
+      replies: components["schemas"]["CommentWithAuthor"][];
+    };
+    CommentWithAuthor: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      postId: string;
+      /** Format: uuid */
+      authorId: string;
+      /** Format: uuid */
+      parentId: string | null;
+      content: string;
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      updatedAt: string;
+      author: components["schemas"]["AuthorSummary"];
+    };
+    CreateCommentBody: {
+      content: string;
+      /** Format: uuid */
+      parentId?: string;
+    };
+    UpdateCommentBody: {
+      content: string;
+    };
+    PaginatedNotification: {
+      items: components["schemas"]["Notification"][];
+      nextCursor: string | null;
+    };
+    Notification: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      userId: string;
+      type: components["schemas"]["NotificationType"];
+      title: string;
+      message: string;
+      isRead: boolean;
+      link?: string | null;
+      /** Format: uuid */
+      commentId?: string | null;
+      /** Format: date-time */
+      createdAt: string;
+    };
+    /** @enum {string} */
+    NotificationType:
+      | "COMMENT"
+      | "POST_COMMENT"
+      | "COMMENT_REPLY"
+      | "LIKE"
+      | "FOLLOW"
+      | "SYSTEM"
+      | "GYM_UPDATE"
+      | "AUTO_CHECKOUT";
+  };
+  responses: never;
+  parameters: never;
+  requestBodies: never;
+  headers: never;
+  pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    getGyms: {
-        parameters: {
-            query?: {
-                cursor?: string;
-                limit?: number;
-                region?: components["schemas"]["Region"];
-                search?: string;
-                sort?: "name" | "rating" | "congestion" | "reviewCount" | "visitorCount" | "monthlyCheckInCount";
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: components["schemas"]["PaginatedGymListItem"];
-                    };
-                };
-            };
-        };
+  getGyms: {
+    parameters: {
+      query?: {
+        cursor?: string;
+        limit?: number;
+        region?: components["schemas"]["Region"];
+        search?: string;
+        sort?:
+          | "name"
+          | "rating"
+          | "congestion"
+          | "reviewCount"
+          | "visitorCount"
+          | "monthlyCheckInCount";
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    getGym: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                gymId: string;
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: components["schemas"]["GymDetail"];
-                    };
-                };
-            };
+        content: {
+          "application/json": {
+            payload: components["schemas"]["PaginatedGymListItem"];
+          };
         };
+      };
     };
-    getGymMembershipPlans: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                gymId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: components["schemas"]["GymMembershipPlan"][];
-                    };
-                };
-            };
-            /** @description Not Found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
+  };
+  getGym: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        gymId: string;
+      };
+      cookie?: never;
     };
-    checkInGym: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                gymId: string;
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        toast: string;
-                        payload: components["schemas"]["CheckInResult"];
-                    };
-                };
-            };
+        content: {
+          "application/json": {
+            payload: components["schemas"]["GymDetail"];
+          };
         };
+      };
     };
-    checkOutGym: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                gymId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        toast: string;
-                        payload: components["schemas"]["CheckOutResult"];
-                    };
-                };
-            };
-        };
+  };
+  getGymMembershipPlans: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        gymId: string;
+      };
+      cookie?: never;
     };
-    getGymReviews: {
-        parameters: {
-            query?: {
-                cursor?: string;
-                limit?: number;
-            };
-            header?: never;
-            path: {
-                gymId: string;
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: components["schemas"]["PaginatedReviewListItem"];
-                    };
-                };
-            };
+        content: {
+          "application/json": {
+            payload: components["schemas"]["GymMembershipPlan"][];
+          };
         };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
     };
-    createReview: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                gymId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateReviewBody"];
-            };
-        };
-        responses: {
-            /** @description Created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        toast: string;
-                        payload: components["schemas"]["Review"];
-                    };
-                };
-            };
-        };
+  };
+  checkInGym: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        gymId: string;
+      };
+      cookie?: never;
     };
-    getMyGymReview: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                gymId: string;
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: components["schemas"]["ReviewListItem"] | null;
-                    };
-                };
-            };
-            /** @description Unauthorized */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
+        content: {
+          "application/json": {
+            payload: components["schemas"]["CheckInResult"];
+          };
         };
+      };
     };
-    getGymReviewById: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                gymId: string;
-                reviewId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: components["schemas"]["ReviewListItem"];
-                    };
-                };
-            };
-            /** @description Not Found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
+  };
+  checkOutGym: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        gymId: string;
+      };
+      cookie?: never;
     };
-    updateGymReview: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                gymId: string;
-                reviewId: string;
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateReviewBody"];
-            };
+        content: {
+          "application/json": {
+            payload: components["schemas"]["CheckOutResult"];
+          };
         };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        toast: string;
-                        payload: components["schemas"]["Review"];
-                    };
-                };
-            };
-            /** @description Forbidden */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Not Found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
+      };
     };
-    getRecords: {
-        parameters: {
-            query?: {
-                cursor?: string;
-                limit?: number;
-                month?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: components["schemas"]["PaginatedRecordListItem"];
-                    };
-                };
-            };
-        };
+  };
+  getGymReviews: {
+    parameters: {
+      query?: {
+        cursor?: string;
+        limit?: number;
+      };
+      header?: never;
+      path: {
+        gymId: string;
+      };
+      cookie?: never;
     };
-    createRecord: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateSessionBody"];
-            };
+        content: {
+          "application/json": {
+            payload: components["schemas"]["PaginatedReviewListItem"];
+          };
         };
-        responses: {
-            /** @description Created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        toast: string;
-                        payload: components["schemas"]["RecordDetail"];
-                    };
-                };
-            };
-        };
+      };
     };
-    getRecord: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                recordId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: components["schemas"]["RecordDetail"];
-                    };
-                };
-            };
-        };
+  };
+  createGymReview: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        gymId: string;
+      };
+      cookie?: never;
     };
-    deleteRecord: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                recordId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        toast: string;
-                        payload: null;
-                    };
-                };
-            };
-        };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["CreateReviewBody"];
+      };
     };
-    updateRecord: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                recordId: string;
-            };
-            cookie?: never;
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateSessionBody"];
-            };
+        content: {
+          "application/json": {
+            toast: string;
+            payload: components["schemas"]["Review"];
+          };
         };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        toast: string;
-                        payload: components["schemas"]["RecordDetail"];
-                    };
-                };
-            };
-        };
+      };
     };
-    getPosts: {
-        parameters: {
-            query?: {
-                cursor?: string;
-                limit?: number;
-                category?: components["schemas"]["CommunityCategory"];
-                search?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: components["schemas"]["PaginatedPostListItem"];
-                    };
-                };
-            };
-        };
+  };
+  getMyGymReview: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        gymId: string;
+      };
+      cookie?: never;
     };
-    createPost: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreatePostBody"];
-            };
+        content: {
+          "application/json": {
+            payload: components["schemas"]["Review"] & unknown;
+          };
         };
-        responses: {
-            /** @description Created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        toast: string;
-                        payload: components["schemas"]["Post"];
-                    };
-                };
-            };
-        };
+      };
     };
-    getPost: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                postId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: components["schemas"]["PostDetail"];
-                    };
-                };
-            };
-        };
+  };
+  getGymReview: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        gymId: string;
+        reviewId: string;
+      };
+      cookie?: never;
     };
-    deletePost: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                postId: string;
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        toast: string;
-                        payload: null;
-                    };
-                };
-            };
+        content: {
+          "application/json": {
+            payload: components["schemas"]["Review"];
+          };
         };
+      };
     };
-    updatePost: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                postId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdatePostBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        toast: string;
-                        payload: components["schemas"]["Post"];
-                    };
-                };
-            };
-        };
+  };
+  deleteGymReview: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        gymId: string;
+        reviewId: string;
+      };
+      cookie?: never;
     };
-    recordPostView: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                postId: string;
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description 삭제됨 */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: {
-                            viewCount: number;
-                        };
-                    };
-                };
-            };
-        };
+        content?: never;
+      };
     };
-    togglePostLike: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                postId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: {
-                            liked: boolean;
-                        };
-                    };
-                };
-            };
-        };
+  };
+  updateGymReview: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        gymId: string;
+        reviewId: string;
+      };
+      cookie?: never;
     };
-    togglePostBookmark: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                postId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: {
-                            bookmarked: boolean;
-                        };
-                    };
-                };
-            };
-        };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["UpdateReviewBody"];
+      };
     };
-    getPostComments: {
-        parameters: {
-            query?: {
-                cursor?: string;
-                limit?: number;
-            };
-            header?: never;
-            path: {
-                postId: string;
-            };
-            cookie?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: components["schemas"]["PaginatedCommentListItem"];
-                    };
-                };
-            };
+        content: {
+          "application/json": {
+            toast: string;
+            payload: components["schemas"]["Review"];
+          };
         };
+      };
     };
-    createComment: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                postId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateCommentBody"];
-            };
-        };
-        responses: {
-            /** @description Created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        toast: string;
-                        payload: components["schemas"]["CommentWithAuthor"];
-                    };
-                };
-            };
-        };
+  };
+  getMe: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    deleteComment: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                postId: string;
-                commentId: string;
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        toast: string;
-                        payload: null;
-                    };
-                };
-            };
+        content: {
+          "application/json": {
+            payload: components["schemas"]["UserMe"];
+          };
         };
+      };
     };
-    updateComment: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                postId: string;
-                commentId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateCommentBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        toast: string;
-                        payload: components["schemas"]["CommentWithAuthor"];
-                    };
-                };
-            };
-        };
+  };
+  deleteMe: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    getMe: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: components["schemas"]["UserMe"] | null;
-                    };
-                };
-            };
+        content: {
+          "application/json": {
+            toast: string;
+            payload?: unknown;
+          };
         };
+      };
     };
-    deleteMe: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        toast: string;
-                        payload: unknown;
-                    };
-                };
-            };
-        };
+  };
+  updateMe: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    updateMe: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateUserBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        toast: string;
-                        payload: components["schemas"]["User"];
-                    };
-                };
-            };
-        };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["UpdateUserBody"];
+      };
     };
-    getMyCheckIns: {
-        parameters: {
-            query?: {
-                /** @description true면 기록 폼에 연결 가능한 체크인만 반환 */
-                linkableOnly?: boolean;
-                /** @description linkableOnly와 함께 사용. 해당 기록(세션)에만 연결된 체크인도 목록에 포함(수정 폼에서 재선택용) */
-                forSessionId?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: {
-                            items: components["schemas"]["MyCheckInItem"][];
-                        };
-                    };
-                };
-            };
-            /** @description Unauthorized */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
+        content: {
+          "application/json": {
+            toast: string;
+            payload: components["schemas"]["User"];
+          };
         };
+      };
     };
-    registerPushDevice: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RegisterPushDeviceBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: components["schemas"]["UserPushDevice"];
-                    };
-                };
-            };
-            /** @description Unauthorized */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
+  };
+  getMyCheckIns: {
+    parameters: {
+      query?: {
+        linkableOnly?: boolean | null;
+        forSessionId?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    deletePushDevice: {
-        parameters: {
-            query: {
-                /** @description 삭제할 Expo Push Token */
-                token: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: Record<string, never> | null;
-                    };
-                };
+        content: {
+          "application/json": {
+            payload: {
+              items: components["schemas"]["MyCheckInItem"][];
             };
-            /** @description Unauthorized */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
+          };
         };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
     };
-    getMyMemberships: {
-        parameters: {
-            query?: {
-                gymId?: string;
-                activeOnly?: "true" | "false";
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: components["schemas"]["UserMembership"][];
-                    };
-                };
-            };
-            /** @description Unauthorized */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
+  };
+  registerPushDevice: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    createMyMembership: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateUserMembershipBody"];
-            };
-        };
-        responses: {
-            /** @description Created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        toast: string;
-                        payload: components["schemas"]["UserMembership"];
-                    };
-                };
-            };
-        };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["RegisterPushDeviceBody"];
+      };
     };
-    getMyMembershipById: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                userMembershipId: string;
-            };
-            cookie?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: components["schemas"]["UserMembership"];
-                    };
-                };
-            };
-            /** @description Unauthorized */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Not Found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
+        content: {
+          "application/json": {
+            payload: components["schemas"]["UserPushDevice"];
+          };
         };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
     };
-    deleteMyMembership: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                userMembershipId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        toast: string;
-                        payload: {
-                            ok: boolean;
-                        };
-                    };
-                };
-            };
-        };
+  };
+  deletePushDevice: {
+    parameters: {
+      query: {
+        token: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    patchMyMembership: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                userMembershipId: string;
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PatchUserMembershipBody"];
-            };
+        content: {
+          "application/json": {
+            payload?: unknown;
+          };
         };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        toast: string;
-                        payload: components["schemas"]["UserMembership"];
-                    };
-                };
-            };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
         };
+        content?: never;
+      };
     };
-    getMyMembershipUsage: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                userMembershipId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: components["schemas"]["UserMembershipUsagePayload"];
-                    };
-                };
-            };
-            /** @description Unauthorized */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Not Found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
+  };
+  getMyMemberships: {
+    parameters: {
+      query?: {
+        gymId?: string;
+        activeOnly?: "true" | "false";
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    createMembershipPause: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                userMembershipId: string;
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateMembershipPauseBody"];
-            };
+        content: {
+          "application/json": {
+            payload: components["schemas"]["UserMembership"][];
+          };
         };
-        responses: {
-            /** @description Created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        toast: string;
-                        payload: components["schemas"]["UserMembership"];
-                    };
-                };
-            };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
         };
+        content?: never;
+      };
     };
-    deleteMembershipPause: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                userMembershipId: string;
-                pauseId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        toast: string;
-                        payload: components["schemas"]["UserMembership"];
-                    };
-                };
-            };
-        };
+  };
+  createMyMembership: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    patchMembershipPause: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                userMembershipId: string;
-                pauseId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PatchMembershipPauseBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        toast: string;
-                        payload: components["schemas"]["UserMembership"];
-                    };
-                };
-            };
-        };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["CreateUserMembershipBody"];
+      };
     };
-    getMyNicknameAvailability: {
-        parameters: {
-            query: {
-                nickname: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: {
-                            available: boolean;
-                        };
-                    };
-                };
-            };
+        content: {
+          "application/json": {
+            toast: string;
+            payload: components["schemas"]["UserMembership"];
+          };
         };
+      };
     };
-    getMyFollowers: {
-        parameters: {
-            query?: {
-                cursor?: string;
-                limit?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: components["schemas"]["PaginatedFollowUser"];
-                    };
-                };
-            };
-        };
+  };
+  getMyMembershipById: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        userMembershipId: string;
+      };
+      cookie?: never;
     };
-    getMyFollowing: {
-        parameters: {
-            query?: {
-                cursor?: string;
-                limit?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: components["schemas"]["PaginatedFollowUser"];
-                    };
-                };
-            };
+        content: {
+          "application/json": {
+            payload: components["schemas"]["UserMembership"];
+          };
         };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
     };
-    getMyBookmarkedPosts: {
-        parameters: {
-            query?: {
-                cursor?: string;
-                limit?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: components["schemas"]["PaginatedPostListItem"];
-                    };
-                };
-            };
-        };
+  };
+  deleteMyMembership: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        userMembershipId: string;
+      };
+      cookie?: never;
     };
-    getMyLikedPosts: {
-        parameters: {
-            query?: {
-                cursor?: string;
-                limit?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: components["schemas"]["PaginatedPostListItem"];
-                    };
-                };
-            };
+        content: {
+          "application/json": {
+            toast: string;
+            payload?: unknown;
+          };
         };
+      };
     };
-    getMyStatistics: {
-        parameters: {
-            query: {
-                period: "week" | "month" | "year" | "all";
-                /** @description 기준일 yyyy-MM-dd (미입력 시 오늘) */
-                anchor?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: components["schemas"]["MeStatisticsPayload"];
-                    };
-                };
-            };
-        };
+  };
+  patchMyMembership: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        userMembershipId: string;
+      };
+      cookie?: never;
     };
-    getUser: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                userId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: components["schemas"]["UserProfile"];
-                    };
-                };
-            };
-        };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PatchUserMembershipBody"];
+      };
     };
-    toggleFollow: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                userId: string;
-            };
-            cookie?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: {
-                            following: boolean;
-                        };
-                    };
-                };
-            };
+        content: {
+          "application/json": {
+            toast: string;
+            payload: components["schemas"]["UserMembership"];
+          };
         };
+      };
     };
-    getUserFollowers: {
-        parameters: {
-            query?: {
-                cursor?: string;
-                limit?: number;
-            };
-            header?: never;
-            path: {
-                userId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: components["schemas"]["PaginatedFollowUser"];
-                    };
-                };
-            };
-        };
+  };
+  getMyMembershipUsage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        userMembershipId: string;
+      };
+      cookie?: never;
     };
-    getUserFollowing: {
-        parameters: {
-            query?: {
-                cursor?: string;
-                limit?: number;
-            };
-            header?: never;
-            path: {
-                userId: string;
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: components["schemas"]["PaginatedFollowUser"];
-                    };
-                };
-            };
+        content: {
+          "application/json": {
+            payload: components["schemas"]["UserMembershipUsagePayload"];
+          };
         };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
     };
-    getUserPublicRecords: {
-        parameters: {
-            query?: {
-                cursor?: string;
-                limit?: number;
-                /** @description 방문일 필터 (yyyy-MM-dd) */
-                day?: string;
-            };
-            header?: never;
-            path: {
-                userId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: components["schemas"]["PaginatedRecordListItem"];
-                    };
-                };
-            };
-        };
+  };
+  getMyMembershipPauses: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        userMembershipId: string;
+      };
+      cookie?: never;
     };
-    getCompletionWeekStats: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: {
-                            points: {
-                                /** Format: date */
-                                date: string;
-                                count: number;
-                            }[];
-                        };
-                    };
-                };
-            };
+        content: {
+          "application/json": {
+            payload: components["schemas"]["MembershipPauseItem"][];
+          };
         };
+      };
     };
-    getNotifications: {
-        parameters: {
-            query?: {
-                cursor?: string;
-                limit?: number;
-                type?: components["schemas"]["NotificationType"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: components["schemas"]["PaginatedNotification"];
-                    };
-                };
-            };
-        };
+  };
+  createMyMembershipPause: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        userMembershipId: string;
+      };
+      cookie?: never;
     };
-    markNotificationsRead: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        toast: string;
-                        payload: null;
-                    };
-                };
-            };
-        };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["CreateMembershipPauseBody"];
+      };
     };
-    getNotificationsUnreadCount: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: {
-                            count: number;
-                        };
-                    };
-                };
-            };
-            /** @description Unauthorized */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
+        content: {
+          "application/json": {
+            toast: string;
+            payload: components["schemas"]["MembershipPauseItem"];
+          };
         };
+      };
     };
-    deleteNotification: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        toast: string;
-                        payload: null;
-                    };
-                };
-            };
-            /** @description Unauthorized */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Not Found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
+  };
+  deleteMyMembershipPause: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        userMembershipId: string;
+        pauseId: string;
+      };
+      cookie?: never;
     };
-    patchNotification: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": {
-                    /** @enum {boolean} */
-                    isRead: true;
-                };
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        toast: string;
-                        payload: components["schemas"]["Notification"];
-                    };
-                };
-            };
-            /** @description Unauthorized */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Not Found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
+        content?: never;
+      };
     };
-    getPresignedUrl: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    /** @description 원본 파일명 (확장자 포함) */
-                    filename: string;
-                    /** @description image/* 또는 video/* */
-                    contentType: string;
-                    /**
-                     * @description S3 경로 세그먼트 (images | videos)
-                     * @enum {string}
-                     */
-                    type: "images" | "videos";
-                };
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        payload: {
-                            presignedUrl: string;
-                            publicUrl: string;
-                            /** @description {development|production}/{images|videos}/{name}_{ts}.{ext} */
-                            key: string;
-                            bucket: string;
-                            /** @enum {string} */
-                            type: "images" | "videos";
-                        };
-                    };
-                };
-            };
-        };
+  };
+  patchMyMembershipPause: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        userMembershipId: string;
+        pauseId: string;
+      };
+      cookie?: never;
     };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PatchMembershipPauseBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            toast: string;
+            payload: components["schemas"]["MembershipPauseItem"];
+          };
+        };
+      };
+    };
+  };
+  checkNicknameAvailability: {
+    parameters: {
+      query: {
+        nickname: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            payload: {
+              available: boolean;
+            };
+          };
+        };
+      };
+    };
+  };
+  getMyFollowers: {
+    parameters: {
+      query?: {
+        cursor?: string;
+        limit?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            payload: components["schemas"]["PaginatedFollowUser"];
+          };
+        };
+      };
+    };
+  };
+  getMyFollowing: {
+    parameters: {
+      query?: {
+        cursor?: string;
+        limit?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            payload: components["schemas"]["PaginatedFollowUser"];
+          };
+        };
+      };
+    };
+  };
+  getMyBookmarkedPosts: {
+    parameters: {
+      query?: {
+        cursor?: string;
+        limit?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            payload: components["schemas"]["PaginatedPostListItem"];
+          };
+        };
+      };
+    };
+  };
+  getMyLikedPosts: {
+    parameters: {
+      query?: {
+        cursor?: string;
+        limit?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            payload: components["schemas"]["PaginatedPostListItem"];
+          };
+        };
+      };
+    };
+  };
+  getMeStatistics: {
+    parameters: {
+      query?: {
+        period?: "week" | "month" | "year" | "all";
+        anchor?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            payload: components["schemas"]["MeStatisticsPayload"];
+          };
+        };
+      };
+    };
+  };
+  getUserProfile: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        userId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            payload: components["schemas"]["UserProfile"];
+          };
+        };
+      };
+    };
+  };
+  followUser: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        userId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  unfollowUser: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        userId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getUserFollowers: {
+    parameters: {
+      query?: {
+        cursor?: string;
+        limit?: number;
+      };
+      header?: never;
+      path: {
+        userId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            payload: components["schemas"]["PaginatedFollowUser"];
+          };
+        };
+      };
+    };
+  };
+  getUserFollowing: {
+    parameters: {
+      query?: {
+        cursor?: string;
+        limit?: number;
+      };
+      header?: never;
+      path: {
+        userId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            payload: components["schemas"]["PaginatedFollowUser"];
+          };
+        };
+      };
+    };
+  };
+  getUserPublicRecords: {
+    parameters: {
+      query?: {
+        cursor?: string;
+        limit?: number;
+      };
+      header?: never;
+      path: {
+        userId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            payload: components["schemas"]["PaginatedRecordListItem"];
+          };
+        };
+      };
+    };
+  };
+  getRecords: {
+    parameters: {
+      query?: {
+        cursor?: string;
+        limit?: number;
+        userId?: string;
+        gymId?: string;
+        month?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 목록 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            payload: components["schemas"]["PaginatedRecordListItem"];
+          };
+        };
+      };
+    };
+  };
+  createRecord: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["CreateSessionBody"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            toast?: {
+              /** @enum {string} */
+              type?: "success" | "error" | "info";
+              title?: string;
+              description?: string;
+            };
+            payload: components["schemas"]["RecordDetail"];
+          };
+        };
+      };
+    };
+  };
+  getRecord: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        recordId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            payload: components["schemas"]["RecordDetail"];
+          };
+        };
+      };
+    };
+  };
+  deleteRecord: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        recordId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 삭제됨 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updateRecord: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        recordId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["UpdateSessionBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            toast?: {
+              /** @enum {string} */
+              type?: "success" | "error" | "info";
+              title?: string;
+              description?: string;
+            };
+            payload: components["schemas"]["RecordDetail"];
+          };
+        };
+      };
+    };
+  };
+  getPosts: {
+    parameters: {
+      query?: {
+        cursor?: string;
+        limit?: number;
+        category?: string;
+        search?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            payload: components["schemas"]["PaginatedPostListItem"];
+          };
+        };
+      };
+    };
+  };
+  createPost: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["CreatePostBody"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            toast?: {
+              /** @enum {string} */
+              type?: "success" | "error" | "info";
+              title?: string;
+              description?: string;
+            };
+            payload: components["schemas"]["PostDetail"];
+          };
+        };
+      };
+    };
+  };
+  getPost: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        postId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            payload: components["schemas"]["PostDetail"];
+          };
+        };
+      };
+    };
+  };
+  deletePost: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        postId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 삭제됨 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updatePost: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        postId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["UpdatePostBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            toast?: {
+              /** @enum {string} */
+              type?: "success" | "error" | "info";
+              title?: string;
+              description?: string;
+            };
+            payload: components["schemas"]["PostDetail"];
+          };
+        };
+      };
+    };
+  };
+  getComments: {
+    parameters: {
+      query?: {
+        cursor?: string;
+        limit?: number;
+      };
+      header?: never;
+      path: {
+        postId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            payload: components["schemas"]["PaginatedCommentListItem"];
+          };
+        };
+      };
+    };
+  };
+  createComment: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        postId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["CreateCommentBody"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            toast?: {
+              /** @enum {string} */
+              type?: "success" | "error" | "info";
+              title?: string;
+              description?: string;
+            };
+            payload?: unknown;
+          };
+        };
+      };
+    };
+  };
+  deleteComment: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        postId: string;
+        commentId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description 삭제됨 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updateComment: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        postId: string;
+        commentId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["UpdateCommentBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            toast?: {
+              /** @enum {string} */
+              type?: "success" | "error" | "info";
+              title?: string;
+              description?: string;
+            };
+            payload?: unknown;
+          };
+        };
+      };
+    };
+  };
+  likePost: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        postId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  unlikePost: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        postId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  bookmarkPost: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        postId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  unbookmarkPost: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        postId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  viewPost: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        postId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getNotifications: {
+    parameters: {
+      query?: {
+        cursor?: string;
+        limit?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            payload: components["schemas"]["PaginatedNotification"];
+          };
+        };
+      };
+    };
+  };
+  deleteNotification: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  patchNotification: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": {
+          isRead: boolean;
+        };
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            payload: components["schemas"]["Notification"];
+          };
+        };
+      };
+    };
+  };
+  readAllNotifications: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getUnreadNotificationCount: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            payload: {
+              count: number;
+            };
+          };
+        };
+      };
+    };
+  };
+  getCompletionWeekStats: {
+    parameters: {
+      query?: {
+        anchor?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            payload: {
+              points: {
+                date: string;
+                count: number;
+              }[];
+            };
+          };
+        };
+      };
+    };
+  };
+  createPresignedUploadUrl: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": {
+          filename: string;
+          contentType: string;
+          /** @enum {string} */
+          type: "images" | "videos";
+        };
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            payload: {
+              /** Format: uri */
+              presignedUrl: string;
+              key: string;
+              /** Format: uri */
+              publicUrl: string;
+            };
+          };
+        };
+      };
+    };
+  };
 }

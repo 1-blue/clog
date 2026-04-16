@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useState } from "react";
 import { motion } from "motion/react";
+import { useCallback, useState } from "react";
 
 import ImageCarouselLightboxDialog from "#web/components/shared/image-carousel-lightbox/ImageCarouselLightboxDialog";
 import { cn } from "#web/libs/utils";
@@ -52,9 +52,7 @@ const LandingVisualPlaceholder: React.FC<IProps> = ({ variant }) => {
         <div
           className={cn(
             "grid gap-3 sm:gap-4",
-            variant === "hero"
-              ? "grid-cols-3"
-              : "grid-cols-3",
+            variant === "hero" ? "grid-cols-3" : "grid-cols-3",
           )}
         >
           {images.map((img, i) => (

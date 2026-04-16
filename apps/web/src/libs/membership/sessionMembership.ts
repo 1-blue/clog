@@ -1,7 +1,5 @@
+import { isCountPlanCode, type TMembershipPlanCode } from "@clog/contracts";
 import type { MembershipPause, Prisma } from "@clog/db";
-
-import type { TMembershipPlanCode } from "@clog/utils";
-import { isCountPlanCode } from "@clog/utils";
 
 import {
   isSessionDateWithinMembership,
