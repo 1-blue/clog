@@ -40,11 +40,17 @@ CREATE TYPE "GymMembershipBrand" AS ENUM ('THE_CLIMB', 'SEOULFOREST', 'CLIMBINGP
 -- CreateEnum
 CREATE TYPE "PushPlatform" AS ENUM ('ANDROID');
 
+-- CreateEnum
+CREATE TYPE "AdminAuditAction" AS ENUM ('CREATE', 'UPDATE', 'DELETE', 'CLOSE', 'REOPEN', 'ROLE_CHANGE');
+
 -- CreateTable
 CREATE TABLE "users" (
     "id" UUID NOT NULL,
+    "name" TEXT,
     "email" TEXT NOT NULL,
-    "nickname" TEXT NOT NULL,
+    "email_verified" TIMESTAMP(3),
+    "image" TEXT,
+    "nickname" TEXT NOT NULL DEFAULT '',
     "bio" TEXT,
     "profile_image" TEXT,
     "cover_image" TEXT,
@@ -94,14 +100,35 @@ CREATE TABLE "api_error_logs" (
 CREATE TABLE "accounts" (
     "id" UUID NOT NULL,
     "user_id" UUID NOT NULL,
-    "provider" "Provider" NOT NULL,
+    "type" TEXT NOT NULL,
+    "provider" TEXT NOT NULL,
     "provider_account_id" TEXT NOT NULL,
-    "access_token" TEXT,
     "refresh_token" TEXT,
+    "access_token" TEXT,
     "expires_at" INTEGER,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "token_type" TEXT,
+    "scope" TEXT,
+    "id_token" TEXT,
+    "session_state" TEXT,
 
     CONSTRAINT "accounts_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "nextauth_sessions" (
+    "id" UUID NOT NULL,
+    "session_token" TEXT NOT NULL,
+    "user_id" UUID NOT NULL,
+    "expires" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "nextauth_sessions_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "verification_tokens" (
+    "identifier" TEXT NOT NULL,
+    "token" TEXT NOT NULL,
+    "expires" TIMESTAMP(3) NOT NULL
 );
 
 -- CreateTable
@@ -139,6 +166,9 @@ CREATE TABLE "gyms" (
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
     "membership_brand" "GymMembershipBrand" NOT NULL,
+    "is_closed" BOOLEAN NOT NULL DEFAULT false,
+    "closed_at" TIMESTAMP(3),
+    "closed_reason" TEXT,
     "facilities" "GymFacilityType"[] DEFAULT ARRAY[]::"GymFacilityType"[],
 
     CONSTRAINT "gyms_pkey" PRIMARY KEY ("id")
@@ -357,6 +387,23 @@ CREATE TABLE "notifications" (
     CONSTRAINT "notifications_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "admin_audit_logs" (
+    "id" UUID NOT NULL,
+    "actor_id" UUID NOT NULL,
+    "action" "AdminAuditAction" NOT NULL,
+    "target_type" TEXT NOT NULL,
+    "target_id" TEXT NOT NULL,
+    "target_label" TEXT,
+    "before" JSONB,
+    "after" JSONB,
+    "note" TEXT,
+    "request_meta" JSONB,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "admin_audit_logs_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
@@ -376,6 +423,15 @@ CREATE INDEX "api_error_logs_user_id_idx" ON "api_error_logs"("user_id");
 CREATE UNIQUE INDEX "accounts_provider_provider_account_id_key" ON "accounts"("provider", "provider_account_id");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "nextauth_sessions_session_token_key" ON "nextauth_sessions"("session_token");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "verification_tokens_token_key" ON "verification_tokens"("token");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "verification_tokens_identifier_token_key" ON "verification_tokens"("identifier", "token");
+
+-- CreateIndex
 CREATE INDEX "follows_following_id_idx" ON "follows"("following_id");
 
 -- CreateIndex
@@ -383,6 +439,9 @@ CREATE UNIQUE INDEX "follows_follower_id_following_id_key" ON "follows"("followe
 
 -- CreateIndex
 CREATE INDEX "gyms_membership_brand_idx" ON "gyms"("membership_brand");
+
+-- CreateIndex
+CREATE INDEX "gyms_is_closed_idx" ON "gyms"("is_closed");
 
 -- CreateIndex
 CREATE INDEX "gym_membership_plans_gym_id_idx" ON "gym_membership_plans"("gym_id");
@@ -456,6 +515,15 @@ CREATE INDEX "notifications_user_id_idx" ON "notifications"("user_id");
 -- CreateIndex
 CREATE INDEX "notifications_comment_id_idx" ON "notifications"("comment_id");
 
+-- CreateIndex
+CREATE INDEX "admin_audit_logs_actor_id_idx" ON "admin_audit_logs"("actor_id");
+
+-- CreateIndex
+CREATE INDEX "admin_audit_logs_target_type_target_id_idx" ON "admin_audit_logs"("target_type", "target_id");
+
+-- CreateIndex
+CREATE INDEX "admin_audit_logs_created_at_idx" ON "admin_audit_logs"("created_at");
+
 -- AddForeignKey
 ALTER TABLE "users" ADD CONSTRAINT "users_home_gym_id_fkey" FOREIGN KEY ("home_gym_id") REFERENCES "gyms"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
@@ -467,6 +535,9 @@ ALTER TABLE "api_error_logs" ADD CONSTRAINT "api_error_logs_user_id_fkey" FOREIG
 
 -- AddForeignKey
 ALTER TABLE "accounts" ADD CONSTRAINT "accounts_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "nextauth_sessions" ADD CONSTRAINT "nextauth_sessions_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "follows" ADD CONSTRAINT "follows_follower_id_fkey" FOREIGN KEY ("follower_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -560,3 +631,6 @@ ALTER TABLE "notifications" ADD CONSTRAINT "notifications_user_id_fkey" FOREIGN 
 
 -- AddForeignKey
 ALTER TABLE "notifications" ADD CONSTRAINT "notifications_comment_id_fkey" FOREIGN KEY ("comment_id") REFERENCES "comments"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "admin_audit_logs" ADD CONSTRAINT "admin_audit_logs_actor_id_fkey" FOREIGN KEY ("actor_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -6,7 +6,7 @@ import {
 } from "@clog/contracts";
 import { prisma } from "@clog/db/prisma";
 
-import { getSearchParams, json, requireAuth } from "#web/libs/api";
+import { errorResponse, getSearchParams, json, requireAuth } from "#web/libs/api";
 import { catchApiError } from "#web/libs/api/errorCatch";
 
 const platformToPrisma = {
@@ -19,6 +19,14 @@ export const POST = async (request: Request) => {
   if (error) return error;
 
   try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId! },
+      select: { id: true },
+    });
+    if (!user) {
+      return errorResponse("세션이 유효하지 않습니다. 다시 로그인해 주세요.", 401);
+    }
+
     const body = await request.json();
     const { token, platform } = registerPushDeviceSchema.parse(body);
     const prismaPlatform = platformToPrisma[platform];

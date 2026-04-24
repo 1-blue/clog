@@ -84,14 +84,63 @@ const WebViewScreen: React.FC<IProps> = ({ path = "", authCallbackUrl }) => {
     const script = `
 (function(){
   var t = ${JSON.stringify(token)};
-  var url = window.location.origin + '/api/v1/users/me/push-device';
-  fetch(url, {
-    method: 'POST',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ token: t, platform: 'ANDROID' })
-  })
-    .then(function (r) { return r.text(); })
+  var origin = window.location.origin;
+  var authBase = origin + '/api/auth';
+  var meUrl = origin + '/api/v1/users/me';
+  var pushUrl = origin + '/api/v1/users/me/push-device';
+  function safeJson(text) {
+    try { return JSON.parse(text); } catch (e) { return null; }
+  }
+  function hasPayloadUser(j) {
+    return !!(j && typeof j === 'object' && j.payload && typeof j.payload === 'object' && j.payload.id);
+  }
+  function signOutAndGoLogin() {
+    try {
+      fetch(authBase + '/csrf', { credentials: 'include' })
+        .then(function(r){ return r.text(); })
+        .then(function(t){
+          var j = safeJson(t);
+          var csrfToken = j && j.csrfToken ? j.csrfToken : null;
+          if (!csrfToken) return;
+          return fetch(authBase + '/signout', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ csrfToken: csrfToken, callbackUrl: origin + '/login' }).toString()
+          });
+        })
+        .then(function(){
+          window.location.href = origin + '/login';
+        })
+        .catch(function(){
+          window.location.href = origin + '/login';
+        });
+    } catch (e) {
+      window.location.href = origin + '/login';
+    }
+  }
+  fetch(meUrl, { credentials: 'include' })
+    .then(function (r) {
+      if (!r.ok) return { ok: false, status: r.status, text: '' };
+      return r.text().then(function (text) { return { ok: true, status: r.status, text: text }; });
+    })
+    .then(function (x) {
+      if (!x.ok) {
+        // 고스트 세션: 세션은 있는데 DB 유저가 없을 때 /users/me 가 404
+        if (x.status === 404) signOutAndGoLogin();
+        return;
+      }
+      var j = safeJson(x.text);
+      // 비로그인(200 payload:null) 또는 고스트 세션(404) 등은 푸시 등록 스킵
+      if (!hasPayloadUser(j)) return;
+      return fetch(pushUrl, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: t, platform: 'ANDROID' })
+      });
+    })
+    .then(function () {})
     .catch(function () {});
 })();
 true;
