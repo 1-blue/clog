@@ -121,10 +121,18 @@ const WebViewScreen: React.FC<IProps> = ({ path = "", authCallbackUrl }) => {
   }
   fetch(meUrl, { credentials: 'include' })
     .then(function (r) {
-      if (!r.ok) return { ok: false, status: r.status, text: '' };
-      return r.text().then(function (text) { return { ok: true, status: r.status, text: text }; });
+      var ghost = false;
+      try {
+        ghost = r.headers && r.headers.get && (r.headers.get('x-clog-ghost-session') === '1');
+      } catch (e) {}
+      if (!r.ok) return { ok: false, status: r.status, text: '', ghost: ghost };
+      return r.text().then(function (text) { return { ok: true, status: r.status, text: text, ghost: ghost }; });
     })
     .then(function (x) {
+      if (x.ghost) {
+        signOutAndGoLogin();
+        return;
+      }
       if (!x.ok) {
         // 고스트 세션: 세션은 있는데 DB 유저가 없을 때 /users/me 가 404
         if (x.status === 404) signOutAndGoLogin();

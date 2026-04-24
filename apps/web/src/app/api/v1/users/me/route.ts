@@ -1,3 +1,5 @@
+import { NextResponse } from "next/server";
+
 import { updateUserSchema } from "@clog/contracts";
 import { prisma } from "@clog/db/prisma";
 
@@ -34,7 +36,14 @@ export const GET = async (request: Request) => {
       include: meInclude,
     });
 
-    if (!user) return errorResponse("유저를 찾을 수 없습니다.", 404);
+    if (!user) {
+      const res = NextResponse.json(
+        { toast: "세션이 유효하지 않습니다. 다시 로그인해 주세요.", payload: null },
+        { status: 200 },
+      );
+      res.headers.set("x-clog-ghost-session", "1");
+      return res;
+    }
 
     const { visitCount, sendCount } = await getUserProfileStats(
       user.id,

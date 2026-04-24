@@ -5,7 +5,25 @@
  */
 export const ssrAwareFetch: typeof fetch = async (input, init) => {
   if (typeof window !== "undefined") {
-    return globalThis.fetch(input, init);
+    const res = await globalThis.fetch(input, init);
+    try {
+      if (res.headers.get("x-clog-ghost-session") === "1") {
+        const w = window as unknown as {
+          __clogGhostSessionHandling?: boolean;
+        };
+        if (!w.__clogGhostSessionHandling) {
+          w.__clogGhostSessionHandling = true;
+          void import("next-auth/react").then(({ signOut }) =>
+            signOut({ redirect: false }).finally(() => {
+              window.location.href = "/login";
+            }),
+          );
+        }
+      }
+    } catch {
+      // ignore
+    }
+    return res;
   }
 
   try {
